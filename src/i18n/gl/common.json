@@ -1,0 +1,15 @@
+{
+  "skipLink": "Saltar ao contido",
+  "prototypeNotice": "Prototipo con datos simulados",
+  "language": {
+    "label": "Idioma"
+  },
+  "home": {
+    "documentTitle": "Inicio · {{appName}}",
+    "title": "Reserva de instalacións deportivas municipais",
+    "intro": "Prototipo en construción. Aquí poderás consultar a dispoñibilidade e reservar as instalacións deportivas do teu concello."
+  },
+  "footer": {
+    "license": "Software libre baixo licenza EUPL-1.2"
+  }
+}
