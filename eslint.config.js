@@ -23,6 +23,9 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
     },
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
+    },
   },
   {
     files: ['**/*.{js,mjs}'],
