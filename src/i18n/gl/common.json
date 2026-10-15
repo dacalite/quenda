@@ -1,15 +1,53 @@
 {
   "skipLink": "Saltar ao contido",
-  "prototypeNotice": "Prototipo con datos simulados",
+  "pageTitle": "{{page}} · {{site}}",
+  "loading": "Cargando…",
   "language": {
     "label": "Idioma"
   },
-  "home": {
-    "documentTitle": "Inicio · {{appName}}",
-    "title": "Reserva de instalacións deportivas municipais",
-    "intro": "Prototipo en construción. Aquí poderás consultar a dispoñibilidade e reservar as instalacións deportivas do teu concello."
+  "preferences": {
+    "open": "Accesibilidade",
+    "title": "Preferencias de visualización",
+    "intro": "Os cambios aplícanse ao momento e súmanse ás preferencias do teu dispositivo.",
+    "textSize": {
+      "label": "Tamaño do texto",
+      "normal": "Normal",
+      "large": "Grande",
+      "xlarge": "Moi grande"
+    },
+    "highContrast": "Alto contraste",
+    "reducedMotion": "Reducir o movemento"
+  },
+  "error": {
+    "title": "Non se puido cargar esta páxina",
+    "body": "Volve tentalo dentro duns intres.",
+    "retry": "Tentar de novo"
+  },
+  "notFound": {
+    "title": "Non atopamos esta páxina",
+    "body": "Pode que o enderezo estea mal escrito ou que a páxina xa non exista.",
+    "home": "Ir ao inicio"
   },
   "footer": {
-    "license": "Software libre baixo licenza EUPL-1.2"
+    "license": "Software libre baixo licenza EUPL-1.2",
+    "prototype": "Prototipo con datos simulados: non se garda nada fóra deste navegador."
+  },
+  "citizen": {
+    "home": {
+      "title": "Reserva de instalacións deportivas",
+      "intro": "Aquí poderás buscar as instalacións do concello, ver cando están libres e reservar desde o móbil. Esta sección está en construción."
+    }
+  },
+  "admin": {
+    "home": {
+      "title": "Panel de xestión",
+      "intro": "Desde aquí o persoal do concello xestionará as instalacións, os horarios, as reservas e os indicadores. Esta sección está en construción."
+    }
+  },
+  "deputacion": {
+    "home": {
+      "title": "Vista da deputación",
+      "intro": "Aquí verás os concellos adheridos e os seus indicadores agregados. Esta sección está en construción."
+    }
   }
 }

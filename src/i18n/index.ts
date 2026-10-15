@@ -3,14 +3,16 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { APP_NAME, DEFAULT_LANGUAGE, LANGUAGES, type Language } from '../config/app';
 import esCommon from './es/common.json';
+import esDemo from './es/demo.json';
 import esUi from './es/ui.json';
 import glCommon from './gl/common.json';
+import glDemo from './gl/demo.json';
 import glUi from './gl/ui.json';
 import { setReactAriaLanguage } from './reactAria';
 
 export const resources = {
-  gl: { common: glCommon, ui: glUi },
-  es: { common: esCommon, ui: esUi },
+  gl: { common: glCommon, ui: glUi, demo: glDemo },
+  es: { common: esCommon, ui: esUi, demo: esDemo },
 } as const;
 
 const STORAGE_KEY = `${APP_NAME}.language`;
