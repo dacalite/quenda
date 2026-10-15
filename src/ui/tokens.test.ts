@@ -10,10 +10,9 @@ function readTokens(selector: string) {
   const start = tokensCss.indexOf(`${selector} {`);
   const block = tokensCss.slice(start, tokensCss.indexOf('}', start));
   return Object.fromEntries(
-    [...block.matchAll(/--(color-[a-z-]+):\s*(#[0-9a-f]{6});/gi)].map(([, name, value]) => [
-      name,
-      value,
-    ]),
+    [...block.matchAll(/--(color-[a-z-]+):\s*(?:var\(--[a-z-]+,\s*)?(#[0-9a-f]{6})\)?;/gi)].map(
+      ([, name, value]) => [name, value],
+    ),
   ) as Record<string, string>;
 }
 

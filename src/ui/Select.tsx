@@ -16,6 +16,8 @@ import styles from './overlays.module.css';
 export interface SelectOption {
   id: string;
   label: string;
+  /** Language of the label when it differs from the page, e.g. language names. */
+  lang?: string;
 }
 
 export interface SelectProps {
@@ -58,14 +60,23 @@ export function Select({
     >
       <FieldLabel isRequired={isRequired}>{label}</FieldLabel>
       <AriaButton className={styles.trigger}>
-        <SelectValue />
+        <SelectValue>
+          {({ isPlaceholder, selectedText, defaultChildren }) =>
+            isPlaceholder ? defaultChildren : selectedText
+          }
+        </SelectValue>
         <Icon name="chevronDown" />
       </AriaButton>
       <FieldHelp description={description} errorMessage={errorMessage} />
       <Popover className={styles.popover}>
         <ListBox className={styles.listbox} items={options}>
           {(option) => (
-            <ListBoxItem id={option.id} textValue={option.label} className={styles.option}>
+            <ListBoxItem
+              id={option.id}
+              textValue={option.label}
+              lang={option.lang}
+              className={styles.option}
+            >
               {({ isSelected }) => (
                 <>
                   <span className={styles.check}>{isSelected && <Icon name="check" />}</span>

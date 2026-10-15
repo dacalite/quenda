@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: EUPL-1.2 */
 
-/* Colour pairs are checked by tokens.test.ts. The tenant overrides --color-primary at runtime. */
+/* Colour pairs are checked by tokens.test.ts. Each council sets --tenant-primary at runtime. */
 :root {
   --font-body: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
 
@@ -12,7 +12,7 @@
   --color-border: #6c6c74;
   --color-border-subtle: #d0d0c8;
   --color-focus: #1d4ed8;
-  --color-primary: #0b5cad;
+  --color-primary: var(--tenant-primary, #0b5cad);
   --color-on-primary: #ffffff;
   --color-primary-surface: color-mix(in srgb, var(--color-primary) 10%, #ffffff);
 
