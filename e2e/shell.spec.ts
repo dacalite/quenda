@@ -28,6 +28,7 @@ test.describe('every view passes axe', () => {
 
   test('with the preferences dialog open, in high contrast', async ({ page }) => {
     await page.goto('./bouzalonga');
+    await expect(heading(page)).toBeVisible();
     await page.getByRole('button', { name: 'Accesibilidade' }).click();
     const dialog = page.getByRole('dialog', { name: 'Preferencias de visualización' });
     // Like a person would, press the visible label rather than the hidden native input.

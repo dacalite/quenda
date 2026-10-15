@@ -53,11 +53,15 @@ export function RedirectToDemoStart() {
   return <LoadingFrame />;
 }
 
-function LoadingFrame() {
+function Loading() {
   const { t } = useTranslation();
+  return <p aria-busy="true">{t('loading')}</p>;
+}
+
+function LoadingFrame() {
   return (
     <SiteFrame name={APP_DISPLAY_NAME} homeHref="/">
-      <p aria-busy="true">{t('loading')}</p>
+      <Loading />
     </SiteFrame>
   );
 }
@@ -81,27 +85,25 @@ export function TenantLayout() {
     };
   }, [primaryColor]);
 
-  if (tenant.isPending) return <LoadingFrame />;
-  if (tenant.isError) {
-    return (
-      <SiteFrame name={APP_DISPLAY_NAME} homeHref="/">
-        {tenant.error instanceof NotFoundError ? (
-          <NotFoundPage />
-        ) : (
-          <ErrorPage onRetry={() => void tenant.refetch()} />
-        )}
-      </SiteFrame>
-    );
-  }
-
+  // One frame for every state, so the header is not remounted when the council finishes loading.
   return (
-    <TenantContext value={tenant.data}>
+    <TenantContext value={tenant.data ?? null}>
       <SiteFrame
-        name={tenant.data.name}
-        emblem={tenant.data.emblem}
-        homeHref={`/${tenant.data.slug}`}
+        name={tenant.data?.name ?? APP_DISPLAY_NAME}
+        emblem={tenant.data?.emblem}
+        homeHref={tenant.data ? `/${tenant.data.slug}` : '/'}
       >
-        <Outlet />
+        {tenant.isPending ? (
+          <Loading />
+        ) : tenant.isError ? (
+          tenant.error instanceof NotFoundError ? (
+            <NotFoundPage />
+          ) : (
+            <ErrorPage onRetry={() => void tenant.refetch()} />
+          )
+        ) : (
+          <Outlet />
+        )}
       </SiteFrame>
     </TenantContext>
   );
