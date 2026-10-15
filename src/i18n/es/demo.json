@@ -1,0 +1,30 @@
+{
+  "region": "Controles de la demostración",
+  "notice": "Prototipo con datos simulados",
+  "show": "Mostrar los controles de la demostración",
+  "hide": "Ocultar los controles de la demostración",
+  "role": {
+    "label": "Ver como",
+    "citizen": "Ciudadanía",
+    "staff": "Personal del ayuntamiento",
+    "deputacion": "Diputación"
+  },
+  "persona": {
+    "label": "Persona",
+    "uxia": "Uxía, 34 años, empadronada, usa sobre todo el móvil",
+    "manuel": "Manuel, 72 años, empadronado, usa lector de pantalla",
+    "brais": "Brais, 19 años, no empadronado",
+    "carme": "Carme, administración",
+    "xose": "Xosé, conserjería y control de acceso"
+  },
+  "tenant": {
+    "label": "Ayuntamiento"
+  },
+  "reset": {
+    "open": "Reiniciar la demostración",
+    "title": "¿Reiniciar la demostración?",
+    "body": "Volverán los datos iniciales. Se perderán las reservas y los cambios que hiciste.",
+    "confirm": "Reiniciar",
+    "done": "Demostración reiniciada con los datos iniciales."
+  }
+}
