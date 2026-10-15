@@ -13,6 +13,11 @@ export class NotFoundError extends Error {
   }
 }
 
+/** 403: the signed-in person may not do this, e.g. a resident reading someone else's booking. */
+export class ForbiddenError extends Error {
+  override readonly name = 'ForbiddenError';
+}
+
 /** 409: the request clashes with the current state, e.g. the slot was just taken. */
 export class ConflictError extends Error {
   override readonly name = 'ConflictError';

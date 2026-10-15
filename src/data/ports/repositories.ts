@@ -1,4 +1,9 @@
 // SPDX-License-Identifier: EUPL-1.2
+import type { Recommendation } from '../../domain/recommendations/recommend';
+import type { AvailabilitySlot } from '../../domain/rules/availability';
+import type { RuleViolation } from '../../domain/rules/booking';
+import type { ModifyViolation } from '../../domain/rules/cancellation';
+import type { PriceQuote } from '../../domain/rules/pricing';
 import type { RecurringConflict } from '../../domain/rules/recurring';
 import type {
   AuditEntry,
@@ -22,6 +27,7 @@ import type {
 } from '../../domain/types';
 
 // Contracts of the future REST API. Every call is scoped by tenant and may reject with the errors in ./errors.
+// Residents only reach their own bookings, profile and notifications; council staff reach everything in their council.
 
 export interface TenantRepository {
   list(): Promise<Tenant[]>;
@@ -36,6 +42,10 @@ export interface FacilityRepository {
   get(tenantId: Id, id: Id): Promise<Facility>;
   create(tenantId: Id, input: FacilityInput): Promise<Facility>;
   update(tenantId: Id, id: Id, patch: Partial<FacilityInput>): Promise<Facility>;
+  /** Public: the status of every slot, without revealing who booked what. */
+  availability(tenantId: Id, facilityId: Id, date: IsoDate): Promise<AvailabilitySlot[]>;
+  /** Public: free slots that are usually quiet on that weekday. */
+  recommendations(tenantId: Id, facilityId: Id, date: IsoDate): Promise<Recommendation[]>;
 }
 
 export interface BlockFilter {
@@ -72,10 +82,18 @@ export interface ReservationInput extends Slot {
   notes?: string;
 }
 
+export interface ReservationQuote {
+  price: PriceQuote;
+  /** Empty when the booking can go ahead. */
+  violations: (RuleViolation | ModifyViolation)[];
+}
+
 export interface ReservationRepository {
   list(tenantId: Id, filter?: ReservationFilter): Promise<Reservation[]>;
   get(tenantId: Id, id: Id): Promise<Reservation>;
   getByCode(tenantId: Id, code: string): Promise<Reservation>;
+  /** Price and rule check without booking anything; `replaces` quotes a change of an existing booking. */
+  quote(tenantId: Id, input: ReservationInput, replaces?: Id): Promise<ReservationQuote>;
   create(tenantId: Id, input: ReservationInput): Promise<Reservation>;
   reschedule(tenantId: Id, id: Id, slot: Slot): Promise<Reservation>;
   cancel(tenantId: Id, id: Id): Promise<Reservation>;
