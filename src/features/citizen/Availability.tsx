@@ -1,0 +1,313 @@
+// SPDX-License-Identifier: EUPL-1.2
+import { useQueries } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
+import { NotFoundPage } from '../../app/pages';
+import { Page } from '../../app/Page';
+import { citizenPaths } from '../../app/routes/paths';
+import type { AvailabilitySlot } from '../../domain/rules/availability';
+import { computePrice } from '../../domain/rules/pricing';
+import { addDays, daypart, startOfWeek, zonedNow, type Daypart } from '../../domain/time';
+import type { Facility, IsoDate } from '../../domain/types';
+import { currentLanguage } from '../../i18n';
+import { useFormat } from '../../i18n/format';
+import { Button } from '../../ui/Button';
+import { DataTable } from '../../ui/DataTable';
+import { DatePicker } from '../../ui/DatePicker';
+import { Icon } from '../../ui/Icon';
+import { Link } from '../../ui/Link';
+import { Select } from '../../ui/Select';
+import { StatusBadge } from '../../ui/StatusBadge';
+import { Tab, TabList, TabPanel, Tabs } from '../../ui/Tabs';
+import styles from './citizen.module.css';
+import { useLocalized, useSlotDescription } from './labels';
+import {
+  useAvailability,
+  useAvailabilityQuery,
+  useCitizen,
+  useFacility,
+  useMe,
+  useRecommendations,
+  useReservation,
+  useSchedule,
+} from './queries';
+
+const DAYPARTS: Daypart[] = ['morning', 'afternoon', 'evening'];
+const isIsoDate = (value: string | null): value is IsoDate =>
+  Boolean(value && /^\d{4}-\d{2}-\d{2}$/.test(value));
+
+export function Availability() {
+  const { facilityId = '' } = useParams();
+  const facility = useFacility(facilityId);
+  if (facility.isError) return <NotFoundPage />;
+  if (!facility.data) return null;
+  return <AvailabilityFor facility={facility.data} />;
+}
+
+function AvailabilityFor({ facility }: { facility: Facility }) {
+  const { t } = useTranslation(['citizen', 'domain', 'common']);
+  const { tenant } = useCitizen();
+  const paths = citizenPaths(tenant.slug);
+  const format = useFormat();
+  const localized = useLocalized();
+  const navigate = useNavigate();
+  const describe = useSlotDescription(facility);
+  const [params] = useSearchParams();
+  const today = zonedNow(new Date(), tenant.timeZone).date;
+
+  const requested = params.get('data');
+  const date = isIsoDate(requested) && requested >= today ? requested : today;
+  const subspaceId =
+    facility.subspaces.find((s) => s.id === params.get('espazo'))?.id ??
+    facility.subspaces[0]?.id ??
+    '';
+  const week = params.get('vista') === 'semana';
+  const replaces = params.get('cambiar') ?? undefined;
+
+  const schedule = useSchedule(facility.id);
+  const me = useMe();
+  const availability = useAvailability(facility.id, date);
+  const recommendations = useRecommendations(facility.id, date);
+  const changing = useReservation(replaces ?? '');
+
+  const go = (changes: { date?: IsoDate; subspaceId?: string; week?: boolean }) => {
+    void navigate(
+      paths.availability(facility.id, {
+        date: changes.date ?? date,
+        subspaceId: changes.subspaceId ?? subspaceId,
+        week: changes.week ?? week,
+        ...(replaces ? { replaces } : {}),
+      }),
+      { replace: changes.week !== undefined },
+    );
+  };
+
+  const slotMinutes = schedule.data?.slotMinutes ?? 60;
+  const user = me.data;
+  // Before signing in we show the resident rate; the review step shows the exact price.
+  const price = user
+    ? computePrice({ kind: 'user', user }, facility.pricing, slotMinutes, slotMinutes).totalCents
+    : facility.pricing.residentCents;
+
+  const bookingHref = (slot: AvailabilitySlot) =>
+    paths.booking({
+      facilityId: facility.id,
+      subspaceId: slot.subspaceId,
+      date: slot.date,
+      start: slot.start,
+      end: slot.end,
+      replaces,
+    });
+
+  const slots = (availability.data ?? []).filter((slot) => slot.subspaceId === subspaceId);
+  const list = new Intl.ListFormat(currentLanguage() === 'gl' ? 'gl-ES' : 'es-ES', {
+    type: 'conjunction',
+  });
+
+  const recommended = (recommendations.data ?? []).flatMap((r) => {
+    const all = availability.data ?? [];
+    const slot =
+      all.find((s) => s.start === r.start && s.subspaceId === subspaceId && s.status === 'free') ??
+      all.find((s) => s.start === r.start && s.status === 'free');
+    return slot ? [{ ...r, slot }] : [];
+  });
+
+  return (
+    <Page title={t('availability.title', { name: facility.name })}>
+      {replaces && changing.data && (
+        <p className={styles.notice} data-tone="info">
+          {t('availability.changing', { code: changing.data.code })}
+        </p>
+      )}
+
+      <div className={styles.row}>
+        <Button
+          isDisabled={date <= today}
+          onPress={() => {
+            go({ date: addDays(date, -1) });
+          }}
+        >
+          <Icon name="chevronLeft" />
+          {t('availability.previousDay')}
+        </Button>
+        <DatePicker
+          label={t('availability.date')}
+          value={date}
+          minValue={today}
+          onChange={(value) => {
+            if (value) go({ date: value });
+          }}
+        />
+        <Button
+          onPress={() => {
+            go({ date: addDays(date, 1) });
+          }}
+        >
+          {t('availability.nextDay')}
+          <Icon name="chevronRight" />
+        </Button>
+        {facility.subspaces.length > 1 && (
+          <Select
+            label={t('availability.subspace')}
+            value={subspaceId}
+            onChange={(value) => {
+              go({ subspaceId: value });
+            }}
+            options={facility.subspaces.map((s) => ({ id: s.id, label: localized(s.name) }))}
+          />
+        )}
+      </div>
+
+      {recommended.length > 0 && (
+        <section className={styles.panel} aria-labelledby="recommendations-title">
+          <h2 id="recommendations-title">{t('availability.recommendationsTitle')}</h2>
+          <p>
+            {t('availability.recommendationsIntro', {
+              times: list.format(recommended.map((r) => r.start)),
+            })}
+          </p>
+          <ul className={styles.stack}>
+            {recommended.map((r) => (
+              <li key={r.start}>
+                <Link href={bookingHref(r.slot)}>
+                  {t('availability.recommendation', {
+                    time: r.start,
+                    percent: format.percent(r.expectedOccupancy),
+                  })}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <Tabs
+        selectedKey={week ? 'week' : 'day'}
+        onSelectionChange={(key) => {
+          go({ week: key === 'week' });
+        }}
+      >
+        <TabList aria-label={t('availability.views')}>
+          <Tab id="day">{t('availability.dayView')}</Tab>
+          <Tab id="week">{t('availability.weekView')}</Tab>
+        </TabList>
+        <TabPanel id="day">
+          {availability.isPending ? (
+            <p aria-busy="true">{t('common:loading')}</p>
+          ) : slots.length === 0 ? (
+            <p>{t('availability.noSlots')}</p>
+          ) : (
+            <>
+              {!slots.some((s) => s.status === 'free') && <p>{t('availability.noFree')}</p>}
+              {DAYPARTS.map((part) => {
+                const partSlots = slots.filter((slot) => daypart(slot.start) === part);
+                if (partSlots.length === 0) return null;
+                return (
+                  <section key={part} className={styles.section} aria-labelledby={`part-${part}`}>
+                    <h2 id={`part-${part}`}>{t(`domain:daypart.${part}`)}</h2>
+                    <ul className={styles.slots}>
+                      {partSlots.map((slot) => (
+                        <li key={slot.start}>
+                          {slot.status === 'free' ? (
+                            <Link
+                              href={bookingHref(slot)}
+                              className={styles.slot}
+                              data-status="free"
+                              aria-label={describe(slot, price)}
+                            >
+                              <span className={styles.slotTime}>
+                                {format.timeRange(slot.start, slot.end)}
+                              </span>
+                              <StatusBadge tone="success">
+                                {t('domain:slotStatus.free')}
+                              </StatusBadge>
+                              <span>{format.price(price)}</span>
+                            </Link>
+                          ) : (
+                            <span className={styles.slot} data-status={slot.status}>
+                              <span className={styles.slotTime}>
+                                {format.timeRange(slot.start, slot.end)}
+                              </span>
+                              <StatusBadge tone={slot.status === 'booked' ? 'neutral' : 'warning'}>
+                                {t(`domain:slotStatus.${slot.status}`)}
+                              </StatusBadge>
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                );
+              })}
+            </>
+          )}
+        </TabPanel>
+        <TabPanel id="week">
+          <WeekGrid
+            facility={facility}
+            date={date}
+            subspaceId={subspaceId}
+            bookingHref={bookingHref}
+            price={price}
+          />
+        </TabPanel>
+      </Tabs>
+    </Page>
+  );
+}
+
+function WeekGrid({
+  facility,
+  date,
+  subspaceId,
+  bookingHref,
+  price,
+}: {
+  facility: Facility;
+  date: IsoDate;
+  subspaceId: string;
+  bookingHref: (slot: AvailabilitySlot) => string;
+  price: number;
+}) {
+  const { t } = useTranslation(['citizen', 'domain']);
+  const format = useFormat();
+  const describe = useSlotDescription(facility);
+  const availabilityQuery = useAvailabilityQuery();
+  const days = Array.from({ length: 7 }, (_, i) => addDays(startOfWeek(date), i));
+  const results = useQueries({ queries: days.map((day) => availabilityQuery(facility.id, day)) });
+  const byDay = days.map((_, i) =>
+    (results[i]?.data ?? []).filter((slot) => slot.subspaceId === subspaceId),
+  );
+  const times = [...new Set(byDay.flat().map((slot) => slot.start))].sort();
+
+  return (
+    <DataTable
+      caption={t('availability.weekCaption', { date: format.longDate(days[0] ?? date) })}
+      rows={times}
+      rowKey={(time) => time}
+      columns={[
+        {
+          key: 'time',
+          header: t('availability.timeColumn'),
+          isRowHeader: true,
+          render: (time) => time,
+        },
+        ...days.map((day, i) => ({
+          key: day,
+          header: format.shortDate(day),
+          render: (time: string) => {
+            const slot = byDay[i]?.find((s) => s.start === time);
+            if (!slot) return '—';
+            return slot.status === 'free' ? (
+              <Link href={bookingHref(slot)} aria-label={describe(slot, price)}>
+                {t('domain:slotStatus.free')}
+              </Link>
+            ) : (
+              t(`domain:slotStatus.${slot.status}`)
+            );
+          },
+        })),
+      ]}
+    />
+  );
+}
