@@ -6,6 +6,8 @@ import {
   type BookingHolder,
 } from '../../../domain/rules/booking';
 import { canCancel, canModify } from '../../../domain/rules/cancellation';
+import { occupancyByStart, recommendSlots } from '../../../domain/recommendations/recommend';
+import { getAvailability } from '../../../domain/rules/availability';
 import { computePrice, initialPaymentStatus } from '../../../domain/rules/pricing';
 import { detectConflicts, expandRecurring } from '../../../domain/rules/recurring';
 import { reservationCode } from '../../../domain/reservationCode';
@@ -23,7 +25,12 @@ import type {
   Slot,
   Tenant,
 } from '../../../domain/types';
-import { ConflictError, NotFoundError, RuleViolationError } from '../../ports/errors';
+import {
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+  RuleViolationError,
+} from '../../ports/errors';
 import type { RecurringBookingInput, Repositories } from '../../ports/repositories';
 import type { LocalDatabase } from './database';
 
@@ -152,10 +159,45 @@ export function createLocalRepositories({
     };
   };
 
-  const isStaff = (tenantId: Id) => {
+  // The server knows who is calling from the session: staff see their whole council,
+  // residents only their own data, and anonymous visitors only public information.
+  const caller = (tenantId: Id) => {
     const id = session()?.userId;
-    const user = id ? data().users.find((u) => u.id === id && u.tenantId === tenantId) : undefined;
-    return user?.role === 'staff' || user?.role === 'admin';
+    return id ? data().users.find((u) => u.id === id && u.tenantId === tenantId) : undefined;
+  };
+  const isStaff = (tenantId: Id) => {
+    const role = caller(tenantId)?.role;
+    return role === 'staff' || role === 'admin';
+  };
+  const requireStaff = (tenantId: Id) => {
+    if (!isStaff(tenantId)) throw new ForbiddenError('Only council staff can do this');
+  };
+  /** The resident's own id, `null` for staff, or a 403 for anonymous callers. */
+  const ownerScope = (tenantId: Id): Id | null => {
+    const user = caller(tenantId);
+    if (!user) throw new ForbiddenError('Sign in first');
+    return user.role === 'citizen' ? user.id : null;
+  };
+  const ownsReservation = (tenantId: Id, reservation: Reservation) => {
+    const owner = ownerScope(tenantId);
+    return (
+      owner === null || (reservation.holder.kind === 'user' && reservation.holder.userId === owner)
+    );
+  };
+  const visibleReservation = (tenantId: Id, id: Id) => {
+    const reservation = findIn(data().reservations, tenantId, id, 'reservation');
+    if (!ownsReservation(tenantId, reservation)) throw new NotFoundError('reservation', id);
+    return reservation;
+  };
+  const requireSelfOrStaff = (tenantId: Id, userId: Id) => {
+    const owner = ownerScope(tenantId);
+    if (owner !== null && owner !== userId) throw new NotFoundError('user', userId);
+  };
+  const requireHolderAllowed = (tenantId: Id, holder: Holder) => {
+    const owner = ownerScope(tenantId);
+    if (owner !== null && (holder.kind !== 'user' || holder.userId !== owner)) {
+      throw new ForbiddenError('Residents can only book for themselves');
+    }
   };
 
   const reject = (violations: ConstructorParameters<typeof RuleViolationError>[0]): never => {
@@ -191,7 +233,7 @@ export function createLocalRepositories({
   };
 
   const mutateReservation = (tenantId: Id, id: Id, change: (r: Reservation) => void) => {
-    const reservation = findIn(data().reservations, tenantId, id, 'reservation');
+    const reservation = visibleReservation(tenantId, id);
     change(reservation);
     db.commit();
     return reservation;
@@ -215,6 +257,7 @@ export function createLocalRepositories({
         }),
       update: (tenantId, patch) =>
         respond(() => {
+          requireStaff(tenantId);
           const tenant = tenantOf(tenantId);
           Object.assign(tenant, patch);
           audit(tenantId, 'update', 'tenant', tenantId, tenant.name);
@@ -228,7 +271,7 @@ export function createLocalRepositories({
       get: (tenantId, id) => respond(() => findIn(data().facilities, tenantId, id, 'facility')),
       create: (tenantId, input) =>
         respond(() => {
-          tenantOf(tenantId);
+          requireStaff(tenantId);
           const facility: Facility = { ...input, id: newId('facility'), tenantId };
           data().facilities.push(facility);
           audit(tenantId, 'create', 'facility', facility.id, facility.name);
@@ -237,11 +280,23 @@ export function createLocalRepositories({
         }),
       update: (tenantId, id, patch) =>
         respond(() => {
+          requireStaff(tenantId);
           const facility = findIn(data().facilities, tenantId, id, 'facility');
           Object.assign(facility, patch);
           audit(tenantId, 'update', 'facility', id, facility.name);
           db.commit();
           return facility;
+        }),
+      availability: (tenantId, facilityId, date) =>
+        respond(() => {
+          const facility = findIn(data().facilities, tenantId, facilityId, 'facility');
+          return getAvailability(facilityContext(tenantId, facility), date);
+        }),
+      recommendations: (tenantId, facilityId, date) =>
+        respond(() => {
+          const facility = findIn(data().facilities, tenantId, facilityId, 'facility');
+          const context = facilityContext(tenantId, facility);
+          return recommendSlots(getAvailability(context, date), occupancyByStart(context, date));
         }),
     },
 
@@ -249,6 +304,7 @@ export function createLocalRepositories({
       get: (tenantId, facilityId) => respond(() => scheduleOf(tenantId, facilityId)),
       save: (tenantId, schedule) =>
         respond(() => {
+          requireStaff(tenantId);
           const facility = findIn(data().facilities, tenantId, schedule.facilityId, 'facility');
           const stored = scheduleOf(tenantId, facility.id);
           Object.assign(stored, { ...schedule, tenantId });
@@ -268,6 +324,7 @@ export function createLocalRepositories({
         ),
       createBlock: (tenantId, input) =>
         respond(() => {
+          requireStaff(tenantId);
           const facility = findIn(data().facilities, tenantId, input.facilityId, 'facility');
           const block = {
             ...input,
@@ -283,6 +340,7 @@ export function createLocalRepositories({
         }),
       deleteBlock: (tenantId, id) =>
         respond(() => {
+          requireStaff(tenantId);
           const block = findIn(data().blocks, tenantId, id, 'block');
           data().blocks = data().blocks.filter((b) => b !== block);
           audit(tenantId, 'delete', 'block', id, block.note);
@@ -295,6 +353,7 @@ export function createLocalRepositories({
         respond(() =>
           scoped(data().reservations, tenantId).filter(
             (r) =>
+              ownsReservation(tenantId, r) &&
               (!filter.facilityId || r.facilityId === filter.facilityId) &&
               (!filter.holder || holderKey(r.holder) === holderKey(filter.holder)) &&
               (!filter.from || r.date >= filter.from) &&
@@ -302,20 +361,36 @@ export function createLocalRepositories({
               (!filter.status || filter.status.includes(r.status)),
           ),
         ),
-      get: (tenantId, id) =>
-        respond(() => findIn(data().reservations, tenantId, id, 'reservation')),
+      get: (tenantId, id) => respond(() => visibleReservation(tenantId, id)),
       getByCode: (tenantId, code) =>
         respond(() => {
           const normalized = code.trim().toUpperCase();
           const reservation = scoped(data().reservations, tenantId).find(
             (r) => r.code === normalized,
           );
-          if (!reservation) throw new NotFoundError('reservation', code);
+          if (!reservation || !ownsReservation(tenantId, reservation)) {
+            throw new NotFoundError('reservation', code);
+          }
           return reservation;
+        }),
+      quote: (tenantId, input, replaces) =>
+        respond(() => {
+          const { holder, channel: _channel, notes: _notes, ...slot } = input;
+          requireHolderAllowed(tenantId, holder);
+          const bookingHolder = holderOf(tenantId, holder);
+          const context = bookingContext(tenantId, slot.facilityId, holder);
+          const decision = replaces
+            ? canModify(context, bookingHolder, visibleReservation(tenantId, replaces), slot)
+            : canBook(context, bookingHolder, slot);
+          return {
+            price: price(tenantId, slot, bookingHolder),
+            violations: decision.ok ? [] : decision.violations,
+          };
         }),
       create: (tenantId, input) =>
         respond(() => {
           const { holder, channel, notes = '', ...slot } = input;
+          requireHolderAllowed(tenantId, holder);
           const bookingHolder = holderOf(tenantId, holder);
           const decision = canBook(
             bookingContext(tenantId, slot.facilityId, holder),
@@ -348,7 +423,7 @@ export function createLocalRepositories({
         }),
       reschedule: (tenantId, id, slot) =>
         respond(() => {
-          const reservation = findIn(data().reservations, tenantId, id, 'reservation');
+          const reservation = visibleReservation(tenantId, id);
           const bookingHolder = holderOf(tenantId, reservation.holder);
           const decision = canModify(
             bookingContext(tenantId, slot.facilityId, reservation.holder),
@@ -387,8 +462,9 @@ export function createLocalRepositories({
           }),
         ),
       checkIn: (tenantId, id) =>
-        respond(() =>
-          mutateReservation(tenantId, id, (reservation) => {
+        respond(() => {
+          requireStaff(tenantId);
+          return mutateReservation(tenantId, id, (reservation) => {
             if (
               reservation.status !== 'confirmed' ||
               reservation.date !== localNow(tenantId).date
@@ -398,11 +474,12 @@ export function createLocalRepositories({
             reservation.checkedInAt = instant();
             reservation.history.push(event('checkedIn'));
             audit(tenantId, 'checkIn', 'reservation', id, reservation.code);
-          }),
-        ),
+          });
+        }),
       markNoShow: (tenantId, id) =>
-        respond(() =>
-          mutateReservation(tenantId, id, (reservation) => {
+        respond(() => {
+          requireStaff(tenantId);
+          return mutateReservation(tenantId, id, (reservation) => {
             if (reservation.status !== 'confirmed' || reservation.checkedInAt) {
               throw new ConflictError(
                 'Only confirmed reservations without check-in can be no-shows',
@@ -411,8 +488,8 @@ export function createLocalRepositories({
             reservation.status = 'noShow';
             reservation.history.push(event('noShow'));
             audit(tenantId, 'noShow', 'reservation', id, reservation.code);
-          }),
-        ),
+          });
+        }),
     },
 
     recurringBookings: {
@@ -426,12 +503,14 @@ export function createLocalRepositories({
         ),
       preview: (tenantId, input) =>
         respond(() => {
+          requireStaff(tenantId);
           findIn(data().entities, tenantId, input.entityId, 'entity');
           const { context, dates } = recurringConflicts(tenantId, input);
           return detectConflicts(context, input, dates);
         }),
       create: (tenantId, input) =>
         respond(() => {
+          requireStaff(tenantId);
           const entity = findIn(data().entities, tenantId, input.entityId, 'entity');
           const { context, dates } = recurringConflicts(tenantId, input);
           const conflicts = new Set(detectConflicts(context, input, dates).map((c) => c.date));
@@ -474,6 +553,7 @@ export function createLocalRepositories({
     users: {
       list: (tenantId, filter = {}) =>
         respond(() => {
+          requireStaff(tenantId);
           const search = filter.search?.trim().toLowerCase();
           const digits = search?.replace(/\D/g, '');
           return scoped(data().users, tenantId).filter(
@@ -484,10 +564,14 @@ export function createLocalRepositories({
                 (!!digits && u.phone.replace(/\D/g, '').includes(digits))),
           );
         }),
-      get: (tenantId, id) => respond(() => findIn(data().users, tenantId, id, 'user')),
+      get: (tenantId, id) =>
+        respond(() => {
+          requireSelfOrStaff(tenantId, id);
+          return findIn(data().users, tenantId, id, 'user');
+        }),
       create: (tenantId, input) =>
         respond(() => {
-          tenantOf(tenantId);
+          requireStaff(tenantId);
           const user = { ...input, id: newId('user'), tenantId };
           data().users.push(user);
           audit(tenantId, 'create', 'user', user.id, `${user.firstName} ${user.lastName}`);
@@ -496,6 +580,7 @@ export function createLocalRepositories({
         }),
       update: (tenantId, id, patch) =>
         respond(() => {
+          requireSelfOrStaff(tenantId, id);
           const user = findIn(data().users, tenantId, id, 'user');
           Object.assign(user, patch);
           db.commit();
@@ -510,14 +595,16 @@ export function createLocalRepositories({
 
     notifications: {
       list: (tenantId, userId) =>
-        respond(() =>
-          scoped(data().notifications, tenantId)
+        respond(() => {
+          requireSelfOrStaff(tenantId, userId);
+          return scoped(data().notifications, tenantId)
             .filter((n) => n.userId === userId)
-            .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
-        ),
+            .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        }),
       markRead: (tenantId, id) =>
         respond(() => {
           const notification = findIn(data().notifications, tenantId, id, 'notification');
+          requireSelfOrStaff(tenantId, notification.userId);
           notification.readAt ??= instant();
           db.commit();
           return notification;
@@ -526,7 +613,10 @@ export function createLocalRepositories({
 
     audit: {
       list: (tenantId) =>
-        respond(() => scoped(data().audit, tenantId).sort((a, b) => b.at.localeCompare(a.at))),
+        respond(() => {
+          requireStaff(tenantId);
+          return scoped(data().audit, tenantId).sort((a, b) => b.at.localeCompare(a.at));
+        }),
     },
   };
 

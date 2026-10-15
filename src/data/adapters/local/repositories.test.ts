@@ -3,7 +3,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getAvailability } from '../../../domain/rules/availability';
 import { addDays } from '../../../domain/time';
 import type { Holder, IsoDate, Slot } from '../../../domain/types';
-import { ConflictError, NotFoundError, RuleViolationError } from '../../ports/errors';
+import {
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+  RuleViolationError,
+} from '../../ports/errors';
 import { generateSeed, personaUserId } from '../../seed/generate';
 import { createRandom } from '../../seed/random';
 import { createLocalDatabase, type Database } from './database';
@@ -15,6 +20,12 @@ const TOMORROW = addDays(TODAY, 1);
 const SEED = generateSeed(TODAY);
 const A = 'bouzalonga';
 const B = 'ribasmeiras';
+const STAFF_A = personaUserId(A, 'carme');
+const STAFF_B = personaUserId(B, 'carme');
+
+const uxia: Holder = { kind: 'user', userId: personaUserId(B, 'uxia') };
+const manuel: Holder = { kind: 'user', userId: personaUserId(B, 'manuel') };
+const brais: Holder = { kind: 'user', userId: personaUserId(B, 'brais') };
 
 class MemoryStorage implements Storage {
   #items = new Map<string, string>();
@@ -38,12 +49,15 @@ class MemoryStorage implements Storage {
   }
 }
 
-function setup({ userId = personaUserId(B, 'uxia'), storage = new MemoryStorage() } = {}) {
-  let session = { userId };
+function setup({
+  userId = STAFF_B,
+  storage = new MemoryStorage(),
+}: { userId?: string | null; storage?: MemoryStorage } = {}) {
+  let session = userId;
   const db = createLocalDatabase(storage, 'test.db', () => structuredClone(SEED));
   const repos = createLocalRepositories({
     db,
-    session: () => session,
+    session: () => (session ? { userId: session } : null),
     now: () => NOW,
     latency: false,
     random: createRandom(7).next,
@@ -51,8 +65,8 @@ function setup({ userId = personaUserId(B, 'uxia'), storage = new MemoryStorage(
   return {
     repos,
     db,
-    actAs: (id: string) => {
-      session = { userId: id };
+    actAs: (id: string | null) => {
+      session = id;
     },
   };
 }
@@ -86,16 +100,13 @@ function freeSlot(db: Database, facilityId: string, date: IsoDate, exclude: Slot
   };
 }
 
-const uxia: Holder = { kind: 'user', userId: personaUserId(B, 'uxia') };
-const manuel: Holder = { kind: 'user', userId: personaUserId(B, 'manuel') };
-
 afterEach(() => {
   vi.useRealTimers();
 });
 
 describe('tenant isolation', () => {
   it('never returns rows that belong to another council', async () => {
-    const { repos } = setup();
+    const { repos } = setup({ userId: STAFF_A });
     const lists = await Promise.all([
       repos.facilities.list(A),
       repos.reservations.list(A),
@@ -114,7 +125,7 @@ describe('tenant isolation', () => {
   });
 
   it('answers "not found" when asked for another council’s row by id or code', async () => {
-    const { repos, db } = setup();
+    const { repos, db } = setup({ userId: STAFF_A });
     const data = db.read();
     const foreign = <T extends { tenantId: string }>(rows: T[]) => {
       const row = rows.find((r) => r.tenantId === B);
@@ -125,6 +136,9 @@ describe('tenant isolation', () => {
     const reservation = foreign(data.reservations);
 
     await expect(repos.facilities.get(A, facility.id)).rejects.toBeInstanceOf(NotFoundError);
+    await expect(repos.facilities.availability(A, facility.id, TODAY)).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
     await expect(repos.schedules.get(A, facility.id)).rejects.toBeInstanceOf(NotFoundError);
     await expect(repos.reservations.get(A, reservation.id)).rejects.toBeInstanceOf(NotFoundError);
     await expect(repos.reservations.getByCode(A, reservation.code)).rejects.toBeInstanceOf(
@@ -146,22 +160,142 @@ describe('tenant isolation', () => {
   });
 
   it('refuses to book another council’s facility or on behalf of its residents', async () => {
-    const { repos, db } = setup();
+    const { repos, db } = setup({ userId: STAFF_A });
     const foreignSlot = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
     await expect(
-      repos.reservations.create(A, { ...foreignSlot, holder: uxia, channel: 'web' }),
+      repos.reservations.create(A, { ...foreignSlot, holder: uxia, channel: 'phone' }),
     ).rejects.toBeInstanceOf(NotFoundError);
 
     const localSlot = freeSlot(db.read(), `${A}-tenis`, TOMORROW);
     await expect(
-      repos.reservations.create(A, { ...localSlot, holder: uxia, channel: 'web' }),
+      repos.reservations.create(A, { ...localSlot, holder: uxia, channel: 'phone' }),
     ).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it('treats staff of one council as anonymous in another', async () => {
+    const { repos } = setup({ userId: STAFF_B });
+    await expect(repos.reservations.list(A)).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(repos.users.list(A)).rejects.toBeInstanceOf(ForbiddenError);
+  });
+});
+
+describe('authorization', () => {
+  it('shows residents only their own bookings', async () => {
+    const { repos, db } = setup({ userId: uxia.userId });
+    const own = await repos.reservations.list(B);
+    expect(own.length).toBeGreaterThan(0);
+    expect(own.every((r) => r.holder.kind === 'user' && r.holder.userId === uxia.userId)).toBe(
+      true,
+    );
+
+    const other = db
+      .read()
+      .reservations.find((r) => r.tenantId === B && r.holder.kind === 'entity');
+    if (!other) throw new Error('missing fixture');
+    await expect(repos.reservations.get(B, other.id)).rejects.toBeInstanceOf(NotFoundError);
+    await expect(repos.reservations.getByCode(B, other.code)).rejects.toBeInstanceOf(NotFoundError);
+    await expect(repos.reservations.cancel(B, other.id)).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it('lets residents book, read and change only for themselves', async () => {
+    const { repos, db } = setup({ userId: uxia.userId });
+    const slot = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
+    await expect(
+      repos.reservations.create(B, { ...slot, holder: manuel, channel: 'web' }),
+    ).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(
+      repos.reservations.quote(B, { ...slot, holder: manuel, channel: 'web' }),
+    ).rejects.toBeInstanceOf(ForbiddenError);
+
+    expect((await repos.users.get(B, uxia.userId)).firstName).toBe('Uxía');
+    await expect(repos.users.get(B, manuel.userId)).rejects.toBeInstanceOf(NotFoundError);
+    await expect(
+      repos.users.update(B, manuel.userId, { phone: '600000000' }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+    await expect(repos.notifications.list(B, manuel.userId)).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it('keeps council tools for staff', async () => {
+    const { repos } = setup({ userId: uxia.userId });
+    const [facility] = await repos.facilities.list(B);
+    if (!facility) throw new Error('missing fixture');
+    await expect(repos.users.list(B)).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(repos.audit.list(B)).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(repos.facilities.update(B, facility.id, { name: 'X' })).rejects.toBeInstanceOf(
+      ForbiddenError,
+    );
+    await expect(repos.tenants.update(B, { name: 'X' })).rejects.toBeInstanceOf(ForbiddenError);
+    const own = (await repos.reservations.list(B))[0];
+    if (!own) throw new Error('missing fixture');
+    await expect(repos.reservations.checkIn(B, own.id)).rejects.toBeInstanceOf(ForbiddenError);
+  });
+
+  it('gives anonymous visitors public information only', async () => {
+    const { repos } = setup({ userId: null });
+    const facilities = await repos.facilities.list(B);
+    expect(facilities.length).toBeGreaterThan(0);
+    const facility = facilities[0];
+    if (!facility) throw new Error('missing fixture');
+    expect(await repos.facilities.availability(B, facility.id, TOMORROW)).not.toHaveLength(0);
+    await expect(repos.reservations.list(B)).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(repos.users.get(B, uxia.userId)).rejects.toBeInstanceOf(ForbiddenError);
+  });
+});
+
+describe('availability and recommendations', () => {
+  it('reports slot status without revealing who booked', async () => {
+    const { repos, db } = setup({ userId: uxia.userId });
+    const slot = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
+    await repos.reservations.create(B, { ...slot, holder: uxia, channel: 'web' });
+
+    const slots = await repos.facilities.availability(B, `${B}-tenis`, TOMORROW);
+    const booked = slots.find((s) => s.start === slot.start);
+    expect(booked?.status).toBe('booked');
+    expect(Object.keys(booked ?? {}).sort()).toEqual(
+      ['capacity', 'date', 'end', 'facilityId', 'start', 'status', 'subspaceId', 'taken'].sort(),
+    );
+  });
+
+  it('recommends usually quiet free times', async () => {
+    const { repos } = setup({ userId: null });
+    const recommendations = await repos.facilities.recommendations(B, `${B}-padel`, TOMORROW);
+    expect(recommendations.length).toBeGreaterThan(0);
+    expect(recommendations.every((r) => r.expectedOccupancy <= 0.4)).toBe(true);
   });
 });
 
 describe('reservations', () => {
+  it('quotes the price and the broken rules before booking', async () => {
+    const { repos, db } = setup({ userId: brais.userId });
+    const tennis = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
+    expect(
+      await repos.reservations.quote(B, { ...tennis, holder: brais, channel: 'web' }),
+    ).toMatchObject({ violations: [], price: { totalCents: 700, tariff: 'nonResident' } });
+
+    const pool = freeSlot(db.read(), `${B}-piscina`, TOMORROW);
+    const quote = await repos.reservations.quote(B, { ...pool, holder: brais, channel: 'web' });
+    expect(quote.violations).toEqual([{ code: 'residentsOnly' }]);
+  });
+
+  it('quotes a change of an existing booking with the modification rules', async () => {
+    const { repos, db } = setup({ userId: uxia.userId });
+    const first = freeSlot(db.read(), `${B}-tenis`, addDays(TODAY, 3));
+    const reservation = await repos.reservations.create(B, {
+      ...first,
+      holder: uxia,
+      channel: 'web',
+    });
+    const other = freeSlot(db.read(), `${B}-tenis`, addDays(TODAY, 4));
+    const quote = await repos.reservations.quote(
+      B,
+      { ...other, holder: uxia, channel: 'web' },
+      reservation.id,
+    );
+    expect(quote.violations).toEqual([]);
+  });
+
   it('creates a priced, notified and audited reservation', async () => {
-    const { repos, db } = setup();
+    const { repos, db, actAs } = setup({ userId: uxia.userId });
     const slot = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
     const reservation = await repos.reservations.create(B, {
       ...slot,
@@ -180,11 +314,12 @@ describe('reservations', () => {
     expect(await repos.reservations.getByCode(B, reservation.code.toLowerCase())).toEqual(
       reservation,
     );
-
     const notifications = await repos.notifications.list(B, uxia.userId);
     expect(notifications.find((n) => n.reservationId === reservation.id)?.type).toBe(
       'confirmation',
     );
+
+    actAs(STAFF_B);
     const audit = await repos.audit.list(B);
     expect(audit.find((e) => e.subjectId === reservation.id)?.action).toBe('create');
   });
@@ -192,22 +327,21 @@ describe('reservations', () => {
   it('rejects a taken slot with a conflict and broken rules with their reasons', async () => {
     const { repos, db } = setup();
     const slot = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
-    await repos.reservations.create(B, { ...slot, holder: uxia, channel: 'web' });
+    await repos.reservations.create(B, { ...slot, holder: uxia, channel: 'phone' });
     await expect(
       repos.reservations.create(B, { ...slot, holder: manuel, channel: 'phone' }),
     ).rejects.toBeInstanceOf(ConflictError);
 
-    const brais: Holder = { kind: 'user', userId: personaUserId(B, 'brais') };
     const pool = freeSlot(db.read(), `${B}-piscina`, TOMORROW);
     const error: unknown = await repos.reservations
-      .create(B, { ...pool, holder: brais, channel: 'web' })
+      .create(B, { ...pool, holder: brais, channel: 'inPerson' })
       .catch((e: unknown) => e);
     expect(error).toBeInstanceOf(RuleViolationError);
     expect((error as RuleViolationError).violations).toEqual([{ code: 'residentsOnly' }]);
   });
 
   it('reschedules and cancels, keeping history and notifying the holder', async () => {
-    const { repos, db } = setup();
+    const { repos, db } = setup({ userId: uxia.userId });
     const first = freeSlot(db.read(), `${B}-tenis`, addDays(TODAY, 3));
     const reservation = await repos.reservations.create(B, {
       ...first,
@@ -231,14 +365,14 @@ describe('reservations', () => {
   });
 
   it('tells the holder when the council cancels for them', async () => {
-    const { repos, db, actAs } = setup();
+    const { repos, db, actAs } = setup({ userId: uxia.userId });
     const slot = freeSlot(db.read(), `${B}-tenis`, addDays(TODAY, 3));
     const reservation = await repos.reservations.create(B, {
       ...slot,
       holder: uxia,
       channel: 'web',
     });
-    actAs(personaUserId(B, 'carme'));
+    actAs(STAFF_B);
     await repos.reservations.cancel(B, reservation.id);
     const types = (await repos.notifications.list(B, uxia.userId))
       .filter((n) => n.reservationId === reservation.id)
@@ -303,7 +437,7 @@ describe('recurring bookings', () => {
   });
 
   it('books every date without a conflict, for free', async () => {
-    const { repos } = setup({ userId: personaUserId(B, 'carme') });
+    const { repos } = setup();
     const input = pattern('court-1', '09:00', '10:00');
     const conflicts = await repos.recurringBookings.preview(B, input);
     const booking = await repos.recurringBookings.create(B, input);
@@ -330,7 +464,7 @@ describe('other repositories', () => {
   });
 
   it('creates and updates council data, leaving an audit trail', async () => {
-    const { repos } = setup({ userId: personaUserId(B, 'carme') });
+    const { repos } = setup();
     const [template] = await repos.facilities.list(B);
     if (!template) throw new Error('missing fixture');
     const { id: templateId, tenantId: _tenantId, ...input } = template;
@@ -380,7 +514,7 @@ describe('other repositories', () => {
   });
 
   it('marks notifications as read only once', async () => {
-    const { repos } = setup();
+    const { repos } = setup({ userId: uxia.userId });
     const [notification] = await repos.notifications.list(B, uxia.userId);
     if (!notification) throw new Error('missing fixture');
     const read = await repos.notifications.markRead(B, notification.id);
@@ -400,7 +534,7 @@ describe('adapter behaviour', () => {
 
   it('persists changes and restores the seed on reset', async () => {
     const storage = new MemoryStorage();
-    const first = setup({ storage });
+    const first = setup({ storage, userId: uxia.userId });
     const slot = freeSlot(first.db.read(), `${B}-tenis`, TOMORROW);
     const reservation = await first.repos.reservations.create(B, {
       ...slot,
@@ -408,7 +542,7 @@ describe('adapter behaviour', () => {
       channel: 'web',
     });
 
-    const second = setup({ storage });
+    const second = setup({ storage, userId: uxia.userId });
     expect((await second.repos.reservations.get(B, reservation.id)).code).toBe(reservation.code);
 
     second.db.reset();
