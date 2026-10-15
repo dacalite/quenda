@@ -29,7 +29,7 @@ jobs:
         run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
-      # GitHub Pages has no SPA rewrites: unknown paths serve 404.html, so it must be the app.
+      # Pages has no SPA rewrites.
       - name: Fallback de SPA
         run: cp dist/index.html dist/404.html
       - uses: actions/configure-pages@v6

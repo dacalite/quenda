@@ -4,7 +4,6 @@ import { expect, type Page } from '@playwright/test';
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 
-/** Fails on any axe violation, not only serious/critical ones: the bar is WCAG 2.1 AA with no exceptions. */
 export async function expectNoAxeViolations(page: Page) {
   const { violations } = await new AxeBuilder({ page }).withTags(TAGS).analyze();
   const summary = violations.map(

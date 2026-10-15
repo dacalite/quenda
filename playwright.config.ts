@@ -14,7 +14,6 @@ export default defineConfig({
     locale: 'gl-ES',
     trace: 'retain-on-failure',
   },
-  // Every screen must pass on both a phone and a desktop viewport.
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile', use: { ...devices['Pixel 7'] } },

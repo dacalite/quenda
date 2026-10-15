@@ -26,7 +26,7 @@ i18n.on('languageChanged', (language) => {
   try {
     localStorage.setItem(STORAGE_KEY, language);
   } catch {
-    // Storage blocked (private mode): the choice simply lasts for this visit.
+    // Storage unavailable: the choice lasts for this visit only.
   }
 });
 
@@ -37,7 +37,7 @@ void i18n.use(initReactI18next).init({
   supportedLngs: LANGUAGES,
   defaultNS: 'common',
   initAsync: false,
-  interpolation: { escapeValue: false }, // React already escapes output
+  interpolation: { escapeValue: false },
 });
 
 export default i18n;

@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: EUPL-1.2
-// Fails when a source file lacks the EUPL-1.2 SPDX header in its first three lines.
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 

@@ -35,7 +35,7 @@ body {
   outline-offset: 2px;
 }
 
-/* Programmatic focus targets (skip link destination, page headings) are not controls. */
+/* Programmatic focus targets, not controls. */
 [tabindex='-1']:focus {
   outline: none;
 }
