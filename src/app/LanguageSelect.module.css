@@ -1,0 +1,17 @@
+/* SPDX-License-Identifier: EUPL-1.2 */
+
+.field {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.select {
+  min-height: var(--target-min);
+  padding-inline: var(--space-2);
+  font: inherit;
+  color: inherit;
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
+}
