@@ -364,6 +364,81 @@ function seedTenant(
     }
   }
 
+  // A council closure cancelled one of Uxía's bookings next week; her notices offer to move it.
+  {
+    const { facility, seed: facilitySeed } = facilityOf(seed.personaFacility.uxia);
+    const subspace = facility.subspaces[0];
+    const date = addDays(thisMonday, 7 + 3 - 1);
+    const uxiaId = personaUserId(tenantId, 'uxia');
+    if (subspace && !holidayDates.has(date)) {
+      const note = 'Reparación do valado da pista';
+      const at = `${addDays(today, -1)}T09:15:00.000Z`;
+      const blockId = `${tenantId}-block-2`;
+      db.blocks.push({
+        id: blockId,
+        tenantId,
+        facilityId: facility.id,
+        subspaceId: subspace.id,
+        dates: { from: date, to: date },
+        times: { start: '16:00', end: '20:00' },
+        reason: 'maintenance',
+        note,
+        createdAt: at,
+        createdBy: admin,
+      });
+      occupiedOn(facility, date).push({
+        subspaceId: '*',
+        start: toMinutes('16:00'),
+        end: toMinutes('20:00'),
+        blocking: true,
+      });
+      const cancelled = addReservation({
+        facility,
+        slotMinutes: facilitySeed.slotMinutes,
+        subspaceId: subspace.id,
+        date,
+        start: toMinutes('18:00'),
+        end: toMinutes('18:00') + facilitySeed.slotMinutes,
+        holder: { kind: 'user', userId: uxiaId },
+        status: 'cancelled',
+        channel: 'web',
+      });
+      cancelled.createdAt = `${addDays(today, -3)}T18:00:00.000Z`;
+      cancelled.history = [{ at, by: admin, type: 'cancelled', detail: note }];
+      db.notifications.push({
+        id: `${tenantId}-notice-1`,
+        tenantId,
+        userId: uxiaId,
+        type: 'councilNotice',
+        channel: 'app',
+        createdAt: at,
+        reservationId: cancelled.id,
+      });
+      db.audit.push(
+        {
+          id: `${tenantId}-audit-${blockId}`,
+          tenantId,
+          at,
+          actorId: admin,
+          action: 'create',
+          subject: 'block',
+          subjectId: blockId,
+          label: facility.name,
+        },
+        {
+          id: `${tenantId}-audit-${cancelled.id}`,
+          tenantId,
+          at,
+          actorId: admin,
+          action: 'cancel',
+          subject: 'reservation',
+          subjectId: cancelled.id,
+          label: cancelled.code,
+        },
+      );
+    }
+  }
+
   // Each citizen persona has a short, readable history and one booking next week.
   const plans: {
     key: 'uxia' | 'manuel' | 'brais';

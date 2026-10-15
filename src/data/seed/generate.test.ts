@@ -98,6 +98,18 @@ describe('generateSeed', () => {
     }
   });
 
+  it('tells Uxía that a council closure cancelled one of her bookings', () => {
+    for (const tenant of db.tenants) {
+      const notice = db.notifications.find(
+        (n) => n.userId === personaUserId(tenant.id, 'uxia') && n.type === 'councilNotice',
+      );
+      const reservation = db.reservations.find((r) => r.id === notice?.reservationId);
+      expect(reservation?.status).toBe('cancelled');
+      expect(reservation?.history[0]?.detail).toBeTruthy();
+      expect(reservation && reservation.date > TODAY).toBe(true);
+    }
+  });
+
   it('marks Manuel as the screen reader persona with large text', () => {
     const manuel = db.users.find((u) => u.id === personaUserId('bouzalonga', 'manuel'));
     expect(manuel?.preferences.accessibility.textSize).toBe('large');
