@@ -1,0 +1,49 @@
+/* SPDX-License-Identifier: EUPL-1.2 */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.label {
+  font-weight: 700;
+}
+
+.required {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.description {
+  font-size: var(--font-size-2);
+  color: var(--color-text-muted);
+}
+
+.error {
+  display: flex;
+  gap: var(--space-1);
+  align-items: flex-start;
+  font-size: var(--font-size-2);
+  font-weight: 700;
+  color: var(--color-danger);
+}
+
+.input {
+  width: 100%;
+  max-width: 32rem;
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  color: inherit;
+  background: var(--color-background);
+  border: var(--control-border-width) solid var(--color-border);
+  border-radius: var(--radius-1);
+}
+
+.input[data-invalid],
+.field[data-invalid] .input {
+  border-color: var(--color-danger);
+  border-width: 3px;
+}

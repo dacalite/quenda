@@ -4,4 +4,7 @@ import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
 import '../i18n';
 
+// jsdom has no layout, so it lacks this method.
+Element.prototype.scrollIntoView = () => undefined;
+
 afterEach(cleanup);
