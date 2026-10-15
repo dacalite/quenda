@@ -7,7 +7,16 @@ import { useSite } from './contexts';
 import styles from './Page.module.css';
 
 /** Every view: one h1, the document title and, after navigating, focus and an announcement. */
-export function Page({ title, children }: { title: string; children?: ReactNode }) {
+export function Page({
+  title,
+  announcement,
+  children,
+}: {
+  title: string;
+  /** What screen readers hear after navigating here, when it should say more than the title. */
+  announcement?: string;
+  children?: ReactNode;
+}) {
   const { t } = useTranslation();
   const site = useSite();
   const { key } = useLocation();
@@ -15,7 +24,7 @@ export function Page({ title, children }: { title: string; children?: ReactNode 
   const heading = useRef<HTMLHeadingElement>(null);
   const onNavigate = useEffectEvent(() => {
     heading.current?.focus();
-    announce(title);
+    announce(announcement ?? title);
   });
 
   useEffect(() => {

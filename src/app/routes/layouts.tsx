@@ -6,6 +6,7 @@ import { Navigate, Outlet, useHref, useNavigate, useParams } from 'react-router'
 import { APP_DISPLAY_NAME } from '../../config/app';
 import { NotFoundError } from '../../data/ports/errors';
 import { DEPUTACION } from '../../data/seed/catalog';
+import { CitizenNav } from '../../features/citizen/CitizenNav';
 import { DemoBar } from '../../features/demo/DemoBar';
 import { accessibleColor } from '../../ui/contrast';
 import { SkipLink } from '../../ui/SkipLink';
@@ -14,7 +15,7 @@ import { ErrorPage, NotFoundPage } from '../pages';
 import { useTenantBySlug, useTenants } from '../queries';
 import { SiteFrame } from '../SiteFrame';
 import { useDemo, usePreferences } from '../state';
-import { DEPUTACION_PATH, roleHome } from './paths';
+import { citizenPaths, DEPUTACION_PATH, LEGAL_PAGES, roleHome } from './paths';
 
 function useApplyPreferences() {
   const { textSize, highContrast, reducedMotion } = usePreferences();
@@ -67,7 +68,9 @@ function LoadingFrame() {
 }
 
 export function TenantLayout() {
+  const { t } = useTranslation('citizen');
   const { tenantSlug = '' } = useParams();
+  const role = useDemo((state) => state.role);
   const tenant = useTenantBySlug(tenantSlug);
   const setTenantId = useDemo((state) => state.setTenantId);
   const primaryColor = tenant.data?.primaryColor;
@@ -92,6 +95,16 @@ export function TenantLayout() {
         name={tenant.data?.name ?? APP_DISPLAY_NAME}
         emblem={tenant.data?.emblem}
         homeHref={tenant.data ? `/${tenant.data.slug}` : '/'}
+        nav={tenant.data && role === 'citizen' ? <CitizenNav /> : undefined}
+        footerLabel={t('legal.nav')}
+        footerLinks={
+          tenant.data
+            ? (Object.keys(LEGAL_PAGES) as (keyof typeof LEGAL_PAGES)[]).map((page) => ({
+                href: citizenPaths(tenantSlug).legal(page),
+                label: t(`legal.${LEGAL_PAGES[page]}`),
+              }))
+            : []
+        }
       >
         {tenant.isPending ? (
           <Loading />

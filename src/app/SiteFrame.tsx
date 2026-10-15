@@ -13,10 +13,21 @@ export interface SiteFrameProps {
   name: string;
   homeHref: string;
   emblem?: EmblemKind | undefined;
+  nav?: ReactNode;
+  footerLinks?: { href: string; label: string }[];
+  footerLabel?: string;
   children: ReactNode;
 }
 
-export function SiteFrame({ name, homeHref, emblem, children }: SiteFrameProps) {
+export function SiteFrame({
+  name,
+  homeHref,
+  emblem,
+  nav,
+  footerLinks = [],
+  footerLabel,
+  children,
+}: SiteFrameProps) {
   const { t } = useTranslation();
   return (
     <SiteContext value={{ name }}>
@@ -30,6 +41,7 @@ export function SiteFrame({ name, homeHref, emblem, children }: SiteFrameProps) 
             <LanguageSelect />
             <PreferencesDialog />
           </div>
+          {nav}
         </div>
       </header>
       <main id="main" tabIndex={-1} className={styles.main}>
@@ -37,6 +49,17 @@ export function SiteFrame({ name, homeHref, emblem, children }: SiteFrameProps) 
       </main>
       <footer className={styles.footer}>
         <div className={styles.inner}>
+          {footerLinks.length > 0 && (
+            <nav aria-label={footerLabel}>
+              <ul className={styles.footerLinks}>
+                {footerLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href}>{link.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
           <p>{t('footer.prototype')}</p>
           <p>{t('footer.license')}</p>
         </div>
