@@ -30,9 +30,9 @@ export function makeFacility(overrides: Partial<Facility> = {}): Facility {
     coordinates: { lat: 0, lng: 0 },
     capacity: 22,
     subspaces: [
-      { id: 'half-a', name: 'Medio campo A', capacity: 1, contains: [] },
-      { id: 'half-b', name: 'Medio campo B', capacity: 1, contains: [] },
-      { id: 'whole', name: 'Campo enteiro', capacity: 1, contains: ['half-a', 'half-b'] },
+      { id: 'half-a', name: text('Medio campo A'), capacity: 1, contains: [] },
+      { id: 'half-b', name: text('Medio campo B'), capacity: 1, contains: [] },
+      { id: 'whole', name: text('Campo enteiro'), capacity: 1, contains: ['half-a', 'half-b'] },
     ],
     accessibility: [],
     photos: [],

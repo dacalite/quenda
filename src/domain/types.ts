@@ -97,7 +97,7 @@ export interface Pricing {
 
 export interface Subspace {
   id: Id;
-  name: string;
+  name: LocalizedText;
   /** Simultaneous bookings allowed (gym places); 1 means exclusive use. */
   capacity: number;
   /** Subspaces this one also occupies, e.g. the whole pitch contains both halves. */
@@ -299,5 +299,6 @@ export interface AuditEntry {
   action: AuditAction;
   subject: AuditSubject;
   subjectId: Id;
-  summary: string;
+  /** Human label of the subject at the time, e.g. a reservation code or facility name. */
+  label: string;
 }
