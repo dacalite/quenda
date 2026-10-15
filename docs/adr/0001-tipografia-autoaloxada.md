@@ -5,7 +5,7 @@
 
 ## Contexto
 
-O plan fixa a tipografía Atkinson Hyperlegible, deseñada polo Braille Institute para persoas con baixa visión, servida desde o propio despregamento: nada de Google Fonts nin CDN. En 2025 publicouse Atkinson Hyperlegible Next, que amplía os pesos e o xogo de caracteres e mantén os mesmos criterios de lexibilidade.
+A proposta usa a tipografía Atkinson Hyperlegible, deseñada polo Braille Institute para persoas con baixa visión, servida desde o propio despregamento, sen Google Fonts nin CDN. En 2025 publicouse Atkinson Hyperlegible Next, que amplía os pesos e o xogo de caracteres e mantén os mesmos criterios de lexibilidade.
 
 ## Decisión
 

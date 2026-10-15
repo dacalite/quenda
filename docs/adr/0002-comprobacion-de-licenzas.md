@@ -5,7 +5,7 @@
 
 ## Contexto
 
-O plan esixe que todas as dependencias teñan licenzas aprobadas pola OSI e que `npm run licenses` falle se non é así. O paquete `license-checker`, o máis coñecido, leva anos sen mantemento.
+O proxecto só admite dependencias con licenzas aprobadas pola OSI, e `npm run licenses` debe fallar se aparece outra. O paquete `license-checker`, o máis coñecido, leva anos sen mantemento.
 
 ## Decisión
 

@@ -1,6 +1,6 @@
 # Estado dos requisitos
 
-Trazabilidade entre o checklist oficial do reto (§1.5 do plan) e o prototipo. Actualízase ao pechar cada fase.
+Trazabilidade entre os requisitos oficiais do reto e o prototipo. Actualízase ao pechar cada fase.
 
 Lenda: ✅ feito · 🟡 en curso · ⬜ pendente
 
