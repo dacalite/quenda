@@ -105,6 +105,9 @@ export function createGalicianIntl(native: IntlConstructors) {
       );
       const { month: monthWidth, weekday: weekdayWidth = 'long' } = this.#options;
       return parts.map((part) => {
+        if (part.type === 'literal') {
+          return { ...part, value: part.value.replace(/\ba las\b/, 'ás').replace(/\ba la\b/, 'á') };
+        }
         if (part.type === 'weekday') {
           return { ...part, value: WEEKDAYS[weekdayWidth][weekday] ?? part.value };
         }

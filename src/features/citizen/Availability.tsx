@@ -163,7 +163,7 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
           <h2 id="recommendations-title">{t('availability.recommendationsTitle')}</h2>
           <p>
             {t('availability.recommendationsIntro', {
-              times: list.format(recommended.map((r) => r.start)),
+              times: list.format(recommended.map((r) => r.start).sort()),
             })}
           </p>
           <ul className={styles.stack}>
@@ -197,7 +197,7 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
           ) : slots.length === 0 ? (
             <p>{t('availability.noSlots')}</p>
           ) : (
-            <>
+            <div className={styles.dayparts}>
               {!slots.some((s) => s.status === 'free') && <p>{t('availability.noFree')}</p>}
               {DAYPARTS.map((part) => {
                 const partSlots = slots.filter((slot) => daypart(slot.start) === part);
@@ -239,7 +239,7 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
                   </section>
                 );
               })}
-            </>
+            </div>
           )}
         </TabPanel>
         <TabPanel id="week">

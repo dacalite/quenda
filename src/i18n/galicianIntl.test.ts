@@ -34,6 +34,20 @@ describe('Galician Intl fallback', () => {
     ).toBe('xuño de 2026');
   });
 
+  it('says «ás» before the time, as Galician does', () => {
+    const withTime = new gl.DateTimeFormat('gl', {
+      day: 'numeric',
+      month: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'UTC',
+    });
+    // ICU versions differ: «15 de outubro, 22:53» (Node) or «… a las 22:53» (Chrome) in Spanish.
+    expect(withTime.format(new Date('2026-10-15T22:53:00Z'))).toMatch(
+      /^15 de outubro(, | ás )22:53$/,
+    );
+  });
+
   it('respects the time zone when choosing the day', () => {
     const madrid = new gl.DateTimeFormat('gl', { weekday: 'long', timeZone: 'Europe/Madrid' });
     expect(madrid.format(new Date('2026-10-19T22:30:00Z'))).toBe('martes');
