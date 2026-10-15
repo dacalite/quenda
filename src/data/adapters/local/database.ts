@@ -45,6 +45,8 @@ export function createLocalDatabase(
   storage: Storage | null,
   key: string,
   seed: () => Database,
+  /** Stored data that should be replaced by a fresh seed, e.g. a demo opened weeks later. */
+  isStale: (db: Database) => boolean = () => false,
 ): LocalDatabase {
   let data: Database | null = null;
 
@@ -52,7 +54,7 @@ export function createLocalDatabase(
     try {
       const stored = storage?.getItem(key);
       const parsed = stored ? (JSON.parse(stored) as Database) : null;
-      if (parsed?.version === SCHEMA_VERSION) return parsed;
+      if (parsed?.version === SCHEMA_VERSION && !isStale(parsed)) return parsed;
     } catch {
       // Corrupt or unreadable data: start again from the seed.
     }

@@ -425,6 +425,18 @@ describe('adapter behaviour', () => {
     expect(await setup({ storage }).repos.tenants.list()).toHaveLength(2);
   });
 
+  it('can replace stored data that has gone stale', () => {
+    const storage = new MemoryStorage();
+    storage.setItem('test.db', JSON.stringify({ ...SEED, generatedFor: '2026-09-01' }));
+    const db = createLocalDatabase(
+      storage,
+      'test.db',
+      () => structuredClone(SEED),
+      (stored) => stored.generatedFor < '2026-10-08',
+    );
+    expect(db.read().generatedFor).toBe(TODAY);
+  });
+
   it('keeps working in memory when storage is full', async () => {
     const storage = new MemoryStorage();
     storage.setItem = () => {
