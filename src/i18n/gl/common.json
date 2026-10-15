@@ -49,5 +49,6 @@
       "title": "Vista da deputación",
       "intro": "Aquí verás os concellos adheridos e os seus indicadores agregados. Esta sección está en construción."
     }
-  }
+  },
+  "timeRange": "{{start}} a {{end}}"
 }
