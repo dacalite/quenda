@@ -1,0 +1,115 @@
+/* SPDX-License-Identifier: EUPL-1.2 */
+
+.group {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  min-height: var(--target-min);
+  padding-inline-start: var(--space-3);
+  background: var(--color-background);
+  border: var(--control-border-width) solid var(--color-border);
+  border-radius: var(--radius-1);
+}
+
+.group[data-invalid] {
+  border-color: var(--color-danger);
+  border-width: 3px;
+}
+
+.group[data-focus-within] {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.input {
+  display: flex;
+  flex-wrap: wrap;
+  padding-inline-end: var(--space-2);
+}
+
+.segment {
+  padding: 0 0.1em;
+  border-radius: var(--radius-1);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+
+.segment[data-placeholder] {
+  color: var(--color-text-muted);
+}
+
+.segment[data-focused] {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+}
+
+.calendarButton {
+  min-height: calc(var(--target-min) - 2 * var(--control-border-width));
+  border-radius: 0;
+  border-inline-start: var(--control-border-width) solid var(--color-border);
+}
+
+.calendar {
+  padding: var(--space-3);
+}
+
+.calendarHeader {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: var(--space-2);
+}
+
+.calendarHeading {
+  margin: 0;
+  font-size: var(--font-size-3);
+  text-transform: capitalize;
+}
+
+.grid {
+  border-collapse: collapse;
+}
+
+.grid th {
+  font-size: var(--font-size-1);
+  color: var(--color-text-muted);
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--target-min);
+  height: var(--target-min);
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+}
+
+.cell[data-outside-month] {
+  display: none;
+}
+
+.cell[data-hovered] {
+  background: var(--color-primary-surface);
+}
+
+.cell[data-selected] {
+  font-weight: 700;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+}
+
+.cell[data-focus-visible] {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.cell[data-disabled],
+.cell[data-unavailable] {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+  cursor: not-allowed;
+}

@@ -1,0 +1,64 @@
+/* SPDX-License-Identifier: EUPL-1.2 */
+
+.choice {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: var(--target-min);
+  padding-block: var(--space-1);
+  cursor: pointer;
+}
+
+.box,
+.circle {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-on-primary);
+  background: var(--color-background);
+  border: var(--control-border-width) solid var(--color-border);
+}
+
+.box {
+  border-radius: var(--radius-1);
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+.choice[data-selected] .box {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.choice[data-selected] .circle {
+  border-color: var(--color-primary);
+  box-shadow: inset 0 0 0 0.3rem var(--color-background);
+  background: var(--color-primary);
+}
+
+.choice[data-focus-visible] .box,
+.choice[data-focus-visible] .circle {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.choice[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+}
+
+.choiceDescription {
+  display: block;
+  font-size: var(--font-size-2);
+  color: var(--color-text-muted);
+}

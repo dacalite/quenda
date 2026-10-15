@@ -1,0 +1,22 @@
+{
+  "field": {
+    "required": "obligatorio"
+  },
+  "errorSummary": {
+    "title_one": "Hay {{count}} error en el formulario",
+    "title_other": "Hay {{count}} errores en el formulario"
+  },
+  "dialog": {
+    "close": "Cerrar"
+  },
+  "confirm": {
+    "cancel": "Cancelar"
+  },
+  "toast": {
+    "region": "Avisos",
+    "dismiss": "Cerrar el aviso"
+  },
+  "select": {
+    "placeholder": "Elige una opción"
+  }
+}

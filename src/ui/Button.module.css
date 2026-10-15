@@ -1,0 +1,67 @@
+/* SPDX-License-Identifier: EUPL-1.2 */
+
+.button {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  border: var(--control-border-width) solid transparent;
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  transition: background-color var(--duration);
+}
+
+.button[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.primary {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+}
+
+.primary[data-hovered],
+.primary[data-pressed] {
+  background: color-mix(in srgb, var(--color-primary) 82%, #000000);
+}
+
+.secondary {
+  color: var(--color-primary);
+  background: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+.secondary[data-hovered],
+.secondary[data-pressed] {
+  background: var(--color-primary-surface);
+}
+
+.danger {
+  color: #ffffff;
+  background: var(--color-danger);
+}
+
+.danger[data-hovered],
+.danger[data-pressed] {
+  background: color-mix(in srgb, var(--color-danger) 82%, #000000);
+}
+
+.quiet {
+  padding-inline: var(--space-2);
+  color: var(--color-primary);
+  background: transparent;
+}
+
+.quiet[data-hovered],
+.quiet[data-pressed] {
+  background: var(--color-primary-surface);
+}

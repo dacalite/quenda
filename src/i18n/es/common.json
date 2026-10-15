@@ -1,15 +1,53 @@
 {
   "skipLink": "Saltar al contenido",
-  "prototypeNotice": "Prototipo con datos simulados",
+  "pageTitle": "{{page}} · {{site}}",
+  "loading": "Cargando…",
   "language": {
     "label": "Idioma"
   },
-  "home": {
-    "documentTitle": "Inicio · {{appName}}",
-    "title": "Reserva de instalaciones deportivas municipales",
-    "intro": "Prototipo en construcción. Aquí podrás consultar la disponibilidad y reservar las instalaciones deportivas de tu ayuntamiento."
+  "preferences": {
+    "open": "Accesibilidad",
+    "title": "Preferencias de visualización",
+    "intro": "Los cambios se aplican al momento y se suman a las preferencias de tu dispositivo.",
+    "textSize": {
+      "label": "Tamaño del texto",
+      "normal": "Normal",
+      "large": "Grande",
+      "xlarge": "Muy grande"
+    },
+    "highContrast": "Alto contraste",
+    "reducedMotion": "Reducir el movimiento"
+  },
+  "error": {
+    "title": "No se pudo cargar esta página",
+    "body": "Vuelve a intentarlo dentro de unos instantes.",
+    "retry": "Reintentar"
+  },
+  "notFound": {
+    "title": "No encontramos esta página",
+    "body": "Puede que la dirección esté mal escrita o que la página ya no exista.",
+    "home": "Ir al inicio"
   },
   "footer": {
-    "license": "Software libre bajo licencia EUPL-1.2"
+    "license": "Software libre bajo licencia EUPL-1.2",
+    "prototype": "Prototipo con datos simulados: no se guarda nada fuera de este navegador."
+  },
+  "citizen": {
+    "home": {
+      "title": "Reserva de instalaciones deportivas",
+      "intro": "Aquí podrás buscar las instalaciones del ayuntamiento, ver cuándo están libres y reservar desde el móvil. Esta sección está en construcción."
+    }
+  },
+  "admin": {
+    "home": {
+      "title": "Panel de gestión",
+      "intro": "Desde aquí el personal del ayuntamiento gestionará las instalaciones, los horarios, las reservas y los indicadores. Esta sección está en construcción."
+    }
+  },
+  "deputacion": {
+    "home": {
+      "title": "Vista de la diputación",
+      "intro": "Aquí verás los ayuntamientos adheridos y sus indicadores agregados. Esta sección está en construcción."
+    }
   }
 }

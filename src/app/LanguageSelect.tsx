@@ -1,28 +1,23 @@
 // SPDX-License-Identifier: EUPL-1.2
-import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LANGUAGES, LANGUAGE_NAMES } from '../config/app';
-import styles from './LanguageSelect.module.css';
+import { LANGUAGE_NAMES, LANGUAGES } from '../config/app';
+import { currentLanguage } from '../i18n';
+import { Select } from '../ui/Select';
+
+const OPTIONS = LANGUAGES.map((language) => ({
+  id: language,
+  label: LANGUAGE_NAMES[language],
+  lang: language,
+}));
 
 export function LanguageSelect() {
   const { t, i18n } = useTranslation();
-  const id = useId();
-
   return (
-    <div className={styles.field}>
-      <label htmlFor={id}>{t('language.label')}</label>
-      <select
-        id={id}
-        className={styles.select}
-        value={i18n.resolvedLanguage}
-        onChange={(event) => void i18n.changeLanguage(event.target.value)}
-      >
-        {LANGUAGES.map((language) => (
-          <option key={language} value={language} lang={language}>
-            {LANGUAGE_NAMES[language]}
-          </option>
-        ))}
-      </select>
-    </div>
+    <Select
+      label={t('language.label')}
+      options={OPTIONS}
+      value={currentLanguage()}
+      onChange={(language) => void i18n.changeLanguage(language)}
+    />
   );
 }

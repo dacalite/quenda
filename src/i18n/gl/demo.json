@@ -1,0 +1,30 @@
+{
+  "region": "Controis da demostración",
+  "notice": "Prototipo con datos simulados",
+  "show": "Amosar os controis da demostración",
+  "hide": "Ocultar os controis da demostración",
+  "role": {
+    "label": "Ver como",
+    "citizen": "Cidadanía",
+    "staff": "Persoal do concello",
+    "deputacion": "Deputación"
+  },
+  "persona": {
+    "label": "Persoa",
+    "uxia": "Uxía, 34 anos, empadroada, usa sobre todo o móbil",
+    "manuel": "Manuel, 72 anos, empadroado, usa lector de pantalla",
+    "brais": "Brais, 19 anos, non empadroado",
+    "carme": "Carme, administración",
+    "xose": "Xosé, conserxería e control de acceso"
+  },
+  "tenant": {
+    "label": "Concello"
+  },
+  "reset": {
+    "open": "Reiniciar a demostración",
+    "title": "Reiniciar a demostración?",
+    "body": "Volverán os datos iniciais. Perderanse as reservas e os cambios que fixeches.",
+    "confirm": "Reiniciar",
+    "done": "Demostración reiniciada cos datos iniciais."
+  }
+}

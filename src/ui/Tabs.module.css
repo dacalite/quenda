@@ -1,0 +1,40 @@
+/* SPDX-License-Identifier: EUPL-1.2 */
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  border-bottom: var(--control-border-width) solid var(--color-border);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-4);
+  margin-block-end: calc(-1 * var(--control-border-width));
+  font-weight: 700;
+  color: var(--color-text-muted);
+  border-bottom: 4px solid transparent;
+  cursor: pointer;
+  outline: none;
+}
+
+.tab[data-hovered] {
+  color: var(--color-text);
+}
+
+.tab[data-selected] {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.tab[data-focus-visible],
+.panel[data-focus-visible] {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.panel {
+  padding-block: var(--space-4);
+}
