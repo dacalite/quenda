@@ -1,0 +1,88 @@
+/* SPDX-License-Identifier: EUPL-1.2 */
+
+/* Colour pairs are checked by tokens.test.ts. The tenant overrides --color-primary at runtime. */
+:root {
+  --font-body: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+
+  --color-text: #1b1b1f;
+  --color-text-muted: #4b4b55;
+  --color-background: #ffffff;
+  --color-surface: #f4f4f0;
+  --color-surface-strong: #e6e6df;
+  --color-border: #6c6c74;
+  --color-border-subtle: #d0d0c8;
+  --color-focus: #1d4ed8;
+  --color-primary: #0b5cad;
+  --color-on-primary: #ffffff;
+  --color-primary-surface: color-mix(in srgb, var(--color-primary) 10%, #ffffff);
+
+  --color-success: #1d6b36;
+  --color-success-surface: #e7f4ea;
+  --color-warning: #8a4a00;
+  --color-warning-surface: #fff3df;
+  --color-danger: #b42318;
+  --color-danger-surface: #fdecea;
+  --color-info: #1d4ed8;
+  --color-info-surface: #e9effd;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+  --space-6: 4rem;
+
+  --radius-1: 4px;
+  --radius-2: 8px;
+  --radius-3: 12px;
+  --border-width: 1px;
+  --control-border-width: 2px;
+  --focus-width: 3px;
+
+  --font-size-1: 0.875rem;
+  --font-size-2: 1rem;
+  --font-size-3: 1.125rem;
+  --font-size-4: 1.375rem;
+  --font-size-5: 1.75rem;
+  --font-size-6: 2.25rem;
+  --line-height: 1.5;
+
+  --target-min: 44px;
+  --content-max: 72rem;
+  --shadow-1: 0 1px 3px rgb(0 0 0 / 12%);
+  --shadow-2: 0 8px 24px rgb(0 0 0 / 18%);
+  --duration: 150ms;
+}
+
+:root[data-contrast='high'] {
+  --color-text: #000000;
+  --color-text-muted: #000000;
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-strong: #ffffff;
+  --color-border: #000000;
+  --color-border-subtle: #000000;
+  --color-focus: #0033cc;
+  --color-primary: #000000;
+  --color-on-primary: #ffffff;
+  --color-primary-surface: #ffffff;
+  --color-success: #00501f;
+  --color-success-surface: #ffffff;
+  --color-warning: #5c3100;
+  --color-warning-surface: #ffffff;
+  --color-danger: #8a0000;
+  --color-danger-surface: #ffffff;
+  --color-info: #002f99;
+  --color-info-surface: #ffffff;
+  --border-width: 2px;
+  --control-border-width: 3px;
+  --focus-width: 4px;
+}
+
+:root[data-text-size='large'] {
+  font-size: 125%;
+}
+
+:root[data-text-size='xlarge'] {
+  font-size: 150%;
+}
