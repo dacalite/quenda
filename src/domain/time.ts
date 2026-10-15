@@ -38,6 +38,12 @@ export const rangesOverlap = (a: TimeRange, b: TimeRange) =>
 export const minutesBetween = (from: LocalDateTime, to: LocalDateTime) =>
   daysBetween(from.date, to.date) * MINUTES_PER_DAY + toMinutes(to.time) - toMinutes(from.time);
 
+export type Daypart = 'morning' | 'afternoon' | 'evening';
+
+/** Groups slots the way people talk about them: mañá, tarde, noite. */
+export const daypart = (time: Time): Daypart =>
+  time < '14:00' ? 'morning' : time < '20:00' ? 'afternoon' : 'evening';
+
 export function zonedNow(now: Date, timeZone: string): LocalDateTime {
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat('en-CA', {

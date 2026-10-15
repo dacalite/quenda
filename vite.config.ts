@@ -14,7 +14,7 @@ export default defineConfig({
       include: ['src/domain/**'],
       exclude: ['src/domain/**/*.test-utils.ts', 'src/domain/types.ts'],
       thresholds: {
-        'src/domain/rules/**': { statements: 90, branches: 90, functions: 90, lines: 90 },
+        'src/domain/**': { statements: 90, branches: 90, functions: 90, lines: 90 },
       },
     },
   },
