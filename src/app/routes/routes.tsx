@@ -29,6 +29,7 @@ import { RequireCitizen } from '../../features/citizen/RequireCitizen';
 import { ReservationDetail } from '../../features/citizen/ReservationDetail';
 import { IdentityProvider, SignIn } from '../../features/citizen/SignIn';
 import { DeputacionHome } from '../../features/deputacion/DeputacionHome';
+import { NewCouncil } from '../../features/deputacion/NewCouncil';
 import { NotFoundPage } from '../pages';
 import { AppShell, DeputacionLayout, RedirectToDemoStart, TenantLayout } from './layouts';
 import { ADMIN_PATH, DEPUTACION_PATH, LEGAL_PAGES } from './paths';
@@ -44,7 +45,11 @@ export const routes: RouteObject[] = [
       {
         path: DEPUTACION_PATH,
         element: <DeputacionLayout />,
-        children: [{ index: true, element: <DeputacionHome /> }],
+        children: [
+          { index: true, element: <DeputacionHome /> },
+          { path: 'novo-concello', element: <NewCouncil /> },
+          { path: '*', element: <NotFoundPage /> },
+        ],
       },
       {
         path: ':tenantSlug',

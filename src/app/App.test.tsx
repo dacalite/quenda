@@ -100,9 +100,9 @@ describe('app shell', () => {
 
     await choose(/Ver como/, 'Deputación');
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Vista da deputación' }),
+      await screen.findByRole('heading', { level: 1, name: 'Concellos adheridos' }),
     ).toBeInTheDocument();
-    expect(document.title).toBe('Vista da deputación · Deputación de Exemplo');
+    expect(document.title).toBe('Concellos adheridos · Deputación de Exemplo');
     expect(demoBar().queryByRole('button', { name: /Concello/ })).not.toBeInTheDocument();
   });
 

@@ -33,11 +33,5 @@
     "license": "Software libre baixo licenza EUPL-1.2",
     "prototype": "Prototipo con datos simulados: non se garda nada fóra deste navegador."
   },
-  "deputacion": {
-    "home": {
-      "title": "Vista da deputación",
-      "intro": "Aquí verás os concellos adheridos e os seus indicadores agregados. Esta sección está en construción."
-    }
-  },
   "timeRange": "{{start}} a {{end}}"
 }
