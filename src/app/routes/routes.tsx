@@ -3,9 +3,12 @@ import type { RouteObject } from 'react-router';
 import { AccessControl } from '../../features/admin/AccessControl';
 import { AdminHome } from '../../features/admin/AdminHome';
 import { Agenda } from '../../features/admin/Agenda';
+import { Facilities } from '../../features/admin/Facilities';
+import { EditFacility, NewFacility } from '../../features/admin/FacilityForm';
 import { NewBooking } from '../../features/admin/NewBooking';
-import { RequireStaff } from '../../features/admin/RequireStaff';
+import { RequireAdmin, RequireStaff } from '../../features/admin/RequireStaff';
 import { ReservationRecord } from '../../features/admin/ReservationRecord';
+import { ScheduleEditor } from '../../features/admin/ScheduleEditor';
 import { Availability } from '../../features/citizen/Availability';
 import { BookingReview } from '../../features/citizen/BookingReview';
 import { CalendarPage } from '../../features/citizen/CalendarPage';
@@ -25,6 +28,7 @@ import { AppShell, DeputacionLayout, RedirectToDemoStart, TenantLayout } from '.
 import { ADMIN_PATH, DEPUTACION_PATH, LEGAL_PAGES } from './paths';
 
 const personal = (element: React.ReactNode) => <RequireCitizen>{element}</RequireCitizen>;
+const adminOnly = (element: React.ReactNode) => <RequireAdmin>{element}</RequireAdmin>;
 
 export const routes: RouteObject[] = [
   {
@@ -65,6 +69,10 @@ export const routes: RouteObject[] = [
               { path: 'nova-reserva', element: <NewBooking /> },
               { path: 'reservas/:reservationId', element: <ReservationRecord /> },
               { path: 'acceso', element: <AccessControl /> },
+              { path: 'instalacions', element: adminOnly(<Facilities />) },
+              { path: 'instalacions/nova', element: adminOnly(<NewFacility />) },
+              { path: 'instalacions/:facilityId', element: adminOnly(<EditFacility />) },
+              { path: 'instalacions/:facilityId/horario', element: adminOnly(<ScheduleEditor />) },
             ],
           },
           { path: '*', element: <NotFoundPage /> },
