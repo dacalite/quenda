@@ -44,6 +44,7 @@ beforeEach(() => {
     staff: 'carme',
     tenantId: null,
     collapsed: false,
+    signedIn: false,
   });
   usePreferences.setState({ textSize: 'normal', highContrast: false, reducedMotion: false });
 });
@@ -67,7 +68,10 @@ describe('app shell', () => {
     expect(screen.getByRole('banner')).toHaveTextContent('Concello de Bouzalonga');
     expect(screen.getByRole('contentinfo')).toHaveTextContent('Prototipo con datos simulados');
     expect(useDemo.getState().tenantId).toBe('bouzalonga');
-    expect(sessionUserId()).toBe('bouzalonga-uxia');
+    // Nobody is signed in until they go through the simulated Cl@ve or Chave365 gateway.
+    expect(sessionUserId()).toBeNull();
+    const menu = within(screen.getByRole('navigation', { name: 'Menú principal' }));
+    expect(menu.getByRole('link', { name: 'Acceder' })).toBeInTheDocument();
     await expectNoAxeViolations();
   });
 
@@ -103,6 +107,7 @@ describe('app shell', () => {
   });
 
   it('gives Manuel large text when he becomes the demo persona', async () => {
+    useDemo.setState({ signedIn: true });
     renderApp('/bouzalonga');
     await screen.findByRole('heading', { level: 1 });
     await choose(/Persoa/, 'Manuel, 72 anos, empadroado, usa lector de pantalla');

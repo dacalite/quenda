@@ -11,6 +11,7 @@ import {
   toMinutes,
   weekdayOf,
   zonedNow,
+  daypart,
 } from './time';
 
 describe('time helpers', () => {
@@ -49,6 +50,17 @@ describe('time helpers', () => {
     expect(
       minutesBetween({ date: '2026-10-19', time: '23:00' }, { date: '2026-10-20', time: '01:30' }),
     ).toBe(150);
+  });
+
+  it('groups times into morning, afternoon and evening', () => {
+    expect(['09:00', '13:30', '14:00', '19:30', '20:00', '22:30'].map(daypart)).toEqual([
+      'morning',
+      'morning',
+      'afternoon',
+      'afternoon',
+      'evening',
+      'evening',
+    ]);
   });
 
   it('reads the wall-clock time of a time zone', () => {

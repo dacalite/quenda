@@ -1,0 +1,93 @@
+{
+  "facilityType": {
+    "sportsHall": "Pavillón",
+    "paddleCourt": "Pádel",
+    "tennisCourt": "Tenis",
+    "footballPitch": "Campo de fútbol",
+    "swimmingPool": "Piscina",
+    "multipurposeRoom": "Sala multiusos",
+    "gym": "Ximnasio"
+  },
+  "accessibility": {
+    "stepFreeAccess": "Acceso sen chanzos",
+    "adaptedChangingRoom": "Vestiario adaptado",
+    "adaptedToilet": "Aseo adaptado",
+    "reservedParking": "Aparcadoiro reservado",
+    "hearingLoop": "Bucle magnético para audiófonos"
+  },
+  "concession": {
+    "minor": "Menores de idade",
+    "senior": "Maiores de 65 anos",
+    "disability": "Diversidade funcional",
+    "largeFamily": "Familia numerosa"
+  },
+  "tariff": {
+    "resident": "Persoas empadroadas",
+    "nonResident": "Persoas non empadroadas",
+    "entity": "Clubs e asociacións"
+  },
+  "slotStatus": {
+    "free": "libre",
+    "booked": "ocupada",
+    "blocked": "pechada por mantemento ou evento",
+    "closed": "pechado",
+    "past": "xa pasou"
+  },
+  "reservationStatus": {
+    "confirmed": "Confirmada",
+    "cancelled": "Cancelada",
+    "completed": "Feita",
+    "noShow": "Non presentada"
+  },
+  "payment": {
+    "free": "Gratuíta",
+    "pending": "Pendente de pagamento (simulado)",
+    "paid": "Pagada (simulado)"
+  },
+  "channel": {
+    "web": "Web",
+    "phone": "Teléfono",
+    "inPerson": "Presencial"
+  },
+  "daypart": {
+    "morning": "Mañá",
+    "afternoon": "Tarde",
+    "evening": "Noite"
+  },
+  "violation": {
+    "facilityInactive": "Esta instalación non admite reservas neste momento.",
+    "past": "Esa hora xa pasou.",
+    "closed": "A instalación está pechada ese día.",
+    "unavailable": "Esa hora xa está ocupada ou bloqueada.",
+    "outsideOpeningHours": "A instalación non abre a esa hora.",
+    "misaligned": "As reservas empezan en franxas de {{slotMinutes}} minutos.",
+    "tooSoon_one": "Hai que reservar con polo menos {{count}} hora de antelación.",
+    "tooSoon_other": "Hai que reservar con polo menos {{count}} horas de antelación.",
+    "tooFarAhead_one": "Só podes reservar con ata {{count}} día de antelación.",
+    "tooFarAhead_other": "Só podes reservar con ata {{count}} días de antelación.",
+    "tooShort": "A reserva ten que durar polo menos {{minutes}} minutos.",
+    "tooLong": "A reserva non pode durar máis de {{minutes}} minutos.",
+    "weeklyLimit_one": "Xa tes {{count}} reserva esta semana, que é o máximo permitido.",
+    "weeklyLimit_other": "Xa tes {{count}} reservas esta semana, que é o máximo permitido.",
+    "residentsOnly": "Esta instalación só se pode reservar se estás empadroado ou empadroada no concello.",
+    "entitiesOnly": "Esta instalación resérvana só os clubs e as asociacións.",
+    "suspended": "Non podes reservar ata o {{until}} por non presentarte a reservas anteriores.",
+    "notCancellable": "Esta reserva xa non se pode cancelar.",
+    "alreadyStarted": "Esta reserva xa comezou.",
+    "modificationWindowClosed_one": "Os cambios só se poden facer ata {{count}} hora antes.",
+    "modificationWindowClosed_other": "Os cambios só se poden facer ata {{count}} horas antes."
+  },
+  "notificationType": {
+    "confirmation": "Reserva confirmada",
+    "reminder": "Recordatorio",
+    "change": "Reserva cambiada",
+    "cancellation": "Reserva cancelada",
+    "councilNotice": "Aviso do concello",
+    "slotReleased": "Hora libre"
+  },
+  "notificationChannel": {
+    "app": "Na aplicación",
+    "email": "Correo electrónico",
+    "sms": "SMS"
+  }
+}

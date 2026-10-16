@@ -17,11 +17,14 @@ interface DemoState {
   /** Council being shown, set from the URL. */
   tenantId: Id | null;
   collapsed: boolean;
+  /** Residents sign in through the simulated Cl@ve or Chave365 screen. */
+  signedIn: boolean;
   setRole: (role: DemoRole) => void;
   setCitizen: (persona: CitizenPersona) => void;
   setStaff: (persona: StaffPersona) => void;
   setTenantId: (tenantId: Id | null) => void;
   setCollapsed: (collapsed: boolean) => void;
+  setSignedIn: (signedIn: boolean) => void;
 }
 
 export const useDemo = create<DemoState>()(
@@ -32,6 +35,7 @@ export const useDemo = create<DemoState>()(
       staff: 'carme',
       tenantId: null,
       collapsed: false,
+      signedIn: false,
       setRole: (role) => {
         set({ role });
       },
@@ -47,17 +51,26 @@ export const useDemo = create<DemoState>()(
       setCollapsed: (collapsed) => {
         set({ collapsed });
       },
+      setSignedIn: (signedIn) => {
+        set({ signedIn });
+      },
     }),
     {
       name: `${APP_NAME}.demo`,
-      partialize: ({ role, citizen, staff, collapsed }) => ({ role, citizen, staff, collapsed }),
+      partialize: ({ role, citizen, staff, collapsed, signedIn }) => ({
+        role,
+        citizen,
+        staff,
+        collapsed,
+        signedIn,
+      }),
     },
   ),
 );
 
 /** The user the simulated server sees as signed in. */
-export function sessionUserId({ role, citizen, staff, tenantId } = useDemo.getState()) {
-  if (!tenantId || role === 'deputacion') return null;
+export function sessionUserId({ role, citizen, staff, tenantId, signedIn } = useDemo.getState()) {
+  if (!tenantId || role === 'deputacion' || (role === 'citizen' && !signedIn)) return null;
   return personaUserId(tenantId, role === 'citizen' ? citizen : staff);
 }
 

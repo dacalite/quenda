@@ -49,5 +49,6 @@
       "title": "Vista de la diputación",
       "intro": "Aquí verás los ayuntamientos adheridos y sus indicadores agregados. Esta sección está en construcción."
     }
-  }
+  },
+  "timeRange": "{{start}} a {{end}}"
 }
