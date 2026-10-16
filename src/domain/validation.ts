@@ -21,13 +21,16 @@ const NUMERIC_RULES = [
 
 const blank = (text: string) => text.trim() === '';
 const isCount = (value: number) => Number.isInteger(value) && value >= 0;
+// An emptied number field arrives as NaN.
+const countProblem = (value: number): ProblemCode => (Number.isNaN(value) ? 'required' : 'range');
 
 export function validateRules(rules: Partial<BookingRules>, prefix = 'rules'): FieldProblem[] {
   const problems: FieldProblem[] = [];
   for (const key of NUMERIC_RULES) {
     const value = rules[key];
-    if (value !== undefined && !isCount(value))
-      problems.push({ field: `${prefix}.${key}`, code: 'range' });
+    if (value !== undefined && !isCount(value)) {
+      problems.push({ field: `${prefix}.${key}`, code: countProblem(value) });
+    }
   }
   const { minDurationMinutes: min, maxDurationMinutes: max } = rules;
   if (min !== undefined && max !== undefined && min > max) {
@@ -35,8 +38,9 @@ export function validateRules(rules: Partial<BookingRules>, prefix = 'rules'): F
   }
   if (rules.noShow) {
     for (const key of ['strikesForSuspension', 'windowDays', 'suspensionDays'] as const) {
-      if (!isCount(rules.noShow[key]))
-        problems.push({ field: `${prefix}.noShow.${key}`, code: 'range' });
+      const value = rules.noShow[key];
+      if (!isCount(value))
+        problems.push({ field: `${prefix}.noShow.${key}`, code: countProblem(value) });
     }
   }
   return problems;

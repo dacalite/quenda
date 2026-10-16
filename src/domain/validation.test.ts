@@ -95,13 +95,18 @@ describe('validateTenant', () => {
           name: '',
           primaryColor: 'azul',
           languages: [],
-          defaultRules: { ...RULES, noShow: { ...RULES.noShow, windowDays: -1 } },
+          defaultRules: {
+            ...RULES,
+            maxAdvanceDays: Number.NaN,
+            noShow: { ...RULES.noShow, windowDays: -1 },
+          },
         }),
       ),
     ).toEqual([
       'name required',
       'primaryColor format',
       'languages required',
+      'defaultRules.maxAdvanceDays required',
       'defaultRules.noShow.windowDays range',
     ]);
   });
