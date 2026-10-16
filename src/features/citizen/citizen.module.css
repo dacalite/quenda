@@ -24,7 +24,7 @@
 
 .slots {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr));
   gap: var(--space-2);
   padding: 0;
   margin: 0;
@@ -35,34 +35,170 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  min-height: var(--target-min);
+  block-size: 100%;
+  min-block-size: var(--target-min);
   padding: var(--space-2) var(--space-3);
-  border: var(--control-border-width) solid var(--color-border-subtle);
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: var(--control-border-width) solid transparent;
   border-radius: var(--radius-2);
 }
 
 a.slot {
   color: var(--color-text);
   text-decoration: none;
+  background: var(--color-background);
   border-color: var(--color-primary);
+  box-shadow: var(--shadow-1);
+  transition:
+    background-color var(--duration) var(--ease-out),
+    box-shadow var(--duration) var(--ease-out),
+    transform var(--duration) var(--ease-out);
 }
 
 a.slot[data-hovered] {
   background: var(--color-primary-surface);
+  box-shadow: var(--shadow-2);
+  transform: translateY(-1px);
 }
 
 .slotTime {
+  font-size: var(--font-size-3);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
-.slot[data-status='free'] .slotTime {
+a.slot .slotTime {
   color: var(--color-primary);
 }
 
-.slot:not(a) {
+.slotMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.slotStatus {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  font-size: var(--font-size-2);
+  font-weight: 700;
+}
+
+a.slot .slotStatus {
+  color: var(--color-success);
+}
+
+.slotPrice {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.dayStrip {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-1);
+  margin: 0;
+  overflow-x: auto;
+  list-style: none;
+  scroll-snap-type: x proximity;
+}
+
+.dayStrip > li {
+  flex: 1 0 auto;
+  scroll-snap-align: start;
+}
+
+.day {
+  /* Keeps the visually hidden date inside the scrolling strip. */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 3.5rem;
+  min-block-size: 4.5rem;
+  padding: var(--space-2);
+  font-size: var(--font-size-1);
+  font-weight: 700;
+  line-height: 1.2;
   color: var(--color-text-muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  background: var(--color-background);
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-radius: var(--radius-2);
+  transition: background-color var(--duration) var(--ease-out);
+}
+
+.day[data-hovered] {
   background: var(--color-surface);
+}
+
+.dayNumber {
+  font-size: var(--font-size-5);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+.day[aria-current='date'] {
+  color: #c3d8ec;
+  background: var(--color-navy);
+  border-color: var(--color-navy);
+}
+
+.day[aria-current='date'] .dayNumber {
+  color: #ffffff;
+}
+
+:root[data-contrast='high'] .day[aria-current='date'] {
+  color: var(--color-background);
+  background: var(--color-text);
+}
+
+:root[data-contrast='high'] .day[aria-current='date'] .dayNumber {
+  color: var(--color-background);
+}
+
+.dayControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: flex-end;
+}
+
+.suggestions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.suggestion {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  block-size: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-weight: 700;
+  text-decoration: none;
+  background: var(--color-background);
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-radius: var(--radius-2);
+}
+
+.suggestion > svg {
+  margin-block-start: 0.15em;
+}
+
+.suggestion[data-hovered] {
+  text-decoration: underline;
+  border-color: var(--color-primary);
 }
 
 .code {
@@ -186,4 +322,10 @@ a.slot[data-hovered] {
 .noticeIcon[data-unread] {
   color: #ffffff;
   background: var(--color-danger);
+}
+
+.dayButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
 }
