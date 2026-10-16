@@ -1,0 +1,113 @@
+/* SPDX-License-Identifier: EUPL-1.2 */
+
+.ticket {
+  position: relative;
+  border-radius: var(--radius-3);
+  filter: drop-shadow(0 2px 6px rgb(11 37 69 / 10%));
+  transition: filter var(--duration) var(--ease-out);
+}
+
+.ticket:has(.link:hover) {
+  filter: drop-shadow(0 8px 18px rgb(11 37 69 / 18%));
+}
+
+.paper {
+  --notch: 0.75rem;
+
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  min-block-size: 100%;
+  background: var(--color-background);
+  border-radius: var(--radius-3);
+  /* Two bites at the tear line, as on a paper ticket. */
+  mask:
+    radial-gradient(circle at 5.5rem 0, transparent var(--notch), #000 calc(var(--notch) + 0.5px))
+      top / 100% 51% no-repeat,
+    radial-gradient(
+        circle at 5.5rem 100%,
+        transparent var(--notch),
+        #000 calc(var(--notch) + 0.5px)
+      )
+      bottom / 100% 51% no-repeat;
+}
+
+.stub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-2);
+  font-size: var(--font-size-1);
+  font-weight: 700;
+  line-height: 1.2;
+  color: #ffffff;
+  text-transform: uppercase;
+  background: var(--color-navy);
+  border-start-start-radius: var(--radius-3);
+  border-end-start-radius: var(--radius-3);
+  border-inline-end: 2px dashed rgb(255 255 255 / 45%);
+}
+
+.day {
+  font-size: var(--font-size-6);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-tight);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-inline-size: 0;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-inline-start: 0;
+  border-radius: 0 var(--radius-3) var(--radius-3) 0;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-3);
+}
+
+.when {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.link {
+  align-self: flex-start;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The whole ticket opens the booking; the link stays its accessible name. */
+.link::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+}
+
+.link:focus-visible {
+  outline: none;
+}
+
+.ticket:has(.link:focus-visible) {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+:root[data-contrast='high'] .ticket {
+  filter: none;
+}
+
+:root[data-contrast='high'] .paper {
+  mask: none;
+  border: var(--border-width) solid var(--color-border);
+}
+
+:root[data-contrast='high'] .stub {
+  color: var(--color-text);
+  background: var(--color-background);
+  border-inline-end-color: var(--color-border);
+}

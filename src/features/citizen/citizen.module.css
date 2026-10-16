@@ -86,3 +86,104 @@ a.slot[data-hovered] {
   flex-direction: column;
   gap: var(--space-5);
 }
+
+.search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: flex-start;
+  max-inline-size: 44rem;
+}
+
+.search > :first-child {
+  flex: 1 1 18rem;
+}
+
+.search input {
+  max-inline-size: none;
+  border-color: transparent;
+  border-radius: var(--radius-control);
+  padding-inline: var(--space-4);
+}
+
+/* Lined up with the field, below its label. */
+.search > button {
+  margin-block-start: calc(1lh + var(--space-1));
+}
+
+.types {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-start: var(--space-2);
+}
+
+.types > h2 {
+  margin: 0;
+  font-size: var(--font-size-3);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-block-size: var(--target-min);
+  padding: var(--space-1) var(--space-4) var(--space-1) var(--space-3);
+  font-weight: 700;
+  color: var(--color-text);
+  text-decoration: none;
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  transition:
+    background-color var(--duration) var(--ease-out),
+    border-color var(--duration) var(--ease-out);
+}
+
+.chip[data-hovered] {
+  background: var(--color-surface-strong);
+  border-color: var(--color-border);
+}
+
+.more {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  min-block-size: var(--target-min);
+  font-weight: 700;
+}
+
+.noticeCard {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border-radius: var(--radius-3);
+}
+
+.noticeCard p {
+  margin: 0;
+}
+
+.noticeIcon {
+  display: inline-flex;
+  padding: var(--space-2);
+  color: var(--color-primary);
+  background: var(--color-background);
+  border-radius: var(--radius-pill);
+}
+
+.noticeIcon[data-unread] {
+  color: #ffffff;
+  background: var(--color-danger);
+}
