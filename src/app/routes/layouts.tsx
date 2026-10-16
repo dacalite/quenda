@@ -8,6 +8,7 @@ import { NotFoundError } from '../../data/ports/errors';
 import { DEPUTACION } from '../../data/seed/catalog';
 import { CitizenNav } from '../../features/citizen/CitizenNav';
 import { DemoBar } from '../../features/demo/DemoBar';
+import { currentLanguage } from '../../i18n';
 import { accessibleColor } from '../../ui/contrast';
 import { SkipLink } from '../../ui/SkipLink';
 import { TenantContext } from '../contexts';
@@ -74,7 +75,7 @@ function LoadingFrame() {
 }
 
 export function TenantLayout() {
-  const { t } = useTranslation('citizen');
+  const { t, i18n } = useTranslation('citizen');
   const { tenantSlug = '' } = useParams();
   const role = useDemo((state) => state.role);
   const tenant = useTenantBySlug(tenantSlug);
@@ -84,6 +85,12 @@ export function TenantLayout() {
   useEffect(() => {
     if (tenant.data) setTenantId(tenant.data.id);
   }, [tenant.data, setTenantId]);
+
+  const languages = tenant.data?.languages;
+  useEffect(() => {
+    const [fallback] = languages ?? [];
+    if (fallback && !languages?.includes(currentLanguage())) void i18n.changeLanguage(fallback);
+  }, [languages, i18n]);
 
   useEffect(() => {
     if (!primaryColor) return;
