@@ -1,17 +1,20 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router';
+import { downloadFile } from '../../app/download';
 import { Page } from '../../app/Page';
+import { useFacility } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import type { Facility, Reservation } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
+import { useSubspaceName } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import styles from './citizen.module.css';
-import { downloadFile, useReservationsIcs, useSubspaceName } from './labels';
-import { useCitizen, useFacility, useReservation } from './queries';
+import { useReservationsIcs } from './labels';
+import { useCitizen, useReservation } from './queries';
 import { ReservationActions } from './ReservationActions';
 import { ReservationQr } from './ReservationQr';
 

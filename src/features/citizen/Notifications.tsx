@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Page } from '../../app/Page';
+import { useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import type { NotificationChannel } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
@@ -13,7 +14,6 @@ import { useToast } from '../../ui/toasts';
 import styles from './citizen.module.css';
 import {
   useCitizen,
-  useFacilities,
   useMarkRead,
   useMe,
   useMyReservations,

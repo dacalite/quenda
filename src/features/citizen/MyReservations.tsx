@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useTranslation } from 'react-i18next';
 import { Page } from '../../app/Page';
+import { useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import { addDays, weekdayOf, zonedNow } from '../../domain/time';
 import type { Facility, IsoDate, Reservation } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
+import { useSubspaceName } from '../../i18n/labels';
 import { Card } from '../../ui/Card';
 import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { Tab, TabList, TabPanel, Tabs } from '../../ui/Tabs';
 import styles from './citizen.module.css';
-import { useSubspaceName } from './labels';
-import { useCitizen, useFacilities, useMyReservations } from './queries';
+import { useCitizen, useMyReservations } from './queries';
 import { ReservationActions } from './ReservationActions';
 
 const STATUS_TONE = {

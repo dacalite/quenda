@@ -2,7 +2,7 @@
 import { useTranslation } from 'react-i18next';
 import { Page } from '../../app/Page';
 import { LEGAL_PAGES } from '../../app/routes/paths';
-import { useLocalized } from './labels';
+import { useLocalized } from '../../i18n/labels';
 import { useCitizen } from './queries';
 
 export function LegalPage({ page }: { page: keyof typeof LEGAL_PAGES }) {

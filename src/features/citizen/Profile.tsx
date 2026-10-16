@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { downloadFile } from '../../app/download';
 import { LanguageSelect } from '../../app/LanguageSelect';
 import { Page } from '../../app/Page';
 import { PreferencesDialog } from '../../app/PreferencesDialog';
@@ -11,7 +12,6 @@ import { ErrorSummary, type FormError } from '../../ui/ErrorSummary';
 import { TextField } from '../../ui/TextField';
 import { useToast } from '../../ui/toasts';
 import styles from './citizen.module.css';
-import { downloadFile } from './labels';
 import { useMe, useMyReservations, useNotifications, useUpdateMe } from './queries';
 
 type Fields = Pick<User, 'firstName' | 'lastName' | 'email' | 'phone'>;

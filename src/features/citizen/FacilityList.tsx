@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 import { Page } from '../../app/Page';
+import { useAvailabilityQuery, useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
 import { daypart, minutesBetween, zonedNow, type Daypart } from '../../domain/time';
 import type { AccessibilityFeature, FacilityType } from '../../domain/types';
+import { useLocalized } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { Checkbox } from '../../ui/Checkbox';
@@ -18,8 +20,7 @@ import { StatusBadge } from '../../ui/StatusBadge';
 import { TextField } from '../../ui/TextField';
 import styles from './citizen.module.css';
 import { FacilityImage } from './FacilityImage';
-import { useLocalized } from './labels';
-import { useAvailabilityQuery, useCitizen, useFacilities } from './queries';
+import { useCitizen } from './queries';
 
 const FEATURES: AccessibilityFeature[] = [
   'stepFreeAccess',

@@ -3,18 +3,19 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 import { Page } from '../../app/Page';
+import { useFacility } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import { ConflictError, RuleViolationError } from '../../data/ports/errors';
 import type { ReservationInput } from '../../data/ports/repositories';
 import type { Facility, Holder, Id } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
+import { useLocalized, useSubspaceName, useViolationText } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { Checkbox } from '../../ui/Checkbox';
 import { ErrorSummary, type FormError } from '../../ui/ErrorSummary';
 import { Link } from '../../ui/Link';
 import styles from './citizen.module.css';
-import { useLocalized, useSubspaceName, useViolationText } from './labels';
-import { useBook, useCitizen, useFacility, useQuote, useRecommendations } from './queries';
+import { useBook, useCitizen, useQuote, useRecommendations } from './queries';
 
 const ACCEPT_ID = 'accept-rules';
 

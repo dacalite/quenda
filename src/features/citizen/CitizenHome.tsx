@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Page } from '../../app/Page';
+import { useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import { zonedNow } from '../../domain/time';
 import { useFormat } from '../../i18n/format';
@@ -11,7 +12,7 @@ import { Card } from '../../ui/Card';
 import { Link } from '../../ui/Link';
 import { TextField } from '../../ui/TextField';
 import styles from './citizen.module.css';
-import { useCitizen, useFacilities, useMyReservations, useNotifications } from './queries';
+import { useCitizen, useMyReservations, useNotifications } from './queries';
 
 export function CitizenHome() {
   const { t } = useTranslation(['citizen', 'domain']);

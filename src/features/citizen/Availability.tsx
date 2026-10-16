@@ -4,12 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { NotFoundPage } from '../../app/pages';
 import { Page } from '../../app/Page';
+import { useAvailability, useAvailabilityQuery, useFacility, useSchedule } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
 import { computePrice } from '../../domain/rules/pricing';
 import { addDays, daypart, startOfWeek, zonedNow, type Daypart } from '../../domain/time';
 import type { Facility, IsoDate } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
+import { useLocalized } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { DataTable } from '../../ui/DataTable';
 import { DatePicker } from '../../ui/DatePicker';
@@ -19,17 +21,8 @@ import { Select } from '../../ui/Select';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { Tab, TabList, TabPanel, Tabs } from '../../ui/Tabs';
 import styles from './citizen.module.css';
-import { useLocalized, useSlotDescription } from './labels';
-import {
-  useAvailability,
-  useAvailabilityQuery,
-  useCitizen,
-  useFacility,
-  useMe,
-  useRecommendations,
-  useReservation,
-  useSchedule,
-} from './queries';
+import { useSlotDescription } from './labels';
+import { useCitizen, useMe, useRecommendations, useReservation } from './queries';
 
 const DAYPARTS: Daypart[] = ['morning', 'afternoon', 'evening'];
 const isIsoDate = (value: string | null): value is IsoDate =>

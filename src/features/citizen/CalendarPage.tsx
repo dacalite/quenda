@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useTranslation } from 'react-i18next';
+import { downloadFile } from '../../app/download';
 import { Page } from '../../app/Page';
+import { useFacilities } from '../../app/queries';
 import { zonedNow } from '../../domain/time';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { TextField } from '../../ui/TextField';
 import { useToast } from '../../ui/toasts';
 import styles from './citizen.module.css';
-import { downloadFile, useReservationsIcs } from './labels';
-import { useCitizen, useFacilities, useMyReservations } from './queries';
+import { useReservationsIcs } from './labels';
+import { useCitizen, useMyReservations } from './queries';
 
 export function CalendarPage() {
   const { t } = useTranslation('citizen');

@@ -3,12 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { Page } from '../../app/Page';
+import { useFacility, useSchedule } from '../../app/queries';
 import { useRepositories } from '../../app/repositories';
 import { citizenPaths } from '../../app/routes/paths';
 import { computePrice } from '../../domain/rules/pricing';
 import { addDays, zonedNow } from '../../domain/time';
 import type { Concession, Weekday } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
+import { useLocalized } from '../../i18n/labels';
 import { DataTable } from '../../ui/DataTable';
 import { Icon } from '../../ui/Icon';
 import { Link } from '../../ui/Link';
@@ -16,8 +18,7 @@ import { StatusBadge } from '../../ui/StatusBadge';
 import { NotFoundPage } from '../../app/pages';
 import styles from './citizen.module.css';
 import { FacilityImage } from './FacilityImage';
-import { useLocalized } from './labels';
-import { useCitizen, useFacility, useMe, useSchedule } from './queries';
+import { useCitizen, useMe } from './queries';
 
 const WEEKDAYS: Weekday[] = [1, 2, 3, 4, 5, 6, 7];
 // 2026-10-19 is a Monday: weekday names come from Intl in the page language.
