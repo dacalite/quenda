@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: EUPL-1.2
+import type { Indicators } from '../../domain/analytics/indicators';
 import type { Recommendation } from '../../domain/recommendations/recommend';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
 import type { RuleViolation } from '../../domain/rules/booking';
@@ -9,6 +10,7 @@ import type {
   AuditEntry,
   Block,
   Channel,
+  DateRange,
   Entity,
   Facility,
   Holder,
@@ -16,6 +18,7 @@ import type {
   Id,
   IsoDate,
   Notification,
+  NotificationChannel,
   RecurringBooking,
   Reservation,
   ReservationStatus,
@@ -27,7 +30,8 @@ import type {
 } from '../../domain/types';
 
 // Contracts of the future REST API. Every call is scoped by tenant and may reject with the errors in ./errors.
-// Residents only reach their own bookings, profile and notifications; council staff reach everything in their council.
+// Residents only reach their own bookings, profile and notifications; council staff reach everything in their council,
+// and only administrators change the configuration or read the audit log.
 
 export interface TenantRepository {
   list(): Promise<Tenant[]>;
@@ -59,11 +63,18 @@ export type BlockInput = Pick<
   'facilityId' | 'subspaceId' | 'dates' | 'times' | 'reason' | 'note'
 >;
 
+export type HolidayInput = Pick<Holiday, 'date' | 'name'>;
+
 export interface ScheduleRepository {
   get(tenantId: Id, facilityId: Id): Promise<Schedule>;
   save(tenantId: Id, schedule: Schedule): Promise<Schedule>;
   listHolidays(tenantId: Id): Promise<Holiday[]>;
+  createHoliday(tenantId: Id, input: HolidayInput): Promise<Holiday>;
+  deleteHoliday(tenantId: Id, id: Id): Promise<void>;
   listBlocks(tenantId: Id, filter?: BlockFilter): Promise<Block[]>;
+  /** Upcoming bookings the block would cancel, without saving anything. */
+  previewBlock(tenantId: Id, input: BlockInput): Promise<Reservation[]>;
+  /** Saves the block, cancels the affected bookings and tells each person, offering another time. */
   createBlock(tenantId: Id, input: BlockInput): Promise<Block>;
   deleteBlock(tenantId: Id, id: Id): Promise<void>;
 }
@@ -80,6 +91,8 @@ export interface ReservationInput extends Slot {
   holder: Holder;
   channel: Channel;
   notes?: string;
+  /** Staff bookings can send the confirmation by text or email (simulated). */
+  confirmBy?: Exclude<NotificationChannel, 'app'>;
 }
 
 export interface ReservationQuote {
@@ -140,6 +153,10 @@ export interface AuditLogRepository {
   list(tenantId: Id): Promise<AuditEntry[]>;
 }
 
+export interface IndicatorRepository {
+  get(tenantId: Id, range: DateRange): Promise<Indicators>;
+}
+
 export interface Repositories {
   tenants: TenantRepository;
   facilities: FacilityRepository;
@@ -150,4 +167,5 @@ export interface Repositories {
   entities: EntityRepository;
   notifications: NotificationRepository;
   audit: AuditLogRepository;
+  indicators: IndicatorRepository;
 }

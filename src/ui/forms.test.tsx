@@ -9,9 +9,11 @@ import { renderUi } from '../test/render';
 import { Checkbox } from './Checkbox';
 import { DatePicker } from './DatePicker';
 import { ErrorSummary } from './ErrorSummary';
+import { NumberField } from './NumberField';
 import { RadioGroup } from './RadioGroup';
 import { Select } from './Select';
 import { TextField } from './TextField';
+import { TimeField } from './TimeField';
 
 afterEach(async () => {
   await i18n.changeLanguage('gl');
@@ -46,6 +48,68 @@ describe('TextField', () => {
     expect(input).toBeInvalid();
     expect(input).toHaveAccessibleDescription('Escribe un teléfono de 9 cifras');
     expect(input).toHaveAttribute('id', 'phone');
+    await expectNoAxeViolations();
+  });
+});
+
+describe('NumberField', () => {
+  function Price() {
+    const [value, setValue] = useState<number | null>(4.5);
+    return (
+      <>
+        <NumberField
+          label="Prezo"
+          value={value}
+          onChange={setValue}
+          minValue={0}
+          formatOptions={{ style: 'currency', currency: 'EUR' }}
+        />
+        <output>{String(value)}</output>
+      </>
+    );
+  }
+
+  it('reads and writes numbers in the local format, and null when empty', async () => {
+    renderUi(<Price />);
+    const input = screen.getByRole('textbox', { name: 'Prezo' });
+    expect(input).toHaveValue('4,50\u00a0€');
+    await userEvent.clear(input);
+    await userEvent.tab();
+    expect(screen.getByText('null')).toBeInTheDocument();
+    await userEvent.type(input, '6,25');
+    await userEvent.tab();
+    expect(screen.getByText('6.25')).toBeInTheDocument();
+    await expectNoAxeViolations();
+  });
+});
+
+describe('TimeField', () => {
+  function Opening() {
+    const [value, setValue] = useState<string | null>('09:00');
+    return (
+      <>
+        <TimeField label="Apertura" value={value} onChange={setValue} />
+        <output>{value}</output>
+      </>
+    );
+  }
+
+  it('edits a 24-hour time segment by segment with the keyboard', async () => {
+    renderUi(<Opening />);
+    const hour = screen.getByRole('spinbutton', { name: /hora/ });
+    await userEvent.click(hour);
+    await userEvent.keyboard('{ArrowUp}');
+    expect(screen.getByText('10:00')).toBeInTheDocument();
+    await userEvent.keyboard('21');
+    expect(screen.getByText('21:00')).toBeInTheDocument();
+    await expectNoAxeViolations();
+  });
+});
+
+describe('TextField multiline', () => {
+  it('renders a labelled text area', async () => {
+    renderUi(<TextField label="Normas" multiline defaultValue="Liña 1" />);
+    expect(screen.getByRole('textbox', { name: 'Normas' }).tagName).toBe('TEXTAREA');
     await expectNoAxeViolations();
   });
 });
@@ -183,6 +247,42 @@ describe('ErrorSummary', () => {
     await userEvent.click(screen.getByRole('link', { name: 'Escribe un teléfono' }));
     expect(screen.getByRole('textbox', { name: 'Teléfono' })).toHaveFocus();
     await expectNoAxeViolations();
+  });
+
+  it('moves focus into selects and radio groups', async () => {
+    renderUi(
+      <>
+        <ErrorSummary
+          errors={[
+            { fieldId: 'slot', message: 'Escolle unha hora' },
+            { fieldId: 'channel', message: 'Escolle unha canle' },
+          ]}
+        />
+        <Select
+          id="slot"
+          label="Hora"
+          value={null}
+          onChange={vi.fn()}
+          options={[{ id: '09:00', label: '09:00' }]}
+          errorMessage="Escolle unha hora"
+        />
+        <RadioGroup
+          id="channel"
+          label="Canle"
+          value={null}
+          onChange={vi.fn()}
+          options={[
+            { id: 'phone', label: 'Teléfono' },
+            { id: 'inPerson', label: 'Presencial' },
+          ]}
+          errorMessage="Escolle unha canle"
+        />
+      </>,
+    );
+    await userEvent.click(screen.getByRole('link', { name: 'Escolle unha hora' }));
+    expect(screen.getByRole('button', { name: /Hora/ })).toHaveFocus();
+    await userEvent.click(screen.getByRole('link', { name: 'Escolle unha canle' }));
+    expect(screen.getByRole('radio', { name: 'Teléfono' })).toHaveFocus();
   });
 
   it('renders nothing without errors', () => {

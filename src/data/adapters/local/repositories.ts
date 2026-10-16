@@ -5,6 +5,9 @@ import {
   type BookingContext,
   type BookingHolder,
 } from '../../../domain/rules/booking';
+import { computeIndicators } from '../../../domain/analytics/indicators';
+import { attendanceOf, canCheckIn } from '../../../domain/rules/attendance';
+import { affectedByBlock } from '../../../domain/rules/blocks';
 import { canCancel, canModify } from '../../../domain/rules/cancellation';
 import { occupancyByStart, recommendSlots } from '../../../domain/recommendations/recommend';
 import { getAvailability } from '../../../domain/rules/availability';
@@ -12,6 +15,12 @@ import { computePrice, initialPaymentStatus } from '../../../domain/rules/pricin
 import { detectConflicts, expandRecurring } from '../../../domain/rules/recurring';
 import { reservationCode } from '../../../domain/reservationCode';
 import { toMinutes, zonedNow, type LocalDateTime } from '../../../domain/time';
+import {
+  validateFacility,
+  validateSchedule,
+  validateTenant,
+  type FieldProblem,
+} from '../../../domain/validation';
 import type {
   AuditAction,
   AuditSubject,
@@ -19,9 +28,11 @@ import type {
   Holder,
   Id,
   Notification,
+  NotificationChannel,
   NotificationType,
   Reservation,
   ReservationEvent,
+  Schedule,
   Slot,
   Tenant,
 } from '../../../domain/types';
@@ -30,8 +41,9 @@ import {
   ForbiddenError,
   NotFoundError,
   RuleViolationError,
+  ValidationError,
 } from '../../ports/errors';
-import type { RecurringBookingInput, Repositories } from '../../ports/repositories';
+import type { BlockInput, RecurringBookingInput, Repositories } from '../../ports/repositories';
 import type { LocalDatabase } from './database';
 
 export interface Session {
@@ -49,6 +61,30 @@ export interface LocalAdapterOptions {
 }
 
 type Row = { id: Id; tenantId: Id };
+
+const valid = (problems: FieldProblem[]) => {
+  if (problems.length > 0) throw new ValidationError(problems);
+};
+
+// New facilities open on weekdays and Saturday mornings until the council edits the schedule.
+const defaultSchedule = (tenantId: Id, facilityId: Id): Schedule => {
+  const weekday = [{ start: '09:00', end: '22:00' }];
+  return {
+    tenantId,
+    facilityId,
+    slotMinutes: 60,
+    weekly: {
+      1: weekday,
+      2: weekday,
+      3: weekday,
+      4: weekday,
+      5: weekday,
+      6: [{ start: '10:00', end: '14:00' }],
+      7: [],
+    },
+    exceptions: [],
+  };
+};
 
 const holderKey = (holder: Holder) =>
   holder.kind === 'user' ? `user:${holder.userId}` : `entity:${holder.entityId}`;
@@ -112,14 +148,18 @@ export function createLocalRepositories({
     });
   };
 
-  const notify = (reservation: Reservation, type: NotificationType) => {
+  const notify = (
+    reservation: Reservation,
+    type: NotificationType,
+    channel: NotificationChannel = 'app',
+  ) => {
     if (reservation.holder.kind !== 'user') return;
     const notification: Notification = {
       id: newId('notification'),
       tenantId: reservation.tenantId,
       userId: reservation.holder.userId,
       type,
-      channel: 'app',
+      channel,
       createdAt: instant(),
       reservationId: reservation.id,
     };
@@ -171,6 +211,11 @@ export function createLocalRepositories({
   };
   const requireStaff = (tenantId: Id) => {
     if (!isStaff(tenantId)) throw new ForbiddenError('Only council staff can do this');
+  };
+  const requireAdmin = (tenantId: Id) => {
+    if (caller(tenantId)?.role !== 'admin') {
+      throw new ForbiddenError('Only council administrators can do this');
+    }
   };
   /** The resident's own id, `null` for staff, or a 403 for anonymous callers. */
   const ownerScope = (tenantId: Id): Id | null => {
@@ -239,6 +284,19 @@ export function createLocalRepositories({
     return reservation;
   };
 
+  const blockImpact = (tenantId: Id, input: BlockInput) => {
+    const facility = findIn(data().facilities, tenantId, input.facilityId, 'facility');
+    return {
+      facility,
+      affected: affectedByBlock(
+        facility,
+        input,
+        scoped(data().reservations, tenantId),
+        localNow(tenantId),
+      ),
+    };
+  };
+
   const recurringConflicts = (tenantId: Id, input: RecurringBookingInput) => {
     const facility = findIn(data().facilities, tenantId, input.facilityId, 'facility');
     const context = facilityContext(tenantId, facility);
@@ -257,8 +315,9 @@ export function createLocalRepositories({
         }),
       update: (tenantId, patch) =>
         respond(() => {
-          requireStaff(tenantId);
+          requireAdmin(tenantId);
           const tenant = tenantOf(tenantId);
+          valid(validateTenant({ ...tenant, ...patch }));
           Object.assign(tenant, patch);
           audit(tenantId, 'update', 'tenant', tenantId, tenant.name);
           db.commit();
@@ -271,17 +330,20 @@ export function createLocalRepositories({
       get: (tenantId, id) => respond(() => findIn(data().facilities, tenantId, id, 'facility')),
       create: (tenantId, input) =>
         respond(() => {
-          requireStaff(tenantId);
+          requireAdmin(tenantId);
+          valid(validateFacility(input));
           const facility: Facility = { ...input, id: newId('facility'), tenantId };
           data().facilities.push(facility);
+          data().schedules.push(defaultSchedule(tenantId, facility.id));
           audit(tenantId, 'create', 'facility', facility.id, facility.name);
           db.commit();
           return facility;
         }),
       update: (tenantId, id, patch) =>
         respond(() => {
-          requireStaff(tenantId);
+          requireAdmin(tenantId);
           const facility = findIn(data().facilities, tenantId, id, 'facility');
+          valid(validateFacility({ ...facility, ...patch }));
           Object.assign(facility, patch);
           audit(tenantId, 'update', 'facility', id, facility.name);
           db.commit();
@@ -304,15 +366,39 @@ export function createLocalRepositories({
       get: (tenantId, facilityId) => respond(() => scheduleOf(tenantId, facilityId)),
       save: (tenantId, schedule) =>
         respond(() => {
-          requireStaff(tenantId);
+          requireAdmin(tenantId);
           const facility = findIn(data().facilities, tenantId, schedule.facilityId, 'facility');
           const stored = scheduleOf(tenantId, facility.id);
+          valid(validateSchedule(schedule));
           Object.assign(stored, { ...schedule, tenantId });
           audit(tenantId, 'update', 'schedule', facility.id, facility.name);
           db.commit();
           return stored;
         }),
-      listHolidays: (tenantId) => respond(() => scoped(data().holidays, tenantId)),
+      listHolidays: (tenantId) =>
+        respond(() =>
+          scoped(data().holidays, tenantId).sort((a, b) => a.date.localeCompare(b.date)),
+        ),
+      createHoliday: (tenantId, input) =>
+        respond(() => {
+          requireAdmin(tenantId);
+          if (scoped(data().holidays, tenantId).some((h) => h.date === input.date)) {
+            throw new ConflictError('There is already a holiday on that date');
+          }
+          const holiday = { ...input, id: newId('holiday'), tenantId };
+          data().holidays.push(holiday);
+          audit(tenantId, 'create', 'schedule', holiday.id, input.date);
+          db.commit();
+          return holiday;
+        }),
+      deleteHoliday: (tenantId, id) =>
+        respond(() => {
+          requireAdmin(tenantId);
+          const holiday = findIn(data().holidays, tenantId, id, 'holiday');
+          data().holidays = data().holidays.filter((h) => h !== holiday);
+          audit(tenantId, 'delete', 'schedule', id, holiday.date);
+          db.commit();
+        }),
       listBlocks: (tenantId, filter = {}) =>
         respond(() =>
           scoped(data().blocks, tenantId).filter(
@@ -322,10 +408,21 @@ export function createLocalRepositories({
               (!filter.to || b.dates.from <= filter.to),
           ),
         ),
+      previewBlock: (tenantId, input) =>
+        respond(() => {
+          requireAdmin(tenantId);
+          return blockImpact(tenantId, input).affected;
+        }),
       createBlock: (tenantId, input) =>
         respond(() => {
-          requireStaff(tenantId);
-          const facility = findIn(data().facilities, tenantId, input.facilityId, 'facility');
+          requireAdmin(tenantId);
+          const { facility, affected } = blockImpact(tenantId, input);
+          for (const reservation of affected) {
+            reservation.status = 'cancelled';
+            reservation.history.push(event('cancelled', input.note || undefined));
+            notify(reservation, 'councilNotice');
+            audit(tenantId, 'cancel', 'reservation', reservation.id, reservation.code);
+          }
           const block = {
             ...input,
             id: newId('block'),
@@ -340,7 +437,7 @@ export function createLocalRepositories({
         }),
       deleteBlock: (tenantId, id) =>
         respond(() => {
-          requireStaff(tenantId);
+          requireAdmin(tenantId);
           const block = findIn(data().blocks, tenantId, id, 'block');
           data().blocks = data().blocks.filter((b) => b !== block);
           audit(tenantId, 'delete', 'block', id, block.note);
@@ -375,7 +472,13 @@ export function createLocalRepositories({
         }),
       quote: (tenantId, input, replaces) =>
         respond(() => {
-          const { holder, channel: _channel, notes: _notes, ...slot } = input;
+          const {
+            holder,
+            channel: _channel,
+            notes: _notes,
+            confirmBy: _confirmBy,
+            ...slot
+          } = input;
           requireHolderAllowed(tenantId, holder);
           const bookingHolder = holderOf(tenantId, holder);
           const context = bookingContext(tenantId, slot.facilityId, holder);
@@ -389,7 +492,7 @@ export function createLocalRepositories({
         }),
       create: (tenantId, input) =>
         respond(() => {
-          const { holder, channel, notes = '', ...slot } = input;
+          const { holder, channel, notes = '', confirmBy, ...slot } = input;
           requireHolderAllowed(tenantId, holder);
           const bookingHolder = holderOf(tenantId, holder);
           const decision = canBook(
@@ -416,7 +519,7 @@ export function createLocalRepositories({
             history: [event('created')],
           };
           data().reservations.push(reservation);
-          notify(reservation, 'confirmation');
+          notify(reservation, 'confirmation', confirmBy);
           audit(tenantId, 'create', 'reservation', reservation.id, reservation.code);
           db.commit();
           return reservation;
@@ -465,11 +568,8 @@ export function createLocalRepositories({
         respond(() => {
           requireStaff(tenantId);
           return mutateReservation(tenantId, id, (reservation) => {
-            if (
-              reservation.status !== 'confirmed' ||
-              reservation.date !== localNow(tenantId).date
-            ) {
-              throw new ConflictError('Only confirmed reservations for today can be checked in');
+            if (!canCheckIn(reservation, localNow(tenantId))) {
+              throw new ConflictError('Check-in is only open on the day, until the booking ends');
             }
             reservation.checkedInAt = instant();
             reservation.history.push(event('checkedIn'));
@@ -480,10 +580,8 @@ export function createLocalRepositories({
         respond(() => {
           requireStaff(tenantId);
           return mutateReservation(tenantId, id, (reservation) => {
-            if (reservation.status !== 'confirmed' || reservation.checkedInAt) {
-              throw new ConflictError(
-                'Only confirmed reservations without check-in can be no-shows',
-              );
+            if (attendanceOf(reservation, localNow(tenantId)) !== 'unrecorded') {
+              throw new ConflictError('Only finished bookings without a check-in can be no-shows');
             }
             reservation.status = 'noShow';
             reservation.history.push(event('noShow'));
@@ -503,14 +601,14 @@ export function createLocalRepositories({
         ),
       preview: (tenantId, input) =>
         respond(() => {
-          requireStaff(tenantId);
+          requireAdmin(tenantId);
           findIn(data().entities, tenantId, input.entityId, 'entity');
           const { context, dates } = recurringConflicts(tenantId, input);
           return detectConflicts(context, input, dates);
         }),
       create: (tenantId, input) =>
         respond(() => {
-          requireStaff(tenantId);
+          requireAdmin(tenantId);
           const entity = findIn(data().entities, tenantId, input.entityId, 'entity');
           const { context, dates } = recurringConflicts(tenantId, input);
           const conflicts = new Set(detectConflicts(context, input, dates).map((c) => c.date));
@@ -611,10 +709,30 @@ export function createLocalRepositories({
         }),
     },
 
+    indicators: {
+      get: (tenantId, range) =>
+        respond(() => {
+          requireStaff(tenantId);
+          const facilities = scoped(data().facilities, tenantId);
+          return computeIndicators(
+            {
+              facilities: facilities.map((facility) => ({
+                facility,
+                schedule: scheduleOf(tenantId, facility.id),
+              })),
+              holidays: scoped(data().holidays, tenantId),
+              blocks: scoped(data().blocks, tenantId),
+              reservations: scoped(data().reservations, tenantId),
+            },
+            range,
+          );
+        }),
+    },
+
     audit: {
       list: (tenantId) =>
         respond(() => {
-          requireStaff(tenantId);
+          requireAdmin(tenantId);
           return scoped(data().audit, tenantId).sort((a, b) => b.at.localeCompare(a.at));
         }),
     },

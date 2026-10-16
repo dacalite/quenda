@@ -94,7 +94,9 @@ function slotStatus(
 
 export function getAvailability(context: FacilityContext, date: IsoDate): AvailabilitySlot[] {
   const { facility, schedule, holidays } = context;
-  const { ranges, closed } = openingRanges(schedule, holidays, date);
+  const opening = openingRanges(schedule, holidays, date);
+  const { ranges } = opening;
+  const closed = opening.closed || facility.status === 'inactive';
   const step = schedule.slotMinutes;
   const slots: AvailabilitySlot[] = [];
 

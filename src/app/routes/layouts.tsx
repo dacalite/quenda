@@ -6,8 +6,10 @@ import { Navigate, Outlet, useHref, useNavigate, useParams } from 'react-router'
 import { APP_DISPLAY_NAME } from '../../config/app';
 import { NotFoundError } from '../../data/ports/errors';
 import { DEPUTACION } from '../../data/seed/catalog';
+import { StaffNav } from '../../features/admin/StaffNav';
 import { CitizenNav } from '../../features/citizen/CitizenNav';
 import { DemoBar } from '../../features/demo/DemoBar';
+import { currentLanguage } from '../../i18n';
 import { accessibleColor } from '../../ui/contrast';
 import { SkipLink } from '../../ui/SkipLink';
 import { TenantContext } from '../contexts';
@@ -74,7 +76,7 @@ function LoadingFrame() {
 }
 
 export function TenantLayout() {
-  const { t } = useTranslation('citizen');
+  const { t, i18n } = useTranslation('citizen');
   const { tenantSlug = '' } = useParams();
   const role = useDemo((state) => state.role);
   const tenant = useTenantBySlug(tenantSlug);
@@ -84,6 +86,12 @@ export function TenantLayout() {
   useEffect(() => {
     if (tenant.data) setTenantId(tenant.data.id);
   }, [tenant.data, setTenantId]);
+
+  const languages = tenant.data?.languages;
+  useEffect(() => {
+    const [fallback] = languages ?? [];
+    if (fallback && !languages?.includes(currentLanguage())) void i18n.changeLanguage(fallback);
+  }, [languages, i18n]);
 
   useEffect(() => {
     if (!primaryColor) return;
@@ -101,7 +109,15 @@ export function TenantLayout() {
         name={tenant.data?.name ?? APP_DISPLAY_NAME}
         emblem={tenant.data?.emblem}
         homeHref={tenant.data ? `/${tenant.data.slug}` : '/'}
-        nav={tenant.data && role === 'citizen' ? <CitizenNav /> : undefined}
+        nav={
+          tenant.data ? (
+            role === 'citizen' ? (
+              <CitizenNav />
+            ) : role === 'staff' ? (
+              <StaffNav />
+            ) : undefined
+          ) : undefined
+        }
         footerLabel={t('legal.nav')}
         footerLinks={
           tenant.data

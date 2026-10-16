@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Page } from '../../app/Page';
+import { useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import type { NotificationChannel } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
@@ -10,10 +11,10 @@ import { Checkbox } from '../../ui/Checkbox';
 import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { useToast } from '../../ui/toasts';
+import layout from '../../ui/layout.module.css';
 import styles from './citizen.module.css';
 import {
   useCitizen,
-  useFacilities,
   useMarkRead,
   useMe,
   useMyReservations,
@@ -52,7 +53,7 @@ export function Notifications() {
       ) : (notifications.data ?? []).length === 0 ? (
         <p>{t('notifications.empty')}</p>
       ) : (
-        <ul className={styles.stack}>
+        <ul className={layout.stack}>
           {(notifications.data ?? []).map((notification) => {
             const reservation = reservations.data?.find((r) => r.id === notification.reservationId);
             const facility = facilities.data?.find((f) => f.id === reservation?.facilityId);
@@ -60,16 +61,16 @@ export function Notifications() {
             return (
               <li
                 key={notification.id}
-                className={[styles.panel, notification.readAt ? null : styles.unread]
+                className={[layout.panel, notification.readAt ? null : styles.unread]
                   .filter(Boolean)
                   .join(' ')}
               >
-                <p className={styles.row}>
+                <p className={layout.row}>
                   <strong>{t(`domain:notificationType.${notification.type}`)}</strong>
                   {!notification.readAt && (
                     <StatusBadge tone="info">{t('notifications.unread')}</StatusBadge>
                   )}
-                  <span className={styles.meta}>{format.dateTime(notification.createdAt)}</span>
+                  <span className={layout.meta}>{format.dateTime(notification.createdAt)}</span>
                 </p>
                 {reservation && facility && (
                   <>
@@ -122,7 +123,7 @@ function ChannelSettings() {
 
   return (
     <form
-      className={styles.panel}
+      className={layout.panel}
       aria-labelledby="channels-title"
       onSubmit={(event) => {
         event.preventDefault();

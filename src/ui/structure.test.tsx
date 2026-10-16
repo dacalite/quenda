@@ -8,6 +8,7 @@ import { Button } from './Button';
 import { Card } from './Card';
 import { DataTable } from './DataTable';
 import { Link } from './Link';
+import { StatList } from './StatList';
 import { SkipLink } from './SkipLink';
 import { Tab, TabList, TabPanel, Tabs } from './Tabs';
 
@@ -70,6 +71,23 @@ describe('Card', () => {
   });
 });
 
+describe('StatList', () => {
+  it('reads each figure together with its label', async () => {
+    renderUi(
+      <StatList
+        stats={[
+          { label: 'Reservas hoxe', value: '18' },
+          { label: 'Ocupación', value: '64 %', detail: 'esta semana' },
+        ]}
+      />,
+    );
+    const terms = screen.getAllByRole('term');
+    expect(terms.map((term) => term.textContent)).toEqual(['Reservas hoxe', 'Ocupación']);
+    expect(screen.getByText('64 %')).toHaveRole('definition');
+    await expectNoAxeViolations();
+  });
+});
+
 describe('DataTable', () => {
   const rows = [
     { day: 'Luns', occupancy: '45 %' },
@@ -91,7 +109,7 @@ describe('DataTable', () => {
     const table = screen.getByRole('table', { name: 'Ocupación por día' });
     expect(within(table).getAllByRole('columnheader')).toHaveLength(2);
     expect(within(table).getByRole('rowheader', { name: 'Martes' })).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: 'Ocupación por día' })).toHaveAttribute(
+    expect(screen.getByRole('group', { name: 'Ocupación por día' })).toHaveAttribute(
       'tabindex',
       '0',
     );

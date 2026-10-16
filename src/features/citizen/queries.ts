@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { skipToken, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCurrentTenant } from '../../app/contexts';
+import { useInvalidateBookings } from '../../app/queries';
 import { useRepositories } from '../../app/repositories';
 import { sessionUserId, useDemo } from '../../app/state';
 import { ForbiddenError } from '../../data/ports/errors';
@@ -14,46 +15,6 @@ export function useCitizen() {
   const userId = sessionUserId({ ...demo, tenantId: tenant.id });
   const holder: Holder | null = userId ? { kind: 'user', userId } : null;
   return { tenant, userId, holder, signedIn: demo.role === 'citizen' && Boolean(userId) };
-}
-
-export function useFacilities() {
-  const repositories = useRepositories();
-  const tenant = useCurrentTenant();
-  return useQuery({
-    queryKey: ['facilities', tenant.id],
-    queryFn: () => repositories.facilities.list(tenant.id),
-  });
-}
-
-export function useFacility(facilityId: Id) {
-  const repositories = useRepositories();
-  const tenant = useCurrentTenant();
-  return useQuery({
-    queryKey: ['facilities', tenant.id, facilityId],
-    queryFn: () => repositories.facilities.get(tenant.id, facilityId),
-  });
-}
-
-export function useSchedule(facilityId: Id) {
-  const repositories = useRepositories();
-  const tenant = useCurrentTenant();
-  return useQuery({
-    queryKey: ['schedule', tenant.id, facilityId],
-    queryFn: () => repositories.schedules.get(tenant.id, facilityId),
-  });
-}
-
-export function useAvailabilityQuery() {
-  const repositories = useRepositories();
-  const tenant = useCurrentTenant();
-  return (facilityId: Id, date: IsoDate) => ({
-    queryKey: ['availability', tenant.id, facilityId, date],
-    queryFn: () => repositories.facilities.availability(tenant.id, facilityId, date),
-  });
-}
-
-export function useAvailability(facilityId: Id, date: IsoDate) {
-  return useQuery(useAvailabilityQuery()(facilityId, date));
 }
 
 export function useRecommendations(facilityId: Id, date: IsoDate) {
@@ -114,17 +75,6 @@ export function useMe() {
     queryKey: ['users', tenant.id, userId],
     queryFn: userId ? () => repositories.users.get(tenant.id, userId) : skipToken,
   });
-}
-
-/** Everything that depends on bookings, refreshed after any change. */
-function useInvalidateBookings() {
-  const queryClient = useQueryClient();
-  return () =>
-    Promise.all(
-      ['reservations', 'availability', 'recommendations', 'notifications', 'quote'].map((key) =>
-        queryClient.invalidateQueries({ queryKey: [key] }),
-      ),
-    );
 }
 
 export function useBook() {

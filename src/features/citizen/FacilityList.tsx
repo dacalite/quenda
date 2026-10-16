@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 import { Page } from '../../app/Page';
+import { useAvailabilityQuery, useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
 import { daypart, minutesBetween, zonedNow, type Daypart } from '../../domain/time';
 import type { AccessibilityFeature, FacilityType } from '../../domain/types';
+import { useLocalized } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { Checkbox } from '../../ui/Checkbox';
@@ -16,10 +18,10 @@ import { Link } from '../../ui/Link';
 import { Select } from '../../ui/Select';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { TextField } from '../../ui/TextField';
+import layout from '../../ui/layout.module.css';
 import styles from './citizen.module.css';
 import { FacilityImage } from './FacilityImage';
-import { useLocalized } from './labels';
-import { useAvailabilityQuery, useCitizen, useFacilities } from './queries';
+import { useCitizen } from './queries';
 
 const FEATURES: AccessibilityFeature[] = [
   'stepFreeAccess',
@@ -86,7 +88,7 @@ export function FacilityList() {
   return (
     <Page title={t('list.title')}>
       <form
-        className={styles.panel}
+        className={layout.panel}
         aria-labelledby="filters-title"
         onSubmit={(event) => {
           event.preventDefault();
@@ -101,7 +103,7 @@ export function FacilityList() {
         }}
       >
         <h2 id="filters-title">{t('list.filters')}</h2>
-        <div className={styles.filters}>
+        <div className={layout.filters}>
           <TextField
             label={t('list.search')}
             type="search"
@@ -144,9 +146,9 @@ export function FacilityList() {
             ]}
           />
         </div>
-        <fieldset className={styles.fieldset}>
+        <fieldset className={layout.fieldset}>
           <legend>{t('list.accessibility')}</legend>
-          <div className={styles.row}>
+          <div className={layout.row}>
             {FEATURES.map((feature) => (
               <Checkbox
                 key={feature}
@@ -173,7 +175,7 @@ export function FacilityList() {
         >
           {t('list.availableNow')}
         </Checkbox>
-        <div className={styles.row}>
+        <div className={layout.row}>
           <Button type="submit" variant="primary">
             {t('list.apply')}
           </Button>
@@ -193,7 +195,7 @@ export function FacilityList() {
       </p>
       {!loading && results.length === 0 && <p>{t('list.noResults')}</p>}
 
-      <ul className={styles.cards}>
+      <ul className={layout.cards}>
         {results.map((facility) => (
           <Card
             key={facility.id}
@@ -220,7 +222,7 @@ export function FacilityList() {
               type={facility.type}
               alt={facility.photos[0] ? localized(facility.photos[0].alt) : ''}
             />
-            <p className={styles.meta}>
+            <p className={layout.meta}>
               {t(`domain:facilityType.${facility.type}`)} · {facility.address}
             </p>
             {facility.accessibility.length > 0 && (

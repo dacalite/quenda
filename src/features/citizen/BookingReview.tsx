@@ -3,18 +3,19 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 import { Page } from '../../app/Page';
+import { useFacility } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import { ConflictError, RuleViolationError } from '../../data/ports/errors';
 import type { ReservationInput } from '../../data/ports/repositories';
 import type { Facility, Holder, Id } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
+import { useLocalized, useSubspaceName, useViolationText } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { Checkbox } from '../../ui/Checkbox';
 import { ErrorSummary, type FormError } from '../../ui/ErrorSummary';
 import { Link } from '../../ui/Link';
-import styles from './citizen.module.css';
-import { useLocalized, useSubspaceName, useViolationText } from './labels';
-import { useBook, useCitizen, useFacility, useQuote, useRecommendations } from './queries';
+import layout from '../../ui/layout.module.css';
+import { useBook, useCitizen, useQuote, useRecommendations } from './queries';
 
 const ACCEPT_ID = 'accept-rules';
 
@@ -113,7 +114,7 @@ function Review({
       <ErrorSummary errors={errors} />
 
       {blocked && (
-        <section className={styles.notice} data-tone="danger" aria-labelledby="not-possible">
+        <section className={layout.notice} data-tone="danger" aria-labelledby="not-possible">
           <h2 id="not-possible">{t('booking.notPossible')}</h2>
           <ul>
             {conflict && <li>{t('booking.taken')}</li>}
@@ -139,9 +140,9 @@ function Review({
         </section>
       )}
 
-      <section className={styles.panel} aria-labelledby="booking-summary">
+      <section className={layout.panel} aria-labelledby="booking-summary">
         <h2 id="booking-summary">{t('booking.summary')}</h2>
-        <dl className={styles.details}>
+        <dl className={layout.details}>
           <dt>{t('booking.facility')}</dt>
           <dd>{facility.name}</dd>
           <dt>{t('booking.space')}</dt>
@@ -178,7 +179,7 @@ function Review({
 
       {!blocked && (
         <form
-          className={styles.section}
+          className={layout.section}
           aria-labelledby="booking-rules"
           noValidate
           onSubmit={(event) => {
@@ -197,11 +198,11 @@ function Review({
             {t('booking.accept')}
           </Checkbox>
           {errors.length > 0 && (
-            <p className={styles.meta} data-tone="danger">
+            <p className={layout.meta} data-tone="danger">
               {t('booking.acceptError')}
             </p>
           )}
-          <div className={styles.row}>
+          <div className={layout.row}>
             <Button type="submit" variant="primary">
               {book.isPending
                 ? t('booking.saving')

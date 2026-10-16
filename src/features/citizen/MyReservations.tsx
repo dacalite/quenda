@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useTranslation } from 'react-i18next';
 import { Page } from '../../app/Page';
+import { useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import { addDays, weekdayOf, zonedNow } from '../../domain/time';
 import type { Facility, IsoDate, Reservation } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
+import { useSubspaceName } from '../../i18n/labels';
 import { Card } from '../../ui/Card';
 import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { Tab, TabList, TabPanel, Tabs } from '../../ui/Tabs';
-import styles from './citizen.module.css';
-import { useSubspaceName } from './labels';
-import { useCitizen, useFacilities, useMyReservations } from './queries';
+import layout from '../../ui/layout.module.css';
+import { useCitizen, useMyReservations } from './queries';
 import { ReservationActions } from './ReservationActions';
 
 const STATUS_TONE = {
@@ -42,14 +43,14 @@ export function MyReservations() {
 
   const list = (rows: Reservation[], empty: string, past: boolean) =>
     rows.length === 0 ? (
-      <div className={styles.section}>
+      <div className={layout.section}>
         <p>{empty}</p>
         <p>
           <Link href={paths.facilities()}>{t('reservations.find')}</Link>
         </p>
       </div>
     ) : (
-      <ul className={styles.stack}>
+      <ul className={layout.stack}>
         {rows.map((reservation) => {
           const facility = facilities.data?.find((f) => f.id === reservation.facilityId);
           return facility ? (
@@ -119,11 +120,11 @@ function ReservationCard({
       <p>
         {format.longDate(reservation.date)}, {format.timeRange(reservation.start, reservation.end)}
       </p>
-      <p className={styles.row}>
+      <p className={layout.row}>
         <StatusBadge tone={STATUS_TONE[reservation.status]}>
           {t(`domain:reservationStatus.${reservation.status}`)}
         </StatusBadge>
-        <span className={styles.meta}>{t('reservation.title', { code: reservation.code })}</span>
+        <span className={layout.meta}>{t('reservation.title', { code: reservation.code })}</span>
       </p>
       <ReservationActions reservation={reservation} facility={facility} showQr />
     </Card>

@@ -2,6 +2,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   addDays,
+  byDateAndStart,
+  daypart,
   daysBetween,
   fromMinutes,
   isInDateRange,
@@ -11,7 +13,6 @@ import {
   toMinutes,
   weekdayOf,
   zonedNow,
-  daypart,
 } from './time';
 
 describe('time helpers', () => {
@@ -69,5 +70,20 @@ describe('time helpers', () => {
       time: '00:30',
     });
     expect(zonedNow(new Date('2026-07-01T10:00:00Z'), 'Europe/Madrid').time).toBe('12:00');
+  });
+});
+
+describe('byDateAndStart', () => {
+  it('orders by day first, then by start time', () => {
+    const rows = [
+      { date: '2026-10-21', start: '09:00' },
+      { date: '2026-10-20', start: '18:00' },
+      { date: '2026-10-20', start: '10:00' },
+    ];
+    expect(rows.toSorted(byDateAndStart).map((r) => `${r.date} ${r.start}`)).toEqual([
+      '2026-10-20 10:00',
+      '2026-10-20 18:00',
+      '2026-10-21 09:00',
+    ]);
   });
 });

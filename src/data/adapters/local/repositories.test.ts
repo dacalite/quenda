@@ -8,6 +8,7 @@ import {
   ForbiddenError,
   NotFoundError,
   RuleViolationError,
+  ValidationError,
 } from '../../ports/errors';
 import { generateSeed, personaUserId } from '../../seed/generate';
 import { createRandom } from '../../seed/random';
@@ -22,6 +23,7 @@ const A = 'bouzalonga';
 const B = 'ribasmeiras';
 const STAFF_A = personaUserId(A, 'carme');
 const STAFF_B = personaUserId(B, 'carme');
+const CARETAKER_B = personaUserId(B, 'xose');
 
 const uxia: Holder = { kind: 'user', userId: personaUserId(B, 'uxia') };
 const manuel: Holder = { kind: 'user', userId: personaUserId(B, 'manuel') };
@@ -54,11 +56,12 @@ function setup({
   storage = new MemoryStorage(),
 }: { userId?: string | null; storage?: MemoryStorage } = {}) {
   let session = userId;
+  let clock = NOW;
   const db = createLocalDatabase(storage, 'test.db', () => structuredClone(SEED));
   const repos = createLocalRepositories({
     db,
     session: () => (session ? { userId: session } : null),
-    now: () => NOW,
+    now: () => clock,
     latency: false,
     random: createRandom(7).next,
   });
@@ -67,6 +70,9 @@ function setup({
     db,
     actAs: (id: string | null) => {
       session = id;
+    },
+    travelTo: (instant: Date) => {
+      clock = instant;
     },
   };
 }
@@ -230,6 +236,22 @@ describe('authorization', () => {
     await expect(repos.reservations.checkIn(B, own.id)).rejects.toBeInstanceOf(ForbiddenError);
   });
 
+  it('leaves configuration and the audit log to administrators', async () => {
+    const { repos } = setup({ userId: CARETAKER_B });
+    const [facility] = await repos.facilities.list(B);
+    if (!facility) throw new Error('missing fixture');
+    expect((await repos.users.list(B)).length).toBeGreaterThan(0);
+    expect((await repos.indicators.get(B, { from: TODAY, to: TODAY })).range.from).toBe(TODAY);
+    await expect(repos.tenants.update(B, { name: 'X' })).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(repos.facilities.update(B, facility.id, { name: 'X' })).rejects.toBeInstanceOf(
+      ForbiddenError,
+    );
+    await expect(
+      repos.schedules.createHoliday(B, { date: TOMORROW, name: { gl: 'X', es: 'X' } }),
+    ).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(repos.audit.list(B)).rejects.toBeInstanceOf(ForbiddenError);
+  });
+
   it('gives anonymous visitors public information only', async () => {
     const { repos } = setup({ userId: null });
     const facilities = await repos.facilities.list(B);
@@ -324,6 +346,22 @@ describe('reservations', () => {
     expect(audit.find((e) => e.subjectId === reservation.id)?.action).toBe('create');
   });
 
+  it('sends the confirmation of a phone booking by the chosen channel', async () => {
+    const { repos, db } = setup();
+    const slot = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
+    const booking = await repos.reservations.create(B, {
+      ...slot,
+      holder: manuel,
+      channel: 'phone',
+      confirmBy: 'sms',
+    });
+    expect(booking).toMatchObject({ channel: 'phone', createdBy: STAFF_B });
+    const notice = (await repos.notifications.list(B, manuel.userId)).find(
+      (n) => n.reservationId === booking.id,
+    );
+    expect(notice).toMatchObject({ type: 'confirmation', channel: 'sms' });
+  });
+
   it('rejects a taken slot with a conflict and broken rules with their reasons', async () => {
     const { repos, db } = setup();
     const slot = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
@@ -380,8 +418,8 @@ describe('reservations', () => {
     expect(types.sort()).toEqual(['confirmation', 'councilNotice']);
   });
 
-  it('checks in today’s reservations and marks no-shows', async () => {
-    const { repos, db } = setup();
+  it('checks in today’s reservations and marks no-shows once they are over', async () => {
+    const { repos, db, travelTo } = setup();
     const first = freeSlot(db.read(), `${B}-tenis`, TODAY);
     const checkedIn = await repos.reservations.create(B, {
       ...first,
@@ -395,6 +433,10 @@ describe('reservations', () => {
     });
 
     expect((await repos.reservations.checkIn(B, checkedIn.id)).checkedInAt).toBeDefined();
+    await expect(repos.reservations.checkIn(B, checkedIn.id)).rejects.toBeInstanceOf(ConflictError);
+    await expect(repos.reservations.markNoShow(B, absent.id)).rejects.toBeInstanceOf(ConflictError);
+
+    travelTo(new Date('2026-10-15T21:30:00Z'));
     await expect(repos.reservations.markNoShow(B, checkedIn.id)).rejects.toBeInstanceOf(
       ConflictError,
     );
@@ -415,6 +457,39 @@ describe('reservations', () => {
     const pool = await repos.reservations.list(B, { facilityId: `${B}-piscina`, to: TODAY });
     expect(pool.length).toBeGreaterThan(0);
     expect(pool.every((r) => r.facilityId === `${B}-piscina` && r.date <= TODAY)).toBe(true);
+  });
+});
+
+describe('blocks', () => {
+  it('cancels the bookings in the way, telling each person why', async () => {
+    const { repos, db, actAs } = setup({ userId: uxia.userId });
+    const slot = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
+    const booking = await repos.reservations.create(B, { ...slot, holder: uxia, channel: 'web' });
+
+    actAs(STAFF_B);
+    const input = {
+      facilityId: slot.facilityId,
+      subspaceId: null,
+      dates: { from: TOMORROW, to: TOMORROW },
+      times: { start: slot.start, end: slot.end },
+      reason: 'maintenance' as const,
+      note: 'Pintura das liñas',
+    };
+    expect((await repos.schedules.previewBlock(B, input)).map((r) => r.id)).toEqual([booking.id]);
+    expect((await repos.reservations.get(B, booking.id)).status).toBe('confirmed');
+
+    await repos.schedules.createBlock(B, input);
+    const cancelled = await repos.reservations.get(B, booking.id);
+    expect(cancelled.status).toBe('cancelled');
+    expect(cancelled.history.at(-1)).toMatchObject({ type: 'cancelled', detail: input.note });
+    expect(await repos.schedules.previewBlock(B, input)).toEqual([]);
+
+    const notice = (await repos.notifications.list(B, uxia.userId)).find(
+      (n) => n.reservationId === booking.id && n.type === 'councilNotice',
+    );
+    expect(notice).toBeDefined();
+    const audit = await repos.audit.list(B);
+    expect(audit.some((e) => e.action === 'cancel' && e.subjectId === booking.id)).toBe(true);
   });
 });
 
@@ -511,6 +586,59 @@ describe('other repositories', () => {
         'create user',
       ]),
     );
+  });
+
+  it('validates council data as the server would, field by field', async () => {
+    const { repos } = setup();
+    const [facility] = await repos.facilities.list(B);
+    if (!facility) throw new Error('missing fixture');
+    const { id, tenantId: _tenantId, ...input } = facility;
+
+    const created = await repos.facilities.create(B, { ...input, name: 'Pista nova' });
+    expect((await repos.schedules.get(B, created.id)).weekly[1]).not.toHaveLength(0);
+    expect(await repos.facilities.availability(B, created.id, TOMORROW)).not.toHaveLength(0);
+
+    await expect(repos.facilities.create(B, { ...input, name: '' })).rejects.toMatchObject({
+      problems: [{ field: 'name', code: 'required' }],
+    });
+    await expect(repos.facilities.update(B, id, { capacity: 0 })).rejects.toBeInstanceOf(
+      ValidationError,
+    );
+    const schedule = await repos.schedules.get(B, id);
+    await expect(
+      repos.schedules.save(B, {
+        ...schedule,
+        weekly: { ...schedule.weekly, 1: [{ start: '22:00', end: '09:00' }] },
+      }),
+    ).rejects.toBeInstanceOf(ValidationError);
+    await expect(repos.tenants.update(B, { primaryColor: 'vermello' })).rejects.toBeInstanceOf(
+      ValidationError,
+    );
+    expect((await repos.facilities.get(B, id)).capacity).toBe(facility.capacity);
+  });
+
+  it('adds and removes holidays, one per date', async () => {
+    const { repos } = setup();
+    const name = { gl: 'Festa local', es: 'Fiesta local' };
+    const holiday = await repos.schedules.createHoliday(B, { date: TOMORROW, name });
+    expect(await repos.schedules.listHolidays(B)).toContainEqual(holiday);
+    await expect(repos.schedules.createHoliday(B, { date: TOMORROW, name })).rejects.toBeInstanceOf(
+      ConflictError,
+    );
+    await repos.schedules.deleteHoliday(B, holiday.id);
+    expect(await repos.schedules.listHolidays(B)).not.toContainEqual(holiday);
+  });
+
+  it('computes indicators for staff only', async () => {
+    const { repos, actAs } = setup();
+    const range = { from: addDays(TODAY, -56), to: TODAY };
+    const indicators = await repos.indicators.get(B, range);
+    expect(indicators.bookings).toBeGreaterThan(0);
+    expect(indicators.occupancy).toBeGreaterThan(0);
+    expect(indicators.occupancy).toBeLessThan(1);
+    expect(indicators.facilities).toHaveLength((await repos.facilities.list(B)).length);
+    actAs(uxia.userId);
+    await expect(repos.indicators.get(B, range)).rejects.toBeInstanceOf(ForbiddenError);
   });
 
   it('marks notifications as read only once', async () => {

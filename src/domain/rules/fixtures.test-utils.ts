@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import type { LocalDateTime } from '../time';
-import type { BookingRules, Facility, Reservation, Schedule, User } from '../types';
+import type { Block, BookingRules, Facility, Reservation, Schedule, User } from '../types';
 import type { BookingContext } from './booking';
 
 /** Monday 19 October 2026, 10:00. */
@@ -26,7 +26,7 @@ export function makeFacility(overrides: Partial<Facility> = {}): Facility {
     name: 'Campo municipal',
     type: 'footballPitch',
     description: text(''),
-    address: '',
+    address: 'Rúa do Campo, 1',
     coordinates: { lat: 0, lng: 0 },
     capacity: 22,
     subspaces: [
@@ -115,6 +115,22 @@ export function makeReservation(overrides: Partial<Reservation> = {}): Reservati
     createdAt: '2026-10-01T10:00:00.000Z',
     createdBy: 'u1',
     history: [],
+    ...overrides,
+  };
+}
+
+export function makeBlock(overrides: Partial<Block> = {}): Block {
+  return {
+    id: 'b1',
+    tenantId: 't1',
+    facilityId: 'pitch',
+    subspaceId: null,
+    dates: { from: '2026-10-20', to: '2026-10-20' },
+    times: { start: '09:00', end: '11:00' },
+    reason: 'maintenance',
+    note: '',
+    createdAt: '2026-10-01T10:00:00.000Z',
+    createdBy: 'admin',
     ...overrides,
   };
 }

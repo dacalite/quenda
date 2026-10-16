@@ -105,7 +105,8 @@ export function canBook(
   const others = (rows: Reservation[]) => rows.filter((r) => r.id !== ignoreReservationId);
   const violations: RuleViolation[] = [];
 
-  if (facility.status !== 'active') violations.push({ code: 'facilityInactive' });
+  const inactive = facility.status !== 'active';
+  if (inactive) violations.push({ code: 'facilityInactive' });
   if (rules.eligibility === 'entities' && holder.kind !== 'entity') {
     violations.push({ code: 'entitiesOnly' });
   }
@@ -114,7 +115,10 @@ export function canBook(
   }
 
   const problem = findSlotProblem({ ...context, reservations: others(context.reservations) }, slot);
-  if (problem) violations.push(slotProblemToViolation(problem, schedule.slotMinutes));
+  // An inactive facility reads as closed; its own reason is clearer.
+  if (problem && !(inactive && problem === 'closed')) {
+    violations.push(slotProblemToViolation(problem, schedule.slotMinutes));
+  }
 
   if (problem !== 'past') {
     const minutesAhead = minutesBetween(now, { date: slot.date, time: slot.start });

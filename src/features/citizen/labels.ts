@@ -2,51 +2,9 @@
 import { useTranslation } from 'react-i18next';
 import { toIcs } from '../../domain/ics';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
-import type { RuleViolation } from '../../domain/rules/booking';
-import type { CancelViolation, ModifyViolation } from '../../domain/rules/cancellation';
-import type { Facility, Id, LocalizedText, Reservation, Tenant } from '../../domain/types';
-import { currentLanguage } from '../../i18n';
+import type { Facility, Reservation, Tenant } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
-
-export function useLocalized() {
-  useTranslation();
-  const language = currentLanguage();
-  return (text: LocalizedText) => text[language];
-}
-
-export function useSubspaceName() {
-  const localized = useLocalized();
-  return (facility: Facility, subspaceId: Id) => {
-    const subspace = facility.subspaces.find((s) => s.id === subspaceId);
-    return subspace ? localized(subspace.name) : '';
-  };
-}
-
-export function useViolationText() {
-  const { t } = useTranslation('domain');
-  const format = useFormat();
-  return (violation: RuleViolation | CancelViolation | ModifyViolation): string => {
-    switch (violation.code) {
-      case 'misaligned':
-        return t('violation.misaligned', { slotMinutes: violation.slotMinutes });
-      case 'tooSoon':
-        return t('violation.tooSoon', { count: violation.hours });
-      case 'tooFarAhead':
-        return t('violation.tooFarAhead', { count: violation.days });
-      case 'tooShort':
-      case 'tooLong':
-        return t(`violation.${violation.code}`, { minutes: violation.minutes });
-      case 'weeklyLimit':
-        return t('violation.weeklyLimit', { count: violation.max });
-      case 'suspended':
-        return t('violation.suspended', { until: format.longDate(violation.until) });
-      case 'modificationWindowClosed':
-        return t('violation.modificationWindowClosed', { count: violation.hours });
-      default:
-        return t(`violation.${violation.code}`);
-    }
-  };
-}
+import { useSubspaceName } from '../../i18n/labels';
 
 /** What a screen reader hears for a slot: «Pista 1, martes 20 de outubro, 18:00 a 19:00, libre, 4,00 €». */
 export function useSlotDescription(facility: Facility) {
@@ -93,15 +51,4 @@ export function useReservationsIcs() {
       }),
       t('calendar.calendarName', { tenant: tenant.name }),
     );
-}
-
-export function downloadFile(name: string, content: string, type: string) {
-  const url = URL.createObjectURL(new Blob([content], { type }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = name;
-  link.click();
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 1000);
 }

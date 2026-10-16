@@ -10,6 +10,7 @@ import { ConfirmDialog, DialogTrigger, Modal } from '../../ui/Dialog';
 import { Icon } from '../../ui/Icon';
 import { Link } from '../../ui/Link';
 import { useToast } from '../../ui/toasts';
+import layout from '../../ui/layout.module.css';
 import styles from './citizen.module.css';
 import { useCancel, useCitizen } from './queries';
 import { ReservationQr } from './ReservationQr';
@@ -35,7 +36,7 @@ export function ReservationActions({
   if (!decision.ok) return null;
 
   return (
-    <div className={styles.row}>
+    <div className={layout.row}>
       {showQr && (
         <DialogTrigger>
           <Button>{t('reservation.showQr')}</Button>

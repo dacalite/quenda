@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { describe, expect, it } from 'vitest';
-import type { Block } from '../types';
 import {
   findSlotProblem,
   getAvailability,
@@ -8,7 +7,13 @@ import {
   subspacesOverlap,
   type AvailabilitySlot,
 } from './availability';
-import { makeContext, makeFacility, makeReservation, makeSchedule } from './fixtures.test-utils';
+import {
+  makeBlock as block,
+  makeContext,
+  makeFacility,
+  makeReservation,
+  makeSchedule,
+} from './fixtures.test-utils';
 
 const TUESDAY = '2026-10-20';
 const holiday = (date: string) => ({
@@ -16,20 +21,6 @@ const holiday = (date: string) => ({
   tenantId: 't1',
   date,
   name: { gl: 'Festa', es: 'Fiesta' },
-});
-
-const block = (overrides: Partial<Block> = {}): Block => ({
-  id: 'b1',
-  tenantId: 't1',
-  facilityId: 'pitch',
-  subspaceId: null,
-  dates: { from: TUESDAY, to: TUESDAY },
-  times: { start: '09:00', end: '11:00' },
-  reason: 'maintenance',
-  note: '',
-  createdAt: '2026-10-01T10:00:00.000Z',
-  createdBy: 'admin',
-  ...overrides,
 });
 
 const statusOf = (slots: AvailabilitySlot[], subspaceId: string, start: string) =>
@@ -140,6 +131,13 @@ describe('getAvailability', () => {
 
     const withTwo = getAvailability(makeContext({ facility, reservations: two }), TUESDAY);
     expect(withTwo.find((s) => s.start === '18:00')?.status).toBe('booked');
+  });
+
+  it('closes every slot of an inactive facility', () => {
+    const facility = makeFacility({ status: 'inactive' });
+    const slots = getAvailability(makeContext({ facility }), TUESDAY);
+    expect(slots.length).toBeGreaterThan(0);
+    expect(slots.every((s) => s.status === 'closed')).toBe(true);
   });
 
   it('returns nothing on days without opening hours', () => {

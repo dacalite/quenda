@@ -89,5 +89,46 @@
     "app": "Na aplicación",
     "email": "Correo electrónico",
     "sms": "SMS"
+  },
+  "weekday": {
+    "1": "luns",
+    "2": "martes",
+    "3": "mércores",
+    "4": "xoves",
+    "5": "venres",
+    "6": "sábado",
+    "7": "domingo"
+  },
+  "blockReason": {
+    "maintenance": "Mantemento",
+    "event": "Evento",
+    "other": "Outro motivo"
+  },
+  "eligibility": {
+    "everyone": "Calquera persoa",
+    "residents": "Só persoas empadroadas",
+    "entities": "Só clubs e asociacións"
+  },
+  "entityKind": {
+    "club": "Club",
+    "association": "Asociación"
+  },
+  "auditAction": {
+    "create": "Creou",
+    "update": "Cambiou",
+    "delete": "Eliminou",
+    "cancel": "Cancelou",
+    "reschedule": "Cambiou a hora de",
+    "checkIn": "Rexistrou a entrada de",
+    "noShow": "Marcou como non presentada"
+  },
+  "auditSubject": {
+    "tenant": "Configuración do concello",
+    "facility": "Instalación",
+    "schedule": "Horario",
+    "block": "Bloqueo",
+    "reservation": "Reserva",
+    "recurringBooking": "Reserva de tempada",
+    "user": "Persoa"
   }
 }

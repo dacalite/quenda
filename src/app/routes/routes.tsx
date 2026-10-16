@@ -1,6 +1,20 @@
 // SPDX-License-Identifier: EUPL-1.2
 import type { RouteObject } from 'react-router';
+import { AccessControl } from '../../features/admin/AccessControl';
+import { Activity } from '../../features/admin/Activity';
 import { AdminHome } from '../../features/admin/AdminHome';
+import { Agenda } from '../../features/admin/Agenda';
+import { Blocks } from '../../features/admin/Blocks';
+import { Facilities } from '../../features/admin/Facilities';
+import { EditFacility, NewFacility } from '../../features/admin/FacilityForm';
+import { Indicators } from '../../features/admin/Indicators';
+import { NewBooking } from '../../features/admin/NewBooking';
+import { RequireAdmin, RequireStaff } from '../../features/admin/RequireStaff';
+import { ReservationRecord } from '../../features/admin/ReservationRecord';
+import { ScheduleEditor } from '../../features/admin/ScheduleEditor';
+import { SeasonWizard } from '../../features/admin/SeasonWizard';
+import { Seasons } from '../../features/admin/Seasons';
+import { Settings } from '../../features/admin/Settings';
 import { Availability } from '../../features/citizen/Availability';
 import { BookingReview } from '../../features/citizen/BookingReview';
 import { CalendarPage } from '../../features/citizen/CalendarPage';
@@ -20,6 +34,7 @@ import { AppShell, DeputacionLayout, RedirectToDemoStart, TenantLayout } from '.
 import { ADMIN_PATH, DEPUTACION_PATH, LEGAL_PAGES } from './paths';
 
 const personal = (element: React.ReactNode) => <RequireCitizen>{element}</RequireCitizen>;
+const adminOnly = (element: React.ReactNode) => <RequireAdmin>{element}</RequireAdmin>;
 
 export const routes: RouteObject[] = [
   {
@@ -51,7 +66,27 @@ export const routes: RouteObject[] = [
             path: page,
             element: <LegalPage page={page} />,
           })),
-          { path: ADMIN_PATH, element: <AdminHome /> },
+          {
+            path: ADMIN_PATH,
+            element: <RequireStaff />,
+            children: [
+              { index: true, element: <AdminHome /> },
+              { path: 'axenda', element: <Agenda /> },
+              { path: 'nova-reserva', element: <NewBooking /> },
+              { path: 'reservas/:reservationId', element: <ReservationRecord /> },
+              { path: 'acceso', element: <AccessControl /> },
+              { path: 'indicadores', element: <Indicators /> },
+              { path: 'instalacions', element: adminOnly(<Facilities />) },
+              { path: 'instalacions/nova', element: adminOnly(<NewFacility />) },
+              { path: 'instalacions/:facilityId', element: adminOnly(<EditFacility />) },
+              { path: 'instalacions/:facilityId/horario', element: adminOnly(<ScheduleEditor />) },
+              { path: 'bloqueos', element: adminOnly(<Blocks />) },
+              { path: 'tempada', element: adminOnly(<Seasons />) },
+              { path: 'tempada/nova', element: adminOnly(<SeasonWizard />) },
+              { path: 'configuracion', element: adminOnly(<Settings />) },
+              { path: 'actividade', element: adminOnly(<Activity />) },
+            ],
+          },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

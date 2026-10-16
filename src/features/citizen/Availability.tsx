@@ -4,12 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { NotFoundPage } from '../../app/pages';
 import { Page } from '../../app/Page';
+import { useAvailability, useAvailabilityQuery, useFacility, useSchedule } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
 import { computePrice } from '../../domain/rules/pricing';
 import { addDays, daypart, startOfWeek, zonedNow, type Daypart } from '../../domain/time';
 import type { Facility, IsoDate } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
+import { useLocalized } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { DataTable } from '../../ui/DataTable';
 import { DatePicker } from '../../ui/DatePicker';
@@ -18,18 +20,10 @@ import { Link } from '../../ui/Link';
 import { Select } from '../../ui/Select';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { Tab, TabList, TabPanel, Tabs } from '../../ui/Tabs';
+import layout from '../../ui/layout.module.css';
 import styles from './citizen.module.css';
-import { useLocalized, useSlotDescription } from './labels';
-import {
-  useAvailability,
-  useAvailabilityQuery,
-  useCitizen,
-  useFacility,
-  useMe,
-  useRecommendations,
-  useReservation,
-  useSchedule,
-} from './queries';
+import { useSlotDescription } from './labels';
+import { useCitizen, useMe, useRecommendations, useReservation } from './queries';
 
 const DAYPARTS: Daypart[] = ['morning', 'afternoon', 'evening'];
 const isIsoDate = (value: string | null): value is IsoDate =>
@@ -111,12 +105,12 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
   return (
     <Page title={t('availability.title', { name: facility.name })}>
       {replaces && changing.data && (
-        <p className={styles.notice} data-tone="info">
+        <p className={layout.notice} data-tone="info">
           {t('availability.changing', { code: changing.data.code })}
         </p>
       )}
 
-      <div className={styles.row}>
+      <div className={layout.row}>
         <Button
           isDisabled={date <= today}
           onPress={() => {
@@ -155,14 +149,14 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
       </div>
 
       {recommended.length > 0 && (
-        <section className={styles.panel} aria-labelledby="recommendations-title">
+        <section className={layout.panel} aria-labelledby="recommendations-title">
           <h2 id="recommendations-title">{t('availability.recommendationsTitle')}</h2>
           <p>
             {t('availability.recommendationsIntro', {
               times: format.list(recommended.map((r) => r.start).sort()),
             })}
           </p>
-          <ul className={styles.stack}>
+          <ul className={layout.stack}>
             {recommended.map((r) => (
               <li key={r.start}>
                 <Link href={bookingHref(r.slot)}>
@@ -199,7 +193,7 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
                 const partSlots = slots.filter((slot) => daypart(slot.start) === part);
                 if (partSlots.length === 0) return null;
                 return (
-                  <section key={part} className={styles.section} aria-labelledby={`part-${part}`}>
+                  <section key={part} className={layout.section} aria-labelledby={`part-${part}`}>
                     <h2 id={`part-${part}`}>{t(`domain:daypart.${part}`)}</h2>
                     <ul className={styles.slots}>
                       {partSlots.map((slot) => (

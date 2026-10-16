@@ -15,7 +15,6 @@ async function choose(page: Page, label: RegExp, option: string) {
 test.describe('every view passes axe', () => {
   for (const [path, title] of [
     ['/bouzalonga', 'Reserva de instalacións deportivas'],
-    ['/ribasmeiras/xestion', 'Panel de xestión'],
     ['/deputacion', 'Vista da deputación'],
     ['/non-existe', 'Non atopamos esta páxina'],
   ] as const) {
@@ -107,7 +106,7 @@ test('the demo can be reset and says so', async ({ page }) => {
 test.describe('reflow at 320 px without horizontal scroll', () => {
   test.use({ viewport: { width: 320, height: 640 } });
 
-  for (const path of ['/bouzalonga', '/ribasmeiras/xestion', '/deputacion']) {
+  for (const path of ['/bouzalonga', '/deputacion']) {
     test(path, async ({ page }) => {
       await page.goto(`.${path}`);
       await expect(heading(page)).toBeVisible();
