@@ -18,6 +18,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
+    "screenshots": "playwright test --config playwright.screenshots.config.ts",
     "licenses": "license-checker-rseidelsohn --excludePrivatePackages --excludePackages \"caniuse-lite;spdx-exceptions;spdx-ranges\" --onlyAllow \"MIT;MIT-0;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;MPL-2.0;BlueOak-1.0.0;OFL-1.1;CC0-1.0;EUPL-1.2\"",
     "api:lint": "redocly lint docs/api/openapi.yaml",
     "test:coverage": "vitest run --coverage",
