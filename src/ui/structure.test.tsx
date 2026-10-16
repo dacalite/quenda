@@ -115,6 +115,20 @@ describe('DataTable', () => {
     );
     await expectNoAxeViolations();
   });
+
+  it('says so when there is nothing to list', async () => {
+    renderUi(
+      <DataTable
+        caption="Bloqueos"
+        rows={[]}
+        rowKey={() => ''}
+        columns={[{ key: 'when', header: 'Cando', render: () => null }]}
+        empty="Non hai bloqueos previstos."
+      />,
+    );
+    expect(screen.getByRole('cell', { name: 'Non hai bloqueos previstos.' })).toBeInTheDocument();
+    await expectNoAxeViolations();
+  });
 });
 
 describe('Tabs', () => {
