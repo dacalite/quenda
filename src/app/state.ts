@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { APP_NAME } from '../config/app';
-import type { PersonaKey } from '../data/seed/catalog';
+import { DEPUTACION, DEPUTACION_STAFF_ID, type PersonaKey } from '../data/seed/catalog';
 import { personaUserId } from '../data/seed/generate';
 import type { AccessibilityPreferences, Id } from '../domain/types';
 
@@ -72,6 +72,15 @@ export const useDemo = create<DemoState>()(
 export function sessionUserId({ role, citizen, staff, tenantId, signedIn } = useDemo.getState()) {
   if (!tenantId || role === 'deputacion' || (role === 'citizen' && !signedIn)) return null;
   return personaUserId(tenantId, role === 'citizen' ? citizen : staff);
+}
+
+/** What the simulated server reads from the authentication token. */
+export function currentSession(state = useDemo.getState()) {
+  if (state.role === 'deputacion') {
+    return { userId: DEPUTACION_STAFF_ID, deputacionId: DEPUTACION.id };
+  }
+  const userId = sessionUserId(state);
+  return userId ? { userId } : null;
 }
 
 interface PreferencesState extends AccessibilityPreferences {

@@ -140,6 +140,8 @@ export interface TenantSeed {
 }
 
 export const DEPUTACION: Deputacion = { id: 'deputacion-exemplo', name: 'Deputación de Exemplo' };
+/** The deputación employee who uses its back office in the demo. */
+export const DEPUTACION_STAFF_ID = `${DEPUTACION.id}-tecnica`;
 
 export const TENANTS: TenantSeed[] = [
   {
