@@ -10,7 +10,7 @@ export interface FieldProblem {
   code: ProblemCode;
 }
 
-const NUMERIC_RULES = [
+export const NUMERIC_RULES = [
   'minAdvanceHours',
   'maxAdvanceDays',
   'minDurationMinutes',

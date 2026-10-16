@@ -38,6 +38,12 @@ export const rangesOverlap = (a: TimeRange, b: TimeRange) =>
 export const minutesBetween = (from: LocalDateTime, to: LocalDateTime) =>
   daysBetween(from.date, to.date) * MINUTES_PER_DAY + toMinutes(to.time) - toMinutes(from.time);
 
+/** Chronological order for anything with a date and a start time. */
+export const byDateAndStart = (
+  a: { date: IsoDate; start: Time },
+  b: { date: IsoDate; start: Time },
+) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start);
+
 export type Daypart = 'morning' | 'afternoon' | 'evening';
 
 /** Groups slots the way people talk about them: mañá, tarde, noite. */
