@@ -97,7 +97,6 @@ docs/         documentación técnica
 - [Accesibilidade](docs/accesibilidade/criterios.md): criterios, [informe de probas](docs/accesibilidade/informe-probas.md) e [declaración](docs/accesibilidade/declaracion-accesibilidade.md)
 - [Despregamento](docs/despregamento.md)
 - [Decisións de arquitectura (ADR)](docs/adr)
-- [Estado dos requisitos](docs/estado.md) e [decisións pendentes das entrevistas cos concellos](docs/pendente-entrevistas.md)
 
 ## Adaptalo a outro concello
 
