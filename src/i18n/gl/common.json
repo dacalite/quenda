@@ -2,6 +2,7 @@
   "skipLink": "Saltar ao contido",
   "pageTitle": "{{page}} · {{site}}",
   "loading": "Cargando…",
+  "menu": "Menú",
   "language": {
     "label": "Idioma"
   },
@@ -31,12 +32,6 @@
   "footer": {
     "license": "Software libre baixo licenza EUPL-1.2",
     "prototype": "Prototipo con datos simulados: non se garda nada fóra deste navegador."
-  },
-  "citizen": {
-    "home": {
-      "title": "Reserva de instalacións deportivas",
-      "intro": "Aquí poderás buscar as instalacións do concello, ver cando están libres e reservar desde o móbil. Esta sección está en construción."
-    }
   },
   "admin": {
     "home": {

@@ -11,6 +11,7 @@ import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { Link } from '../../ui/Link';
 import { TextField } from '../../ui/TextField';
+import layout from '../../ui/layout.module.css';
 import styles from './citizen.module.css';
 import { useCitizen, useMyReservations, useNotifications } from './queries';
 
@@ -40,7 +41,7 @@ export function CitizenHome() {
 
       <form
         role="search"
-        className={styles.row}
+        className={layout.row}
         onSubmit={(event) => {
           event.preventDefault();
           void navigate(paths.facilities({ q: search.trim() || undefined }));
@@ -58,7 +59,7 @@ export function CitizenHome() {
         </Button>
       </form>
 
-      <section className={styles.section} aria-labelledby="home-types">
+      <section className={layout.section} aria-labelledby="home-types">
         <h2 id="home-types">{t('home.types')}</h2>
         <ul className={styles.featureList}>
           {types.map((type) => (
@@ -72,13 +73,13 @@ export function CitizenHome() {
       </section>
 
       {signedIn ? (
-        <div className={styles.split}>
-          <section className={styles.section} aria-labelledby="home-upcoming">
+        <div className={layout.split}>
+          <section className={layout.section} aria-labelledby="home-upcoming">
             <h2 id="home-upcoming">{t('home.upcoming')}</h2>
             {upcoming.length === 0 ? (
               <p>{t('home.noUpcoming')}</p>
             ) : (
-              <ul className={styles.stack}>
+              <ul className={layout.stack}>
                 {upcoming.map((r) => (
                   <Card key={r.id} as="li" headingLevel={3} title={facilityName(r.facilityId)}>
                     <p>
@@ -95,7 +96,7 @@ export function CitizenHome() {
               <Link href={paths.reservations}>{t('home.allReservations')}</Link>
             </p>
           </section>
-          <section className={styles.section} aria-labelledby="home-notices">
+          <section className={layout.section} aria-labelledby="home-notices">
             <h2 id="home-notices">{t('home.notices')}</h2>
             <p>{unread > 0 ? t('home.unread', { count: unread }) : t('home.noUnread')}</p>
             <p>
@@ -104,7 +105,7 @@ export function CitizenHome() {
           </section>
         </div>
       ) : (
-        <div className={styles.panel}>
+        <div className={layout.panel}>
           <p>{t('home.signInPrompt')}</p>
           <p>
             <Link href={paths.signIn(paths.home)} variant="primary">

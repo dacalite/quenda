@@ -8,7 +8,7 @@ import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { TextField } from '../../ui/TextField';
 import { useToast } from '../../ui/toasts';
-import styles from './citizen.module.css';
+import layout from '../../ui/layout.module.css';
 import { useReservationsIcs } from './labels';
 import { useCitizen, useMyReservations } from './queries';
 
@@ -29,7 +29,7 @@ export function CalendarPage() {
   return (
     <Page title={t('calendar.title')}>
       <p>{t('calendar.intro')}</p>
-      <section className={styles.panel} aria-labelledby="calendar-download">
+      <section className={layout.panel} aria-labelledby="calendar-download">
         <h2 id="calendar-download">{t('calendar.downloadTitle')}</h2>
         <p>{t('calendar.downloadHelp')}</p>
         <p>
@@ -48,7 +48,7 @@ export function CalendarPage() {
           </Button>
         </p>
       </section>
-      <section className={styles.panel} aria-labelledby="calendar-subscribe">
+      <section className={layout.panel} aria-labelledby="calendar-subscribe">
         <h2 id="calendar-subscribe">{t('calendar.subscribeTitle')}</h2>
         <p>{t('calendar.subscribeHelp')}</p>
         <TextField label={t('calendar.url')} value={url} isReadOnly />
@@ -63,7 +63,7 @@ export function CalendarPage() {
             {t('calendar.copy')}
           </Button>
         </p>
-        <p className={styles.meta}>{t('calendar.simulated')}</p>
+        <p className={layout.meta}>{t('calendar.simulated')}</p>
       </section>
     </Page>
   );

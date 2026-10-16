@@ -2,6 +2,7 @@
   "skipLink": "Saltar al contenido",
   "pageTitle": "{{page}} · {{site}}",
   "loading": "Cargando…",
+  "menu": "Menú",
   "language": {
     "label": "Idioma"
   },
@@ -31,12 +32,6 @@
   "footer": {
     "license": "Software libre bajo licencia EUPL-1.2",
     "prototype": "Prototipo con datos simulados: no se guarda nada fuera de este navegador."
-  },
-  "citizen": {
-    "home": {
-      "title": "Reserva de instalaciones deportivas",
-      "intro": "Aquí podrás buscar las instalaciones del ayuntamiento, ver cuándo están libres y reservar desde el móvil. Esta sección está en construcción."
-    }
   },
   "admin": {
     "home": {

@@ -10,7 +10,7 @@ import { PERSONAS } from '../../data/seed/catalog';
 import { Button } from '../../ui/Button';
 import { Link } from '../../ui/Link';
 import { useToast } from '../../ui/toasts';
-import styles from './citizen.module.css';
+import layout from '../../ui/layout.module.css';
 import { useCitizen } from './queries';
 
 const PROVIDERS = { clave: 'Cl@ve', chave365: 'Chave365' } as const;
@@ -25,7 +25,7 @@ export function SignIn() {
   return (
     <Page title={t('signIn.title')}>
       <p>{t('signIn.intro')}</p>
-      <div className={styles.row}>
+      <div className={layout.row}>
         <Link href={paths.provider('clave', back)} variant="primary">
           {t('signIn.clave')}
         </Link>
@@ -33,7 +33,7 @@ export function SignIn() {
           {t('signIn.chave365')}
         </Link>
       </div>
-      <section className={styles.panel} aria-labelledby="sign-in-how">
+      <section className={layout.panel} aria-labelledby="sign-in-how">
         <h2 id="sign-in-how">{t('signIn.howItWorks')}</h2>
         <p>{t('signIn.howItWorksBody')}</p>
       </section>
@@ -62,7 +62,7 @@ export function IdentityProvider() {
       title={t('signIn.providerTitle', { provider: PROVIDERS[provider as keyof typeof PROVIDERS] })}
     >
       <p>{t('signIn.providerIntro')}</p>
-      <div className={styles.row}>
+      <div className={layout.row}>
         <Button
           variant="primary"
           onPress={() => {

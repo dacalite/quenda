@@ -12,6 +12,7 @@ import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
+import layout from '../../ui/layout.module.css';
 import styles from './citizen.module.css';
 import { useReservationsIcs } from './labels';
 import { useCitizen, useReservation } from './queries';
@@ -68,8 +69,8 @@ function Detail({ reservation, facility }: { reservation: Reservation; facility:
         ? { announcement: t('reservation.confirmedAnnouncement', { code: reservation.code }) }
         : {})}
     >
-      <div className={styles.split}>
-        <section className={styles.section} aria-labelledby="reservation-code">
+      <div className={layout.split}>
+        <section className={layout.section} aria-labelledby="reservation-code">
           <h2 id="reservation-code">{t('reservation.code')}</h2>
           <p className={styles.code}>{reservation.code}</p>
           {active && (
@@ -83,9 +84,9 @@ function Detail({ reservation, facility }: { reservation: Reservation; facility:
           )}
         </section>
 
-        <section className={styles.section} aria-labelledby="reservation-details">
+        <section className={layout.section} aria-labelledby="reservation-details">
           <h2 id="reservation-details">{t('reservation.details')}</h2>
-          <dl className={styles.details}>
+          <dl className={layout.details}>
             <dt>{t('booking.facility')}</dt>
             <dd>{facility.name}</dd>
             <dt>{t('booking.space')}</dt>
@@ -128,9 +129,9 @@ function Detail({ reservation, facility }: { reservation: Reservation; facility:
       </div>
 
       {reservation.history.length > 0 && (
-        <section className={styles.section} aria-labelledby="reservation-history">
+        <section className={layout.section} aria-labelledby="reservation-history">
           <h2 id="reservation-history">{t('reservation.history')}</h2>
-          <ol className={styles.stack}>
+          <ol className={layout.stack}>
             {reservation.history.map((event) => {
               const label = t(`reservation.event.${event.type}`);
               const holderId =

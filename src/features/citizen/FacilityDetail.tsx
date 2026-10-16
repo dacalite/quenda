@@ -16,7 +16,7 @@ import { Icon } from '../../ui/Icon';
 import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { NotFoundPage } from '../../app/pages';
-import styles from './citizen.module.css';
+import layout from '../../ui/layout.module.css';
 import { FacilityImage } from './FacilityImage';
 import { useCitizen, useMe } from './queries';
 
@@ -71,17 +71,17 @@ export function FacilityDetail() {
 
   return (
     <Page title={f.name}>
-      <div className={styles.split}>
+      <div className={layout.split}>
         <FacilityImage type={f.type} alt={f.photos[0] ? localized(f.photos[0].alt) : ''} />
-        <div className={styles.section}>
+        <div className={layout.section}>
           <p>{localized(f.description)}</p>
-          <dl className={styles.details}>
+          <dl className={layout.details}>
             <dt>{t('facility.type')}</dt>
             <dd>{t(`domain:facilityType.${f.type}`)}</dd>
             <dt>{t('facility.address')}</dt>
             <dd>{f.address}</dd>
           </dl>
-          <p className={styles.meta}>{t('facility.capacity', { count: f.capacity })}</p>
+          <p className={layout.meta}>{t('facility.capacity', { count: f.capacity })}</p>
           <p>
             {nextFree.data
               ? t('facility.nextFree', {
@@ -98,14 +98,14 @@ export function FacilityDetail() {
         </div>
       </div>
 
-      <section className={styles.panel} aria-labelledby="facility-accessibility">
+      <section className={layout.panel} aria-labelledby="facility-accessibility">
         <h2 id="facility-accessibility">{t('facility.accessibilityTitle')}</h2>
         {f.accessibility.length === 0 ? (
           <p>{t('facility.noAccessibility')}</p>
         ) : (
-          <ul className={styles.stack}>
+          <ul className={layout.stack}>
             {f.accessibility.map((feature) => (
-              <li key={feature} className={styles.row}>
+              <li key={feature} className={layout.row}>
                 <Icon name="check" />
                 {t(`domain:accessibility.${feature}`)}
               </li>
@@ -114,12 +114,12 @@ export function FacilityDetail() {
         )}
       </section>
 
-      <section className={styles.section} aria-labelledby="facility-rules">
+      <section className={layout.section} aria-labelledby="facility-rules">
         <h2 id="facility-rules">{t('facility.rulesTitle')}</h2>
         <p>{localized(f.usageRules)}</p>
       </section>
 
-      <section className={styles.section} aria-labelledby="facility-prices">
+      <section className={layout.section} aria-labelledby="facility-prices">
         <h2 id="facility-prices">{t('facility.pricesTitle')}</h2>
         <DataTable
           caption={t('facility.pricesCaption', { minutes: slotMinutes })}
@@ -131,7 +131,7 @@ export function FacilityDetail() {
               header: t('facility.tariffColumn'),
               isRowHeader: true,
               render: (row) => (
-                <span className={styles.row}>
+                <span className={layout.row}>
                   {t(`domain:tariff.${row.id}`)}
                   {row.id === yourTariff && (
                     <StatusBadge tone="info">{t('facility.yourTariff')}</StatusBadge>
@@ -172,7 +172,7 @@ export function FacilityDetail() {
       </section>
 
       {schedule.data && (
-        <section className={styles.section} aria-labelledby="facility-schedule">
+        <section className={layout.section} aria-labelledby="facility-schedule">
           <h2 id="facility-schedule">{t('facility.scheduleTitle')}</h2>
           <DataTable
             caption={t('facility.scheduleCaption')}
