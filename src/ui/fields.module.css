@@ -36,10 +36,19 @@
   min-height: var(--target-min);
   padding: var(--space-2) var(--space-3);
   font: inherit;
-  color: inherit;
-  background: var(--color-background);
+  color: var(--color-field-text);
+  background: var(--color-field);
   border: var(--control-border-width) solid var(--color-border);
-  border-radius: var(--radius-1);
+  border-radius: var(--radius-2);
+  transition: border-color var(--duration) var(--ease-out);
+}
+
+.input:hover {
+  border-color: var(--color-field-text);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
 }
 
 .input[data-invalid],

@@ -7,9 +7,11 @@
   max-width: 100%;
   min-height: var(--target-min);
   padding-inline-start: var(--space-3);
-  background: var(--color-background);
+  color: var(--color-field-text);
+  background: var(--color-field);
   border: var(--control-border-width) solid var(--color-border);
-  border-radius: var(--radius-1);
+  border-radius: var(--radius-2);
+  overflow: hidden;
 }
 
 .group[data-invalid] {
@@ -46,8 +48,9 @@
 
 .calendarButton {
   min-height: calc(var(--target-min) - 2 * var(--control-border-width));
+  color: var(--color-field-text);
   border-radius: 0;
-  border-inline-start: var(--control-border-width) solid var(--color-border);
+  border-inline-start: var(--border-width) solid var(--color-border-subtle);
 }
 
 .calendar {

@@ -1,10 +1,15 @@
 /* SPDX-License-Identifier: EUPL-1.2 */
 
+/* One strip of figures; the 1px gaps show the border colour behind as dividers. */
 .list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  gap: var(--border-width);
   margin: 0;
+  overflow: hidden;
+  background: var(--color-border-subtle);
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-radius: var(--radius-3);
 }
 
 .stat {
@@ -13,13 +18,10 @@
   gap: var(--space-1);
   padding: var(--space-3) var(--space-4);
   background: var(--color-background);
-  border: var(--border-width) solid var(--color-border-subtle);
-  border-radius: var(--radius-3);
-  box-shadow: var(--shadow-1);
 }
 
 .label {
-  font-weight: 700;
+  font-size: var(--font-size-2);
   color: var(--color-text-muted);
 }
 
@@ -29,6 +31,7 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
+  letter-spacing: var(--tracking-tight);
 }
 
 .detail {

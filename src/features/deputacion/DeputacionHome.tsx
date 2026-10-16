@@ -119,9 +119,7 @@ function Councils({
             title={
               <span
                 className={layout.row}
-                style={
-                  { '--color-primary': accessibleColor(council.primaryColor) } as CSSProperties
-                }
+                style={{ '--color-accent': accessibleColor(council.primaryColor) } as CSSProperties}
               >
                 <Emblem kind={council.emblem} />
                 {council.name}

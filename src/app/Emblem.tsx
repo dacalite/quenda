@@ -14,7 +14,7 @@ export function Emblem({ kind }: { kind: EmblemKind }) {
     <svg aria-hidden="true" focusable="false" width="2.25rem" height="2.5rem" viewBox="0 0 32 36">
       <path
         d="M3 3h26v16c0 8-6 12-13 14C9 31 3 27 3 19z"
-        fill="var(--color-primary)"
+        fill="var(--color-accent)"
         stroke="var(--color-text)"
         strokeWidth="1.5"
       />

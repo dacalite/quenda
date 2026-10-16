@@ -10,12 +10,16 @@
   min-height: var(--target-min);
   padding: var(--space-2) var(--space-3);
   font: inherit;
-  color: inherit;
+  color: var(--color-field-text);
   text-align: start;
-  background: var(--color-background);
+  background: var(--color-field);
   border: var(--control-border-width) solid var(--color-border);
-  border-radius: var(--radius-1);
+  border-radius: var(--radius-2);
   cursor: pointer;
+}
+
+.trigger[data-hovered] {
+  border-color: var(--color-field-text);
 }
 
 .trigger [data-placeholder] {
@@ -29,7 +33,7 @@
   overflow: auto;
   color: var(--color-text);
   background: var(--color-background);
-  border: var(--control-border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-border-subtle);
   border-radius: var(--radius-2);
   box-shadow: var(--shadow-2);
 }
@@ -48,6 +52,10 @@
   border-radius: var(--radius-1);
   cursor: pointer;
   outline: none;
+}
+
+.option[data-hovered] {
+  background: var(--color-surface);
 }
 
 .option[data-focused] {

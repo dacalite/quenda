@@ -7,7 +7,7 @@ import { accessibleColor, contrastRatio } from './contrast';
 const tokensCss = readFileSync('src/ui/tokens.css', 'utf8');
 
 function readTokens(selector: string) {
-  const start = tokensCss.indexOf(`${selector} {`);
+  const start = Math.max(tokensCss.indexOf(`${selector} {`), tokensCss.indexOf(`${selector},`));
   const block = tokensCss.slice(start, tokensCss.indexOf('}', start));
   return Object.fromEntries(
     [...block.matchAll(/--(color-[a-z-]+):\s*(?:var\(--[a-z-]+,\s*)?(#[0-9a-f]{6})\)?;/gi)].map(
@@ -30,6 +30,13 @@ const PAIRS: [string, string, number][] = [
   ['color-focus', 'color-background', 3],
   ['color-primary', 'color-background', 4.5],
   ['color-on-primary', 'color-primary', 4.5],
+  ['color-on-primary', 'color-primary-strong', 4.5],
+  ['color-primary', 'color-surface', 4.5],
+  ['color-primary', 'color-primary-surface', 4.5],
+  ['color-text', 'color-primary-surface', 7],
+  ['color-text', 'color-selection', 7],
+  ['color-field-text', 'color-field', 7],
+  ['color-border', 'color-field', 3],
   ['color-success', 'color-success-surface', 4.5],
   ['color-warning', 'color-warning-surface', 4.5],
   ['color-danger', 'color-danger-surface', 4.5],
@@ -49,6 +56,18 @@ describe.each([
     expect(fg, foreground).toBeDefined();
     expect(bg, background).toBeDefined();
     expect(contrastRatio(fg ?? '', bg ?? '')).toBeGreaterThanOrEqual(high ? 7 : minimum);
+  });
+});
+
+// Status colours do not appear on the navy bands, and a white field is its own edge there.
+describe('navy bands', () => {
+  const colours = { ...base, ...readTokens('.on-navy') };
+  it.each(
+    PAIRS.filter(([fg, bg]) => !/success|warning|danger|info/.test(fg) && bg !== 'color-field'),
+  )('%s on %s', (foreground, background, minimum) => {
+    expect(
+      contrastRatio(colours[foreground] ?? '', colours[background] ?? ''),
+    ).toBeGreaterThanOrEqual(minimum);
   });
 });
 

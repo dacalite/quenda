@@ -4,17 +4,27 @@
 :root {
   --font-body: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
 
-  --color-text: #1b1b1f;
-  --color-text-muted: #4b4b55;
+  --color-xunta: #0069b4;
+  --color-navy: #0b2545;
+  --color-celeste: #4fb3e8;
+  /* The council's own colour, used as an accent: emblem and a thin rule. */
+  --color-accent: var(--tenant-primary, #0069b4);
+
+  --color-text: #0b2545;
+  --color-text-muted: #4a5d73;
   --color-background: #ffffff;
-  --color-surface: #f4f4f0;
-  --color-surface-strong: #e6e6df;
-  --color-border: #6c6c74;
-  --color-border-subtle: #d0d0c8;
-  --color-focus: #1d4ed8;
-  --color-primary: var(--tenant-primary, #0b5cad);
+  --color-surface: #f3f8fc;
+  --color-surface-strong: #e3f0f9;
+  --color-border: #6b7f95;
+  --color-border-subtle: #d5e3ef;
+  --color-focus: #0069b4;
+  --color-primary: #0069b4;
+  --color-primary-strong: #00508a;
   --color-on-primary: #ffffff;
-  --color-primary-surface: color-mix(in srgb, var(--color-primary) 10%, #ffffff);
+  --color-primary-surface: #e3f0f9;
+  --color-field: #ffffff;
+  --color-field-text: #0b2545;
+  --color-selection: #cde6f7;
 
   --color-success: #1d6b36;
   --color-success-surface: #e7f4ea;
@@ -22,8 +32,8 @@
   --color-warning-surface: #fff3df;
   --color-danger: #b42318;
   --color-danger-surface: #fdecea;
-  --color-info: #1d4ed8;
-  --color-info-surface: #e9effd;
+  --color-info: #0069b4;
+  --color-info-surface: #e3f0f9;
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -32,9 +42,12 @@
   --space-5: 2.5rem;
   --space-6: 4rem;
 
-  --radius-1: 4px;
-  --radius-2: 8px;
-  --radius-3: 12px;
+  /* Residents get soft, rounded shapes; the staff surface tightens them (see [data-surface]). */
+  --radius-1: 8px;
+  --radius-2: 12px;
+  --radius-3: 18px;
+  --radius-pill: 999px;
+  --radius-control: var(--radius-pill);
   --border-width: 1px;
   --control-border-width: 2px;
   --focus-width: 3px;
@@ -45,16 +58,47 @@
   --font-size-4: 1.375rem;
   --font-size-5: 1.75rem;
   --font-size-6: 2.25rem;
+  --font-size-7: clamp(2.25rem, 1.6rem + 2.6vw, 3.25rem);
   --line-height: 1.5;
+  --tracking-tight: -0.02em;
 
   --target-min: 44px;
   --content-max: 72rem;
-  --shadow-1: 0 1px 3px rgb(0 0 0 / 12%);
-  --shadow-2: 0 8px 24px rgb(0 0 0 / 18%);
-  --duration: 150ms;
+  --shadow-1: 0 1px 2px rgb(11 37 69 / 6%), 0 2px 8px rgb(11 37 69 / 6%);
+  --shadow-2: 0 4px 12px rgb(11 37 69 / 8%), 0 16px 40px rgb(11 37 69 / 14%);
+  --duration: 180ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-:root[data-contrast='high'] {
+[data-surface='staff'] {
+  --radius-1: 4px;
+  --radius-2: 6px;
+  --radius-3: 8px;
+  --radius-control: 6px;
+}
+
+/* Navy bands: the citizen hero and the staff header. */
+.on-navy {
+  --color-text: #ffffff;
+  --color-text-muted: #c3d8ec;
+  --color-background: #0b2545;
+  --color-surface: #13325a;
+  --color-surface-strong: #1a3a63;
+  --color-border: #9db9d3;
+  --color-border-subtle: #2c4a70;
+  --color-focus: #4fb3e8;
+  --color-primary: #ffffff;
+  --color-primary-strong: #e3f0f9;
+  --color-on-primary: #0b2545;
+  --color-primary-surface: #1a3a63;
+  --color-selection: #1f4878;
+
+  color: var(--color-text);
+  background-color: var(--color-background);
+}
+
+:root[data-contrast='high'],
+:root[data-contrast='high'] .on-navy {
   --color-text: #000000;
   --color-text-muted: #000000;
   --color-background: #ffffff;
@@ -64,8 +108,12 @@
   --color-border-subtle: #000000;
   --color-focus: #0033cc;
   --color-primary: #000000;
+  --color-primary-strong: #000000;
   --color-on-primary: #ffffff;
   --color-primary-surface: #ffffff;
+  --color-field: #ffffff;
+  --color-field-text: #000000;
+  --color-selection: #ffff00;
   --color-success: #00501f;
   --color-success-surface: #ffffff;
   --color-warning: #5c3100;
@@ -77,6 +125,8 @@
   --border-width: 2px;
   --control-border-width: 3px;
   --focus-width: 4px;
+  --shadow-1: none;
+  --shadow-2: 0 0 0 2px #000000;
 }
 
 :root[data-text-size='large'] {

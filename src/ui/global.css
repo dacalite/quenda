@@ -10,6 +10,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  accent-color: var(--color-primary);
+  scrollbar-color: var(--color-border) var(--color-surface);
 }
 
 body {
@@ -20,17 +22,40 @@ body {
   color: var(--color-text);
   background: var(--color-background);
   overflow-wrap: break-word;
+  caret-color: var(--color-primary);
+  font-variant-numeric: lining-nums;
+}
+
+::selection {
+  color: var(--color-text);
+  background: var(--color-selection);
 }
 
 h1,
 h2,
 h3 {
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 a {
   color: var(--color-primary);
-  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+table,
+time {
+  font-variant-numeric: tabular-nums;
 }
 
 :focus-visible {

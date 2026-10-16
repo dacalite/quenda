@@ -63,7 +63,7 @@
 
 .notice {
   padding: var(--space-3) var(--space-4);
-  border-inline-start: 6px solid currentColor;
+  border: var(--border-width) solid currentColor;
   border-radius: var(--radius-2);
 }
 

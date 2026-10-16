@@ -23,7 +23,7 @@
 }
 
 .box {
-  border-radius: var(--radius-1);
+  border-radius: 6px;
 }
 
 .circle {

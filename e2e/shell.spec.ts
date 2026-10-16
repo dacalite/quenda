@@ -74,14 +74,14 @@ test('navigating moves focus to the new heading and updates the title', async ({
 test('switching council changes the brand colour', async ({ page }) => {
   await page.goto('./bouzalonga');
   await expect(heading(page)).toBeVisible();
-  const primary = () =>
+  const accent = () =>
     page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue('--color-primary'),
+      getComputedStyle(document.documentElement).getPropertyValue('--color-accent'),
     );
-  const before = await primary();
+  const before = await accent();
   await choose(page, /Concello/, 'Concello de Ribasmeiras');
   await expect(page).toHaveTitle(/Concello de Ribasmeiras/);
-  expect(await primary()).not.toBe(before);
+  expect(await accent()).not.toBe(before);
 });
 
 test('the chosen language survives a reload', async ({ page }) => {
