@@ -8,6 +8,7 @@ import { Button } from './Button';
 import { Card } from './Card';
 import { DataTable } from './DataTable';
 import { Link } from './Link';
+import { StatList } from './StatList';
 import { SkipLink } from './SkipLink';
 import { Tab, TabList, TabPanel, Tabs } from './Tabs';
 
@@ -66,6 +67,23 @@ describe('Card', () => {
       </Card>,
     );
     expect(screen.getByRole('heading', { level: 3, name: 'Pista de pádel' })).toBeInTheDocument();
+    await expectNoAxeViolations();
+  });
+});
+
+describe('StatList', () => {
+  it('reads each figure together with its label', async () => {
+    renderUi(
+      <StatList
+        stats={[
+          { label: 'Reservas hoxe', value: '18' },
+          { label: 'Ocupación', value: '64 %', detail: 'esta semana' },
+        ]}
+      />,
+    );
+    const terms = screen.getAllByRole('term');
+    expect(terms.map((term) => term.textContent)).toEqual(['Reservas hoxe', 'Ocupación']);
+    expect(screen.getByText('64 %')).toHaveRole('definition');
     await expectNoAxeViolations();
   });
 });

@@ -47,3 +47,7 @@
   border-color: var(--color-danger);
   border-width: 3px;
 }
+
+.short {
+  max-width: 12rem;
+}

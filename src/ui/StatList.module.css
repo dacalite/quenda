@@ -1,0 +1,37 @@
+/* SPDX-License-Identifier: EUPL-1.2 */
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-background);
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-radius: var(--radius-3);
+  box-shadow: var(--shadow-1);
+}
+
+.label {
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.value {
+  margin: 0;
+  font-size: var(--font-size-6);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.detail {
+  margin: 0;
+  color: var(--color-text-muted);
+}

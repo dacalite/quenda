@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 import {
   Input,
+  TextArea,
   TextField as AriaTextField,
   type TextFieldProps as AriaTextFieldProps,
 } from 'react-aria-components';
@@ -15,6 +16,7 @@ export interface TextFieldProps extends Omit<
   description?: string;
   /** Shown, and linked to the input, when the field is invalid. */
   errorMessage?: string | undefined;
+  multiline?: boolean;
 }
 
 export function TextField({
@@ -22,6 +24,7 @@ export function TextField({
   description,
   errorMessage,
   isRequired,
+  multiline = false,
   ...props
 }: TextFieldProps) {
   return (
@@ -33,7 +36,11 @@ export function TextField({
       className={fieldStyles.field}
     >
       <FieldLabel isRequired={isRequired ?? false}>{label}</FieldLabel>
-      <Input className={fieldStyles.input} />
+      {multiline ? (
+        <TextArea className={fieldStyles.input} rows={4} />
+      ) : (
+        <Input className={fieldStyles.input} />
+      )}
       <FieldHelp description={description} errorMessage={errorMessage} />
     </AriaTextField>
   );

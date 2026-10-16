@@ -19,6 +19,7 @@ export interface RadioGroupProps {
   errorMessage?: string | undefined;
   isRequired?: boolean;
   name?: string;
+  id?: string;
 }
 
 export function RadioGroup({

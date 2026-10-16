@@ -31,6 +31,8 @@ export interface SelectProps {
   isRequired?: boolean;
   isDisabled?: boolean;
   name?: string;
+  /** Goes on the button that opens the list, so an error summary can move focus to it. */
+  id?: string;
 }
 
 export function Select({
@@ -42,6 +44,7 @@ export function Select({
   errorMessage,
   placeholder,
   isRequired = false,
+  id,
   ...props
 }: SelectProps) {
   const { t } = useTranslation('ui');
@@ -59,7 +62,7 @@ export function Select({
       className={fieldStyles.field}
     >
       <FieldLabel isRequired={isRequired}>{label}</FieldLabel>
-      <AriaButton className={styles.trigger}>
+      <AriaButton id={id} className={styles.trigger}>
         <SelectValue>
           {({ isPlaceholder, selectedText, defaultChildren }) =>
             isPlaceholder ? defaultChildren : selectedText

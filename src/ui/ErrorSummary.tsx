@@ -10,6 +10,8 @@ export interface FormError {
   message: string;
 }
 
+const FOCUSABLE = 'input, select, textarea, button, [tabindex]';
+
 /** Listed at the top of a form after a failed submit; takes focus so the errors are read first. */
 export function ErrorSummary({ errors }: { errors: FormError[] }) {
   const { t } = useTranslation('ui');
@@ -37,7 +39,11 @@ export function ErrorSummary({ errors }: { errors: FormError[] }) {
                 const field = document.getElementById(error.fieldId);
                 if (!field) return;
                 event.preventDefault();
-                field.focus();
+                // A radio group is not focusable itself: its selected or first option is.
+                const target =
+                  field.querySelector<HTMLElement>('input:checked') ??
+                  (field.matches(FOCUSABLE) ? field : field.querySelector<HTMLElement>(FOCUSABLE));
+                (target ?? field).focus();
                 field.scrollIntoView({ block: 'center' });
               }}
             >
