@@ -157,16 +157,18 @@ test.describe('citizen screens pass axe', () => {
     await expect(heading(page)).toHaveText(/^Reservar:/);
   });
 
-  test('the map link leaves the app for OpenStreetMap', async ({ page }) => {
-    await page.route('https://www.openstreetmap.org/**', (route) =>
-      route.fulfill({ contentType: 'text/html', body: '<title>OSM</title>' }),
+  test('the map link opens Google Maps at the facility', async ({ page }) => {
+    await page.route('https://www.google.com/maps/**', (route) =>
+      route.fulfill({ contentType: 'text/html', body: '<title>Maps</title>' }),
     );
     await page.goto('./bouzalonga/instalacions');
     await page
       .getByRole('link', { name: /^Ver no mapa:/ })
       .first()
       .click();
-    await expect(page).toHaveURL(/^https:\/\/www\.openstreetmap\.org\/\?mlat=/);
+    await expect(page).toHaveURL(
+      /^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=-?\d+\.\d+,-?\d+\.\d+$/,
+    );
   });
 
   test('profile errors are summarised and linked to each field', async ({ page }) => {

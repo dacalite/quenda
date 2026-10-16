@@ -52,7 +52,7 @@
     "noResults": "Ningunha instalación cumpre estes filtros. Proba a quitar algún.",
     "seeAvailability": "Ver dispoñibilidade",
     "map": "Ver no mapa",
-    "mapLabel": "Ver no mapa: {{name}} (OpenStreetMap)"
+    "mapLabel": "Ver no mapa: {{name}} (Google Maps)"
   },
   "facility": {
     "type": "Tipo",

@@ -208,7 +208,7 @@ export function FacilityList() {
                   {t('list.seeAvailability')}
                 </Link>
                 <Link
-                  href={`https://www.openstreetmap.org/?mlat=${String(facility.coordinates.lat)}&mlon=${String(facility.coordinates.lng)}#map=17/${String(facility.coordinates.lat)}/${String(facility.coordinates.lng)}`}
+                  href={`https://www.google.com/maps/search/?api=1&query=${String(facility.coordinates.lat)},${String(facility.coordinates.lng)}`}
                   aria-label={t('list.mapLabel', { name: facility.name })}
                 >
                   {t('list.map')}
