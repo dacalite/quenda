@@ -1,9 +1,16 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { expect, test, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from './axe';
+import { freezeDate } from './clock';
 
 const heading = (page: Page) => page.getByRole('heading', { level: 1 });
 const step = (page: Page) => page.getByRole('dialog');
+
+// The tour shows the quiet hours of today, so there must be some left.
+test.use({ timezoneId: 'Europe/Madrid' });
+test.beforeEach(async ({ page }) => {
+  await freezeDate(page);
+});
 
 async function expectStep(page: Page, progress: string, title: string) {
   await expect(step(page)).toBeFocused();

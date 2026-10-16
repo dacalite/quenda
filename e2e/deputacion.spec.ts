@@ -1,25 +1,14 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { expect, test, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from './axe';
+import { freezeDate } from './clock';
 
 const heading = (page: Page) => page.getByRole('heading', { level: 1 });
 
-// Monday 19 October 2026, 10:00 in Galicia, so a new council always has free slots left today.
-// Only Date is frozen; Playwright's clock would also replace Intl, which the Galician fallback extends.
+// A new council must always have free slots left today.
 test.use({ timezoneId: 'Europe/Madrid' });
 test.beforeEach(async ({ page }) => {
-  await page.addInitScript((fixed) => {
-    const RealDate = Date;
-    class FrozenDate extends RealDate {
-      constructor(value?: string | number | Date) {
-        super(value ?? fixed);
-      }
-      static override now() {
-        return fixed;
-      }
-    }
-    window.Date = FrozenDate as DateConstructor;
-  }, Date.parse('2026-10-19T10:00:00+02:00'));
+  await freezeDate(page);
 });
 
 async function open(page: Page, path: string) {
