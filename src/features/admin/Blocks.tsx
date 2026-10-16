@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import { useFacilities } from '../../app/queries';
 import type { BlockInput } from '../../data/ports/repositories';
@@ -37,7 +38,7 @@ export function Blocks() {
           <NewBlock facilities={facilities.data} />
         </>
       ) : (
-        <p aria-busy="true">{t('common:loading')}</p>
+        <Pending queries={[facilities]} size="section" />
       )}
     </Page>
   );

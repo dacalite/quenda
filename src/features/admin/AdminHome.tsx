@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useTranslation } from 'react-i18next';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import { useFacilities } from '../../app/queries';
 import { adminPaths } from '../../app/routes/paths';
@@ -30,7 +31,6 @@ export function AdminHome() {
   const active = (reservations.data ?? []).filter((r) => r.status !== 'cancelled');
   const today = active.filter((r) => r.date === now.date).sort(byDateAndStart);
   const unrecorded = today.filter((r) => attendanceOf(r, now) === 'unrecorded');
-  const loading = reservations.isPending || indicators.isPending;
 
   const quickLinks = [
     { href: paths.newBooking(), label: t('home.quick.newBooking') },
@@ -50,8 +50,8 @@ export function AdminHome() {
 
       <section className={layout.section} aria-labelledby="home-figures">
         <h2 id="home-figures">{t('home.figures')}</h2>
-        {loading ? (
-          <p aria-busy="true">{t('common:loading')}</p>
+        {!reservations.data || !indicators.data ? (
+          <Pending queries={[reservations, indicators]} size="section" />
         ) : (
           <StatList
             stats={[
@@ -62,13 +62,13 @@ export function AdminHome() {
               },
               {
                 label: t('home.weekOccupancy'),
-                value: format.percent(indicators.data?.occupancy ?? 0),
+                value: format.percent(indicators.data.occupancy),
               },
               {
                 label: t('home.weekCancellations'),
-                value: String(indicators.data?.cancellations ?? 0),
+                value: String(indicators.data.cancellations),
               },
-              { label: t('home.weekNoShows'), value: String(indicators.data?.noShows ?? 0) },
+              { label: t('home.weekNoShows'), value: String(indicators.data.noShows) },
               {
                 label: t('home.unrecorded'),
                 value: String(unrecorded.length),
@@ -97,7 +97,7 @@ export function AdminHome() {
 
       <section className={layout.section} aria-labelledby="home-today">
         <h2 id="home-today">{t('home.todayTitle')}</h2>
-        {loading ? null : today.length === 0 ? (
+        {!reservations.data ? null : today.length === 0 ? (
           <p>{t('home.noneToday')}</p>
         ) : (
           <ReservationTable

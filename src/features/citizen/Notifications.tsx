@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import { useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
@@ -48,13 +49,13 @@ export function Notifications() {
           </Button>
         </p>
       )}
-      {notifications.isPending ? (
-        <p aria-busy="true">{t('common:loading')}</p>
-      ) : (notifications.data ?? []).length === 0 ? (
+      {!notifications.data ? (
+        <Pending queries={[notifications]} size="section" />
+      ) : notifications.data.length === 0 ? (
         <p>{t('notifications.empty')}</p>
       ) : (
         <ul className={layout.stack}>
-          {(notifications.data ?? []).map((notification) => {
+          {notifications.data.map((notification) => {
             const reservation = reservations.data?.find((r) => r.id === notification.reservationId);
             const facility = facilities.data?.find((f) => f.id === reservation?.facilityId);
             const reason = reservation?.history.findLast((e) => e.type === 'cancelled')?.detail;

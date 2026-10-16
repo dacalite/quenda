@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useTranslation } from 'react-i18next';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import { useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
@@ -67,8 +68,8 @@ export function MyReservations() {
 
   return (
     <Page title={t('reservations.title')}>
-      {reservations.isPending ? (
-        <p aria-busy="true">{t('common:loading')}</p>
+      {!reservations.data ? (
+        <Pending queries={[reservations]} size="section" />
       ) : (
         <Tabs>
           <TabList aria-label={t('reservations.tabs')}>

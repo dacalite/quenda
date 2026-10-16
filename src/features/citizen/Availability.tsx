@@ -2,6 +2,7 @@
 import { useQueries } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
+import { Pending } from '../../app/Pending';
 import { NotFoundPage } from '../../app/pages';
 import { Page } from '../../app/Page';
 import { useAvailability, useAvailabilityQuery, useFacility, useSchedule } from '../../app/queries';
@@ -182,8 +183,8 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
           <Tab id="week">{t('availability.weekView')}</Tab>
         </TabList>
         <TabPanel id="day">
-          {availability.isPending ? (
-            <p aria-busy="true">{t('common:loading')}</p>
+          {!availability.data ? (
+            <Pending queries={[availability]} size="section" />
           ) : slots.length === 0 ? (
             <p>{t('availability.noSlots')}</p>
           ) : (

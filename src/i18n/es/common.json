@@ -22,7 +22,8 @@
   "error": {
     "title": "No se pudo cargar esta página",
     "body": "Vuelve a intentarlo dentro de unos instantes.",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "inline": "No se ha podido cargar esta información."
   },
   "notFound": {
     "title": "No encontramos esta página",

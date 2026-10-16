@@ -16,6 +16,7 @@ import { accessibleColor } from '../../ui/contrast';
 import { SkipLink } from '../../ui/SkipLink';
 import { TenantContext } from '../contexts';
 import { ErrorPage, NotFoundPage } from '../pages';
+import { Pending } from '../Pending';
 import { useTenantBySlug, useTenants } from '../queries';
 import { SiteFrame } from '../SiteFrame';
 import { useDemo, usePreferences } from '../state';
@@ -66,8 +67,7 @@ export function RedirectToDemoStart() {
 }
 
 function Loading() {
-  const { t } = useTranslation();
-  return <p aria-busy="true">{t('loading')}</p>;
+  return <Pending size="section" />;
 }
 
 function LoadingFrame() {

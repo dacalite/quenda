@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import { useFacilities, useSchedule } from '../../app/queries';
 import { adminPaths } from '../../app/routes/paths';
@@ -38,7 +39,7 @@ export function SeasonWizard() {
   if (!facilities.data || !entities.data) {
     return (
       <Page title={t('wizard.title')}>
-        <p aria-busy="true">{t('common:loading')}</p>
+        <Pending queries={[facilities, entities]} />
       </Page>
     );
   }

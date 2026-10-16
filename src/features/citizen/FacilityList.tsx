@@ -3,6 +3,7 @@ import { useQueries } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import { useAvailabilityQuery, useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
@@ -193,6 +194,7 @@ export function FacilityList() {
       <p role="status" aria-busy={loading}>
         {loading ? t('common:loading') : t('list.results', { count: results.length })}
       </p>
+      {facilities.isError && <Pending queries={[facilities]} />}
       {!loading && results.length === 0 && <p>{t('list.noResults')}</p>}
 
       <ul className={layout.cards}>

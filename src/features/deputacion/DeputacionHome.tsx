@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
+import { Pending } from '../../app/Pending';
 import { Emblem } from '../../app/Emblem';
 import { Page } from '../../app/Page';
 import { adminPaths, citizenPaths, deputacionPaths } from '../../app/routes/paths';
@@ -67,12 +68,12 @@ export function DeputacionHome() {
             {figures.data ? (
               <ComparisonReport figures={figures.data} councils={councils.data} />
             ) : (
-              <p aria-busy="true">{t('compare.loading')}</p>
+              <Pending queries={[figures]} label={t('compare.loading')} size="section" />
             )}
           </section>
         </>
       ) : (
-        <p aria-busy="true">{t('compare.loading')}</p>
+        <Pending queries={[councils]} label={t('compare.loading')} size="section" />
       )}
       <Deployment />
     </Page>
