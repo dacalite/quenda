@@ -45,6 +45,36 @@ const asciiSlug = (value: string) =>
     .toLowerCase()
     .replace(/[^a-z]+/g, '');
 
+type UserData = Pick<
+  User,
+  'firstName' | 'lastName' | 'role' | 'resident' | 'concessions' | 'maskedDni' | 'phone'
+>;
+
+function buildUser(
+  tenantId: string,
+  id: string,
+  data: UserData,
+  textSize: User['preferences']['accessibility']['textSize'] = 'normal',
+): User {
+  return {
+    ...data,
+    id,
+    tenantId,
+    email: `${asciiSlug(data.firstName)}.${asciiSlug(data.lastName.split(' ')[0] ?? '')}${id.slice(-3).replace(/\D/g, '')}@example.org`,
+    preferences: {
+      language: 'gl',
+      channels: ['app', 'email'],
+      accessibility: { textSize, highContrast: false, reducedMotion: false },
+    },
+  };
+}
+
+/** The demo people, with an account in every council so any of them can be tried anywhere. */
+export const personaUsers = (tenantId: string): User[] =>
+  PERSONAS.map(({ key, textSize, ...data }) =>
+    buildUser(tenantId, personaUserId(tenantId, key), data, textSize),
+  );
+
 const pad = (value: number) => String(value).padStart(2, '0');
 
 /** Typical demand by hour: quiet mornings, busy evenings, livelier weekend mornings. */
@@ -113,30 +143,9 @@ function seedTenant(
     }
   }
 
-  const newUser = (
-    id: string,
-    data: Pick<
-      User,
-      'firstName' | 'lastName' | 'role' | 'resident' | 'concessions' | 'maskedDni' | 'phone'
-    >,
-    textSize: User['preferences']['accessibility']['textSize'] = 'normal',
-  ): User => ({
-    ...data,
-    id,
-    tenantId,
-    email: `${asciiSlug(data.firstName)}.${asciiSlug(data.lastName.split(' ')[0] ?? '')}${id.slice(-3).replace(/\D/g, '')}@example.org`,
-    preferences: {
-      language: 'gl',
-      channels: ['app', 'email'],
-      accessibility: { textSize, highContrast: false, reducedMotion: false },
-    },
-  });
+  const newUser = (id: string, data: UserData) => buildUser(tenantId, id, data);
 
-  const users = new Map<string, User>();
-  for (const persona of PERSONAS) {
-    const { key, textSize, ...data } = persona;
-    users.set(personaUserId(tenantId, key), newUser(personaUserId(tenantId, key), data, textSize));
-  }
+  const users = new Map(personaUsers(tenantId).map((user) => [user.id, user]));
   const residents: User[] = [];
   for (let i = 1; i <= RESIDENTS_PER_TENANT; i++) {
     const concessions: Concession[] = [];

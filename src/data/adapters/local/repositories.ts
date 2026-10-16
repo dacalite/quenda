@@ -5,7 +5,8 @@ import {
   type BookingContext,
   type BookingHolder,
 } from '../../../domain/rules/booking';
-import { computeIndicators } from '../../../domain/analytics/indicators';
+import { computeIndicators, type IndicatorSource } from '../../../domain/analytics/indicators';
+import { newTenant, starterFacility, validateNewCouncil } from '../../../domain/councils';
 import { attendanceOf, canCheckIn } from '../../../domain/rules/attendance';
 import { affectedByBlock } from '../../../domain/rules/blocks';
 import { canCancel, canModify } from '../../../domain/rules/cancellation';
@@ -35,6 +36,7 @@ import type {
   Schedule,
   Slot,
   Tenant,
+  User,
 } from '../../../domain/types';
 import {
   ConflictError,
@@ -48,6 +50,8 @@ import type { LocalDatabase } from './database';
 
 export interface Session {
   userId: Id;
+  /** Present when the caller works for a deputación rather than a council. */
+  deputacionId?: Id;
 }
 
 export interface LocalAdapterOptions {
@@ -58,6 +62,8 @@ export interface LocalAdapterOptions {
   /** Simulated network latency in ms; `false` in tests. */
   latency?: { min: number; max: number } | false;
   random?: () => number;
+  /** People who get an account in a council the deputación signs up. */
+  initialUsers?: (tenantId: Id) => User[];
 }
 
 type Row = { id: Id; tenantId: Id };
@@ -95,6 +101,7 @@ export function createLocalRepositories({
   now = () => new Date(),
   latency = { min: 150, max: 400 },
   random = Math.random,
+  initialUsers = () => [],
 }: LocalAdapterOptions): Repositories {
   const data = () => db.read();
 
@@ -217,6 +224,13 @@ export function createLocalRepositories({
       throw new ForbiddenError('Only council administrators can do this');
     }
   };
+  const requireDeputacion = (deputacionId: Id) => {
+    if (session()?.deputacionId !== deputacionId) {
+      throw new ForbiddenError('Only the deputación can do this');
+    }
+  };
+  const councilsOf = (deputacionId: Id) =>
+    data().tenants.filter((t) => t.deputacionId === deputacionId);
   /** The resident's own id, `null` for staff, or a 403 for anonymous callers. */
   const ownerScope = (tenantId: Id): Id | null => {
     const user = caller(tenantId);
@@ -303,6 +317,16 @@ export function createLocalRepositories({
     const from = context.now.date > input.season.from ? context.now.date : input.season.from;
     return { context, dates: expandRecurring(input, { from, to: input.season.to }) };
   };
+
+  const indicatorSource = (tenantId: Id): IndicatorSource => ({
+    facilities: scoped(data().facilities, tenantId).map((facility) => ({
+      facility,
+      schedule: scheduleOf(tenantId, facility.id),
+    })),
+    holidays: scoped(data().holidays, tenantId),
+    blocks: scoped(data().blocks, tenantId),
+    reservations: scoped(data().reservations, tenantId),
+  });
 
   const repositories: Repositories = {
     tenants: {
@@ -713,19 +737,7 @@ export function createLocalRepositories({
       get: (tenantId, range) =>
         respond(() => {
           requireStaff(tenantId);
-          const facilities = scoped(data().facilities, tenantId);
-          return computeIndicators(
-            {
-              facilities: facilities.map((facility) => ({
-                facility,
-                schedule: scheduleOf(tenantId, facility.id),
-              })),
-              holidays: scoped(data().holidays, tenantId),
-              blocks: scoped(data().blocks, tenantId),
-              reservations: scoped(data().reservations, tenantId),
-            },
-            range,
-          );
+          return computeIndicators(indicatorSource(tenantId), range);
         }),
     },
 
@@ -734,6 +746,74 @@ export function createLocalRepositories({
         respond(() => {
           requireAdmin(tenantId);
           return scoped(data().audit, tenantId).sort((a, b) => b.at.localeCompare(a.at));
+        }),
+    },
+
+    deputacions: {
+      get: (deputacionId) =>
+        respond(() => {
+          const deputacion = data().deputacions.find((d) => d.id === deputacionId);
+          if (!deputacion) throw new NotFoundError('deputacion', deputacionId);
+          return deputacion;
+        }),
+      listCouncils: (deputacionId) =>
+        respond(() => {
+          requireDeputacion(deputacionId);
+          return councilsOf(deputacionId);
+        }),
+      indicators: (deputacionId, range) =>
+        respond(() => {
+          requireDeputacion(deputacionId);
+          const sources = councilsOf(deputacionId).map((t) => ({
+            tenantId: t.id,
+            source: indicatorSource(t.id),
+          }));
+          return {
+            councils: sources.map(({ tenantId, source }) => ({
+              tenantId,
+              indicators: computeIndicators(source, range),
+            })),
+            total: computeIndicators(
+              {
+                facilities: sources.flatMap(({ source }) => source.facilities),
+                holidays: sources.flatMap(({ source }) => source.holidays),
+                blocks: sources.flatMap(({ source }) => source.blocks),
+                reservations: sources.flatMap(({ source }) => source.reservations),
+              },
+              range,
+            ),
+          };
+        }),
+      createCouncil: (deputacionId, input) =>
+        respond(() => {
+          requireDeputacion(deputacionId);
+          valid(
+            validateNewCouncil(
+              input,
+              data().tenants.map((t) => t.slug),
+            ),
+          );
+          const tenant = newTenant(newId('tenant'), input, deputacionId);
+          data().tenants.push(tenant);
+          audit(tenant.id, 'create', 'tenant', tenant.id, tenant.name);
+          for (const type of input.facilityTypes) {
+            const starter = starterFacility(type, input.address);
+            const facility: Facility = {
+              ...starter.facility,
+              id: newId('facility'),
+              tenantId: tenant.id,
+            };
+            data().facilities.push(facility);
+            data().schedules.push({
+              ...starter.schedule,
+              tenantId: tenant.id,
+              facilityId: facility.id,
+            });
+            audit(tenant.id, 'create', 'facility', facility.id, facility.name);
+          }
+          data().users.push(...initialUsers(tenant.id));
+          db.commit();
+          return tenant;
         }),
     },
   };

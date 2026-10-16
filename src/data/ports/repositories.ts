@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import type { Indicators } from '../../domain/analytics/indicators';
+import type { NewCouncil } from '../../domain/councils';
 import type { Recommendation } from '../../domain/recommendations/recommend';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
 import type { RuleViolation } from '../../domain/rules/booking';
@@ -11,6 +12,7 @@ import type {
   Block,
   Channel,
   DateRange,
+  Deputacion,
   Entity,
   Facility,
   Holder,
@@ -31,7 +33,7 @@ import type {
 
 // Contracts of the future REST API. Every call is scoped by tenant and may reject with the errors in ./errors.
 // Residents only reach their own bookings, profile and notifications; council staff reach everything in their council,
-// and only administrators change the configuration or read the audit log.
+// and only administrators change the configuration or read the audit log. A deputación sees its councils as a whole.
 
 export interface TenantRepository {
   list(): Promise<Tenant[]>;
@@ -157,6 +159,26 @@ export interface IndicatorRepository {
   get(tenantId: Id, range: DateRange): Promise<Indicators>;
 }
 
+export interface CouncilIndicators {
+  tenantId: Id;
+  indicators: Indicators;
+}
+
+export interface DeputacionIndicators {
+  councils: CouncilIndicators[];
+  /** The figures of every council together, as if they were one. */
+  total: Indicators;
+}
+
+/** The back office of a deputación that runs a shared instance for its councils. */
+export interface DeputacionRepository {
+  get(deputacionId: Id): Promise<Deputacion>;
+  listCouncils(deputacionId: Id): Promise<Tenant[]>;
+  indicators(deputacionId: Id, range: DateRange): Promise<DeputacionIndicators>;
+  /** Signs a council up with its starter facilities, ready to take bookings. */
+  createCouncil(deputacionId: Id, input: NewCouncil): Promise<Tenant>;
+}
+
 export interface Repositories {
   tenants: TenantRepository;
   facilities: FacilityRepository;
@@ -168,4 +190,5 @@ export interface Repositories {
   notifications: NotificationRepository;
   audit: AuditLogRepository;
   indicators: IndicatorRepository;
+  deputacions: DeputacionRepository;
 }
