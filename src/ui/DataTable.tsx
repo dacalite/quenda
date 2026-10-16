@@ -28,9 +28,10 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
   const captionId = useId();
   return (
-    // Focusable so keyboard users can scroll a wide table on small screens.
+    // Focusable so keyboard users can scroll a wide table on small screens. A group, not a
+    // region: the table usually sits in a section with the same name, and landmarks must differ.
     // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-    <div className={styles.scroller} role="region" aria-labelledby={captionId} tabIndex={0}>
+    <div className={styles.scroller} role="group" aria-labelledby={captionId} tabIndex={0}>
       <table className={styles.table}>
         <caption id={captionId} className={hideCaption ? 'visually-hidden' : styles.caption}>
           {caption}

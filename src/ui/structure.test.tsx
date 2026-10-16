@@ -109,7 +109,7 @@ describe('DataTable', () => {
     const table = screen.getByRole('table', { name: 'Ocupación por día' });
     expect(within(table).getAllByRole('columnheader')).toHaveLength(2);
     expect(within(table).getByRole('rowheader', { name: 'Martes' })).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: 'Ocupación por día' })).toHaveAttribute(
+    expect(screen.getByRole('group', { name: 'Ocupación por día' })).toHaveAttribute(
       'tabindex',
       '0',
     );

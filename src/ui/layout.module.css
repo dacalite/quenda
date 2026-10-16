@@ -36,6 +36,12 @@
   align-items: center;
 }
 
+ul.row {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
 .meta {
   margin: 0;
   color: var(--color-text-muted);
