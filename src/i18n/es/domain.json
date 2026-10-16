@@ -89,5 +89,46 @@
     "app": "En la aplicación",
     "email": "Correo electrónico",
     "sms": "SMS"
+  },
+  "weekday": {
+    "1": "lunes",
+    "2": "martes",
+    "3": "miércoles",
+    "4": "jueves",
+    "5": "viernes",
+    "6": "sábado",
+    "7": "domingo"
+  },
+  "blockReason": {
+    "maintenance": "Mantenimiento",
+    "event": "Evento",
+    "other": "Otro motivo"
+  },
+  "eligibility": {
+    "everyone": "Cualquier persona",
+    "residents": "Solo personas empadronadas",
+    "entities": "Solo clubes y asociaciones"
+  },
+  "entityKind": {
+    "club": "Club",
+    "association": "Asociación"
+  },
+  "auditAction": {
+    "create": "Creó",
+    "update": "Cambió",
+    "delete": "Eliminó",
+    "cancel": "Canceló",
+    "reschedule": "Cambió la hora de",
+    "checkIn": "Registró la entrada de",
+    "noShow": "Marcó como no presentada"
+  },
+  "auditSubject": {
+    "tenant": "Configuración del ayuntamiento",
+    "facility": "Instalación",
+    "schedule": "Horario",
+    "block": "Bloqueo",
+    "reservation": "Reserva",
+    "recurringBooking": "Reserva de temporada",
+    "user": "Persona"
   }
 }

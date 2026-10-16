@@ -33,6 +33,11 @@ export function useFormat() {
       }).format(new Date(instant)),
     price: (cents: Cents) =>
       new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(cents / 100),
+    /** One decimal, as contrast ratios are written: «4,5». */
+    decimal: (value: number) =>
+      new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(
+        value,
+      ),
     /** «11:00 e 15:00» */
     list: (items: string[]) => new Intl.ListFormat(locale, { type: 'conjunction' }).format(items),
     percent: (ratio: number) =>

@@ -2,7 +2,7 @@
 import { useTranslation } from 'react-i18next';
 import type { RuleViolation } from '../domain/rules/booking';
 import type { CancelViolation, ModifyViolation } from '../domain/rules/cancellation';
-import type { Facility, Id, LocalizedText } from '../domain/types';
+import type { Facility, Id, LocalizedText, Weekday } from '../domain/types';
 import { currentLanguage } from '.';
 import { useFormat } from './format';
 
@@ -44,4 +44,19 @@ export function useViolationText() {
         return t(`violation.${violation.code}`);
     }
   };
+}
+
+const WEEKDAY_KEYS = {
+  1: 'weekday.1',
+  2: 'weekday.2',
+  3: 'weekday.3',
+  4: 'weekday.4',
+  5: 'weekday.5',
+  6: 'weekday.6',
+  7: 'weekday.7',
+} as const satisfies Record<Weekday, string>;
+
+export function useWeekdayName() {
+  const { t } = useTranslation('domain');
+  return (day: Weekday) => t(WEEKDAY_KEYS[day]);
 }
