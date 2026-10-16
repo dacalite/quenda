@@ -742,6 +742,29 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/Notification' }
         '404': { $ref: '#/components/responses/NotFound' }
+  /calendar-feeds/{feedToken}.ics:
+    parameters:
+      - name: feedToken
+        in: path
+        required: true
+        description: Segredo propio de cada persoa, que pode revogar desde o seu perfil.
+        schema: { type: string, minLength: 16 }
+    get:
+      tags: [Reservas]
+      operationId: getCalendarFeed
+      summary: Subscrición ao calendario persoal
+      description: >-
+        Calendario iCalendar (RFC 5545) coas reservas confirmadas da persoa, en hora de
+        Europe/Madrid. As aplicacións de calendario non poden identificarse con OIDC, así que
+        o acceso vai polo segredo do enderezo.
+      security: []
+      responses:
+        '200':
+          description: Calendario coas reservas.
+          content:
+            text/calendar:
+              schema: { type: string }
+        '404': { $ref: '#/components/responses/NotFound' }
   /tenants/{tenantId}/notifications/{notificationId}/read:
     parameters:
       - $ref: '#/components/parameters/TenantId'
