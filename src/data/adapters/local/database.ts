@@ -50,15 +50,17 @@ export function createLocalDatabase(
 ): LocalDatabase {
   let data: Database | null = null;
 
-  const load = (): Database => {
+  const load = (): { data: Database; fresh: boolean } => {
     try {
       const stored = storage?.getItem(key);
       const parsed = stored ? (JSON.parse(stored) as Database) : null;
-      if (parsed?.version === SCHEMA_VERSION && !isStale(parsed)) return parsed;
+      if (parsed?.version === SCHEMA_VERSION && !isStale(parsed)) {
+        return { data: parsed, fresh: false };
+      }
     } catch {
       // Corrupt or unreadable data: start again from the seed.
     }
-    return seed();
+    return { data: seed(), fresh: true };
   };
 
   const commit = () => {
@@ -72,8 +74,10 @@ export function createLocalDatabase(
   return {
     read: () => {
       if (!data) {
-        data = load();
-        commit();
+        const loaded = load();
+        data = loaded.data;
+        // Saving a fresh seed takes a while; doing it later keeps the first screen responsive.
+        if (loaded.fresh) setTimeout(commit, 0);
       }
       return data;
     },
