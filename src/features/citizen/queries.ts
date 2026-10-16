@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: EUPL-1.2
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { skipToken, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCurrentTenant } from '../../app/contexts';
 import { useRepositories } from '../../app/repositories';
 import { sessionUserId, useDemo } from '../../app/state';
+import { ForbiddenError } from '../../data/ports/errors';
 import type { ReservationInput, UserInput } from '../../data/ports/repositories';
 import type { Holder, Id, IsoDate } from '../../domain/types';
 
@@ -69,8 +70,7 @@ export function useMyReservations() {
   const { tenant, holder, userId } = useCitizen();
   return useQuery({
     queryKey: ['reservations', tenant.id, 'mine', userId],
-    queryFn: () => repositories.reservations.list(tenant.id, holder ? { holder } : {}),
-    enabled: Boolean(holder),
+    queryFn: holder ? () => repositories.reservations.list(tenant.id, { holder }) : skipToken,
   });
 }
 
@@ -79,8 +79,10 @@ export function useReservation(reservationId: Id) {
   const { tenant, userId } = useCitizen();
   return useQuery({
     queryKey: ['reservations', tenant.id, reservationId, userId],
-    queryFn: () => repositories.reservations.get(tenant.id, reservationId),
-    enabled: Boolean(userId && reservationId),
+    queryFn:
+      userId && reservationId
+        ? () => repositories.reservations.get(tenant.id, reservationId)
+        : skipToken,
   });
 }
 
@@ -89,8 +91,10 @@ export function useQuote(input: ReservationInput | null, replaces?: Id) {
   const { tenant, userId } = useCitizen();
   return useQuery({
     queryKey: ['quote', tenant.id, userId, input, replaces],
-    queryFn: () => repositories.reservations.quote(tenant.id, input as ReservationInput, replaces),
-    enabled: Boolean(input && userId),
+    queryFn:
+      input && userId
+        ? () => repositories.reservations.quote(tenant.id, input, replaces)
+        : skipToken,
   });
 }
 
@@ -99,8 +103,7 @@ export function useNotifications() {
   const { tenant, userId } = useCitizen();
   return useQuery({
     queryKey: ['notifications', tenant.id, userId],
-    queryFn: () => repositories.notifications.list(tenant.id, userId ?? ''),
-    enabled: Boolean(userId),
+    queryFn: userId ? () => repositories.notifications.list(tenant.id, userId) : skipToken,
   });
 }
 
@@ -109,8 +112,7 @@ export function useMe() {
   const { tenant, userId } = useCitizen();
   return useQuery({
     queryKey: ['users', tenant.id, userId],
-    queryFn: () => repositories.users.get(tenant.id, userId ?? ''),
-    enabled: Boolean(userId),
+    queryFn: userId ? () => repositories.users.get(tenant.id, userId) : skipToken,
   });
 }
 
@@ -166,8 +168,10 @@ export function useUpdateMe() {
   const { tenant, userId } = useCitizen();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (patch: Partial<UserInput>) =>
-      repositories.users.update(tenant.id, userId ?? '', patch),
+    mutationFn: (patch: Partial<UserInput>) => {
+      if (!userId) throw new ForbiddenError();
+      return repositories.users.update(tenant.id, userId, patch);
+    },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
   });
 }

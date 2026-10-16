@@ -33,6 +33,8 @@ export function useFormat() {
       }).format(new Date(instant)),
     price: (cents: Cents) =>
       new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(cents / 100),
+    /** «11:00 e 15:00» */
+    list: (items: string[]) => new Intl.ListFormat(locale, { type: 'conjunction' }).format(items),
     percent: (ratio: number) =>
       new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 0 }).format(ratio),
   };

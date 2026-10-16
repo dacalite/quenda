@@ -9,7 +9,6 @@ import type { AvailabilitySlot } from '../../domain/rules/availability';
 import { computePrice } from '../../domain/rules/pricing';
 import { addDays, daypart, startOfWeek, zonedNow, type Daypart } from '../../domain/time';
 import type { Facility, IsoDate } from '../../domain/types';
-import { currentLanguage } from '../../i18n';
 import { useFormat } from '../../i18n/format';
 import { Button } from '../../ui/Button';
 import { DataTable } from '../../ui/DataTable';
@@ -100,9 +99,6 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
     });
 
   const slots = (availability.data ?? []).filter((slot) => slot.subspaceId === subspaceId);
-  const list = new Intl.ListFormat(currentLanguage() === 'gl' ? 'gl-ES' : 'es-ES', {
-    type: 'conjunction',
-  });
 
   const recommended = (recommendations.data ?? []).flatMap((r) => {
     const all = availability.data ?? [];
@@ -163,7 +159,7 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
           <h2 id="recommendations-title">{t('availability.recommendationsTitle')}</h2>
           <p>
             {t('availability.recommendationsIntro', {
-              times: list.format(recommended.map((r) => r.start).sort()),
+              times: format.list(recommended.map((r) => r.start).sort()),
             })}
           </p>
           <ul className={styles.stack}>
