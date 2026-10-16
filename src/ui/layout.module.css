@@ -11,6 +11,15 @@
   font-size: var(--font-size-5);
 }
 
+/* Sections and panels space their children with gap, so paragraphs drop their own margins. */
+:is(.section, .panel) > :is(p, ul, ol, h3) {
+  margin-block: 0;
+}
+
+:is(.section, .panel) > h3:not(:first-child) {
+  margin-block-start: var(--space-2);
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
@@ -97,12 +106,19 @@
 .details {
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: var(--space-2) var(--space-4);
+  column-gap: var(--space-4);
   margin: 0;
+}
+
+.details > dt,
+.details > dd {
+  padding-block: var(--space-2);
+  border-block-end: var(--border-width) solid var(--color-border-subtle);
 }
 
 .details dt {
   font-weight: 700;
+  color: var(--color-text-muted);
 }
 
 .details dd {

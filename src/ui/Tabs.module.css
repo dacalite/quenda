@@ -16,7 +16,6 @@
   font-weight: 700;
   color: var(--color-text-muted);
   border-bottom: 3px solid transparent;
-  border-radius: var(--radius-1) var(--radius-1) 0 0;
   cursor: pointer;
   outline: none;
   transition: color var(--duration) var(--ease-out);

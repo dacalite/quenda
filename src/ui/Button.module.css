@@ -64,6 +64,17 @@
   background: color-mix(in srgb, var(--color-danger) 82%, #000000);
 }
 
+.dangerSecondary {
+  color: var(--color-danger);
+  background: var(--color-background);
+  border-color: var(--color-danger);
+}
+
+.dangerSecondary[data-hovered],
+.dangerSecondary[data-pressed] {
+  background: var(--color-danger-surface);
+}
+
 .quiet {
   padding-inline: var(--space-3);
   color: var(--color-primary);

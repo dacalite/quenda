@@ -156,7 +156,7 @@ function ProfileForm({ user }: { user: User }) {
             {t('profile.download')}
           </Button>
           <DialogTrigger>
-            <Button variant="danger">{t('profile.delete')}</Button>
+            <Button variant="dangerSecondary">{t('profile.delete')}</Button>
             <ConfirmDialog
               title={t('profile.deleteTitle')}
               confirmLabel={t('profile.deleteConfirm')}

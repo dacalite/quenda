@@ -53,6 +53,19 @@ a:hover {
   text-decoration-thickness: 2px;
 }
 
+fieldset {
+  min-inline-size: 0;
+  padding: var(--space-3) var(--space-4);
+  margin: 0;
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-radius: var(--radius-2);
+}
+
+legend {
+  padding-inline: var(--space-1);
+  font-weight: 700;
+}
+
 table,
 time {
   font-variant-numeric: tabular-nums;

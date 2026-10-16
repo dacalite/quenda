@@ -3,7 +3,7 @@
 /* One strip of figures; the 1px gaps show the border colour behind as dividers. */
 .list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
   gap: var(--border-width);
   margin: 0;
   overflow: hidden;

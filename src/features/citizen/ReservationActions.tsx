@@ -61,7 +61,7 @@ export function ReservationActions({
         {t('reservation.change')}
       </Link>
       <DialogTrigger>
-        <Button variant="danger">
+        <Button variant="dangerSecondary">
           <Icon name="close" />
           {t('reservation.cancel')}
         </Button>
