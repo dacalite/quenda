@@ -29,6 +29,8 @@ jobs:
         run: npm run typecheck
       - name: Licenzas das dependencias
         run: npm run licenses
+      - name: Especificación OpenAPI
+        run: npm run api:lint
       - name: Tests unitarios
         run: npm test
       - name: Navegador para os tests e2e

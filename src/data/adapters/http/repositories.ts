@@ -98,7 +98,7 @@ export function createHttpRepositories({
   return {
     tenants: {
       list: () => get('/tenants'),
-      getBySlug: (slug) => get(`/tenants/by-slug/${segment(slug)}`),
+      getBySlug: (slug) => get(`/sites/${segment(slug)}`),
       update: (tenantId, changes) => patch(tenant(tenantId), changes),
     },
     facilities: {
@@ -131,8 +131,7 @@ export function createHttpRepositories({
             (holder.kind === 'user' ? `user:${holder.userId}` : `entity:${holder.entityId}`),
         }),
       get: (tenantId, id) => get(reservation(tenantId, id)),
-      getByCode: (tenantId, code) =>
-        get(`${tenant(tenantId)}/reservations/by-code/${segment(code)}`),
+      getByCode: (tenantId, code) => get(`${tenant(tenantId)}/reservation-codes/${segment(code)}`),
       quote: (tenantId, input, replaces) =>
         post(`${tenant(tenantId)}/reservations/quote`, { ...input, replaces }),
       create: (tenantId, input) => post(`${tenant(tenantId)}/reservations`, input),
