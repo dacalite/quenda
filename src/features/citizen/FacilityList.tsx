@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useQueries } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 import { Pending } from '../../app/Pending';
@@ -15,6 +15,7 @@ import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { Checkbox } from '../../ui/Checkbox';
 import { DatePicker } from '../../ui/DatePicker';
+import { Icon } from '../../ui/Icon';
 import { Link } from '../../ui/Link';
 import { Select } from '../../ui/Select';
 import { StatusBadge } from '../../ui/StatusBadge';
@@ -53,6 +54,8 @@ export function FacilityList() {
     now: params.get('agora') === '1',
   };
   const [draft, setDraft] = useState(applied);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filtersId = useId();
 
   const all = facilities.data ?? [];
   const checkDate = applied.now ? now.date : applied.date;
@@ -103,91 +106,107 @@ export function FacilityList() {
           });
         }}
       >
-        <h2 id="filters-title">{t('list.filters')}</h2>
-        <div className={layout.filters}>
-          <TextField
-            label={t('list.search')}
-            type="search"
-            value={draft.q}
-            onChange={(q) => {
-              setDraft({ ...draft, q });
-            }}
-          />
-          <Select
-            label={t('list.type')}
-            value={draft.type}
-            onChange={(type) => {
-              setDraft({ ...draft, type });
-            }}
-            options={[
-              { id: ANY, label: t('list.anyType') },
-              ...types.map((type: FacilityType) => ({
-                id: type,
-                label: t(`domain:facilityType.${type}`),
-              })),
-            ]}
-          />
-          <DatePicker
-            label={t('list.date')}
-            value={draft.date}
-            minValue={now.date}
-            onChange={(date) => {
-              setDraft({ ...draft, date });
-            }}
-          />
-          <Select
-            label={t('list.daypart')}
-            value={draft.daypart}
-            onChange={(value) => {
-              setDraft({ ...draft, daypart: value });
-            }}
-            options={[
-              { id: ANY, label: t('list.anyDaypart') },
-              ...DAYPARTS.map((part) => ({ id: part, label: t(`domain:daypart.${part}`) })),
-            ]}
-          />
-        </div>
-        <fieldset className={layout.fieldset}>
-          <legend>{t('list.accessibility')}</legend>
-          <div className={layout.row}>
-            {FEATURES.map((feature) => (
-              <Checkbox
-                key={feature}
-                isSelected={draft.features.includes(feature)}
-                onChange={(selected) => {
-                  setDraft({
-                    ...draft,
-                    features: selected
-                      ? [...draft.features, feature]
-                      : draft.features.filter((f) => f !== feature),
-                  });
-                }}
-              >
-                {t(`domain:accessibility.${feature}`)}
-              </Checkbox>
-            ))}
-          </div>
-        </fieldset>
-        <Checkbox
-          isSelected={draft.now}
-          onChange={(value) => {
-            setDraft({ ...draft, now: value });
-          }}
-        >
-          {t('list.availableNow')}
-        </Checkbox>
-        <div className={layout.row}>
-          <Button type="submit" variant="primary">
-            {t('list.apply')}
-          </Button>
-          <Link
-            href={paths.facilities()}
+        <div className={styles.filtersHead}>
+          <h2 id="filters-title">{t('list.filters')}</h2>
+          <Button
+            variant="quiet"
+            className={styles.filtersToggle}
+            aria-expanded={filtersOpen}
+            aria-controls={filtersId}
             onPress={() => {
-              setDraft({ q: '', type: ANY, date: null, daypart: ANY, features: [], now: false });
+              setFiltersOpen(!filtersOpen);
             }}
           >
-            {t('list.clear')}
-          </Link>
+            <Icon name={filtersOpen ? 'close' : 'chevronDown'} />
+            {filtersOpen ? t('list.hideFilters') : t('list.showFilters')}
+          </Button>
+        </div>
+        <div id={filtersId} className={styles.filterFields} data-open={filtersOpen || undefined}>
+          <div className={layout.filters}>
+            <TextField
+              label={t('list.search')}
+              type="search"
+              value={draft.q}
+              onChange={(q) => {
+                setDraft({ ...draft, q });
+              }}
+            />
+            <Select
+              label={t('list.type')}
+              value={draft.type}
+              onChange={(type) => {
+                setDraft({ ...draft, type });
+              }}
+              options={[
+                { id: ANY, label: t('list.anyType') },
+                ...types.map((type: FacilityType) => ({
+                  id: type,
+                  label: t(`domain:facilityType.${type}`),
+                })),
+              ]}
+            />
+            <DatePicker
+              label={t('list.date')}
+              value={draft.date}
+              minValue={now.date}
+              onChange={(date) => {
+                setDraft({ ...draft, date });
+              }}
+            />
+            <Select
+              label={t('list.daypart')}
+              value={draft.daypart}
+              onChange={(value) => {
+                setDraft({ ...draft, daypart: value });
+              }}
+              options={[
+                { id: ANY, label: t('list.anyDaypart') },
+                ...DAYPARTS.map((part) => ({ id: part, label: t(`domain:daypart.${part}`) })),
+              ]}
+            />
+          </div>
+          <fieldset className={layout.fieldset}>
+            <legend>{t('list.accessibility')}</legend>
+            <div className={layout.row}>
+              {FEATURES.map((feature) => (
+                <Checkbox
+                  key={feature}
+                  isSelected={draft.features.includes(feature)}
+                  onChange={(selected) => {
+                    setDraft({
+                      ...draft,
+                      features: selected
+                        ? [...draft.features, feature]
+                        : draft.features.filter((f) => f !== feature),
+                    });
+                  }}
+                >
+                  {t(`domain:accessibility.${feature}`)}
+                </Checkbox>
+              ))}
+            </div>
+          </fieldset>
+          <Checkbox
+            isSelected={draft.now}
+            onChange={(value) => {
+              setDraft({ ...draft, now: value });
+            }}
+          >
+            {t('list.availableNow')}
+          </Checkbox>
+          <div className={layout.row}>
+            <Button type="submit" variant="primary">
+              {t('list.apply')}
+            </Button>
+            <Link
+              href={paths.facilities()}
+              onPress={() => {
+                setDraft({ q: '', type: ANY, date: null, daypart: ANY, features: [], now: false });
+              }}
+            >
+              {t('list.clear')}
+            </Link>
+          </div>
         </div>
       </form>
 

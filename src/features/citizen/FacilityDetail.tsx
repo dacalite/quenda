@@ -18,6 +18,7 @@ import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { NotFoundPage } from '../../app/pages';
 import layout from '../../ui/layout.module.css';
+import styles from './citizen.module.css';
 import { FacilityImage } from './FacilityImage';
 import { useCitizen, useMe } from './queries';
 
@@ -83,14 +84,17 @@ export function FacilityDetail() {
             <dd>{f.address}</dd>
           </dl>
           <p className={layout.meta}>{t('facility.capacity', { count: f.capacity })}</p>
-          <p>
-            {nextFree.data
-              ? t('facility.nextFree', {
-                  date: format.longDate(nextFree.data.date),
-                  time: format.timeRange(nextFree.data.start, nextFree.data.end),
-                })
-              : nextFree.isSuccess && t('facility.noNextFree')}
-          </p>
+          {(nextFree.data || nextFree.isSuccess) && (
+            <p className={styles.nextFree}>
+              <Icon name="clock" />
+              {nextFree.data
+                ? t('facility.nextFree', {
+                    date: format.longDate(nextFree.data.date),
+                    time: format.timeRange(nextFree.data.start, nextFree.data.end),
+                  })
+                : t('facility.noNextFree')}
+            </p>
+          )}
           <p>
             <Link href={paths.availability(f.id)} variant="primary">
               {t('facility.book')}

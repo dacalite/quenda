@@ -4,6 +4,8 @@
   display: block;
   width: 100%;
   height: auto;
+  aspect-ratio: 2 / 1;
+  background: var(--color-primary-surface);
   border-radius: var(--radius-2);
 }
 
@@ -247,8 +249,27 @@ a.slot .slotStatus {
   font-weight: 700;
 }
 
-.unread {
-  border-inline-start: 6px solid var(--color-primary);
+.notification {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-background);
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-radius: var(--radius-3);
+}
+
+.notification > p {
+  margin: 0;
+}
+
+.notification[data-unread] {
+  background: var(--color-primary-surface);
+  border-color: transparent;
+}
+
+:root[data-contrast='high'] .notification[data-unread] {
+  border: var(--control-border-width) solid var(--color-border);
 }
 
 .dayparts {
@@ -362,4 +383,52 @@ a.slot .slotStatus {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
+}
+
+.nextFree {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-3);
+  margin: 0;
+  font-weight: 700;
+  background: var(--color-primary-surface);
+  border-radius: var(--radius-2);
+}
+
+.nextFree > svg {
+  margin-block-start: 0.2em;
+  color: var(--color-primary);
+}
+
+.filtersHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filtersHead > h2 {
+  margin: 0;
+  font-size: var(--font-size-4);
+}
+
+.filterFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Small screens fold the filters away so the results come first. */
+@media (max-width: 55.99rem) {
+  .filterFields:not([data-open]) {
+    display: none;
+  }
+}
+
+@media (min-width: 56rem) {
+  .filtersToggle {
+    display: none;
+  }
 }

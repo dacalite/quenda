@@ -62,9 +62,8 @@ export function Notifications() {
             return (
               <li
                 key={notification.id}
-                className={[layout.panel, notification.readAt ? null : styles.unread]
-                  .filter(Boolean)
-                  .join(' ')}
+                className={styles.notification}
+                data-unread={notification.readAt ? undefined : true}
               >
                 <p className={layout.row}>
                   <strong>{t(`domain:notificationType.${notification.type}`)}</strong>

@@ -36,6 +36,8 @@
   "list": {
     "title": "Instalaciones",
     "filters": "Filtros",
+    "showFilters": "Mostrar los filtros",
+    "hideFilters": "Ocultar los filtros",
     "search": "Nombre o tipo",
     "type": "Tipo de instalación",
     "anyType": "Todos los tipos",
