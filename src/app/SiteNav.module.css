@@ -146,7 +146,8 @@
 
   /* On the navy staff bar, the current section is underlined in the flag's celeste. */
   [data-variant='menu'] .link {
-    padding-block: var(--space-2);
+    padding: var(--space-2) 0.75rem;
+    font-size: var(--font-size-2);
     border-radius: 0;
     box-shadow: inset 0 -3px 0 transparent;
   }
