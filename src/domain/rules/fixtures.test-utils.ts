@@ -26,7 +26,7 @@ export function makeFacility(overrides: Partial<Facility> = {}): Facility {
     name: 'Campo municipal',
     type: 'footballPitch',
     description: text(''),
-    address: '',
+    address: 'Rúa do Campo, 1',
     coordinates: { lat: 0, lng: 0 },
     capacity: 22,
     subspaces: [
