@@ -3,12 +3,15 @@ import type { RouteObject } from 'react-router';
 import { AccessControl } from '../../features/admin/AccessControl';
 import { AdminHome } from '../../features/admin/AdminHome';
 import { Agenda } from '../../features/admin/Agenda';
+import { Blocks } from '../../features/admin/Blocks';
 import { Facilities } from '../../features/admin/Facilities';
 import { EditFacility, NewFacility } from '../../features/admin/FacilityForm';
 import { NewBooking } from '../../features/admin/NewBooking';
 import { RequireAdmin, RequireStaff } from '../../features/admin/RequireStaff';
 import { ReservationRecord } from '../../features/admin/ReservationRecord';
 import { ScheduleEditor } from '../../features/admin/ScheduleEditor';
+import { SeasonWizard } from '../../features/admin/SeasonWizard';
+import { Seasons } from '../../features/admin/Seasons';
 import { Availability } from '../../features/citizen/Availability';
 import { BookingReview } from '../../features/citizen/BookingReview';
 import { CalendarPage } from '../../features/citizen/CalendarPage';
@@ -73,6 +76,9 @@ export const routes: RouteObject[] = [
               { path: 'instalacions/nova', element: adminOnly(<NewFacility />) },
               { path: 'instalacions/:facilityId', element: adminOnly(<EditFacility />) },
               { path: 'instalacions/:facilityId/horario', element: adminOnly(<ScheduleEditor />) },
+              { path: 'bloqueos', element: adminOnly(<Blocks />) },
+              { path: 'tempada', element: adminOnly(<Seasons />) },
+              { path: 'tempada/nova', element: adminOnly(<SeasonWizard />) },
             ],
           },
           { path: '*', element: <NotFoundPage /> },
