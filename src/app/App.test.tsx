@@ -10,7 +10,7 @@ import i18n from '../i18n';
 import { expectNoAxeViolations } from '../test/axe';
 import { AppProviders } from './providers/AppProviders';
 import { routes } from './routes/routes';
-import { sessionUserId, useDemo, usePreferences } from './state';
+import { sessionUserId, useDemo, usePreferences, useTour } from './state';
 
 const SEED = generateSeed('2026-10-15');
 
@@ -47,6 +47,7 @@ beforeEach(() => {
     signedIn: false,
   });
   usePreferences.setState({ textSize: 'normal', highContrast: false, reducedMotion: false });
+  useTour.setState({ seen: ['citizen', 'staff', 'deputacion'], active: null });
 });
 
 afterEach(async () => {
@@ -100,9 +101,9 @@ describe('app shell', () => {
 
     await choose(/Ver como/, 'Deputación');
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Vista da deputación' }),
+      await screen.findByRole('heading', { level: 1, name: 'Concellos adheridos' }),
     ).toBeInTheDocument();
-    expect(document.title).toBe('Vista da deputación · Deputación de Exemplo');
+    expect(document.title).toBe('Concellos adheridos · Deputación de Exemplo');
     expect(demoBar().queryByRole('button', { name: /Concello/ })).not.toBeInTheDocument();
   });
 

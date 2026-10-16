@@ -41,47 +41,54 @@ export function Seasons() {
 
       <section className={layout.section} aria-labelledby="seasons-schedules">
         <h2 id="seasons-schedules">{t('seasons.schedules')}</h2>
-        <DataTable
-          caption={t('seasons.schedules')}
-          hideCaption
-          rows={rows}
-          rowKey={(b) => b.id}
-          columns={[
-            { key: 'entity', header: t('seasons.entity'), isRowHeader: true, render: entityName },
-            {
-              key: 'place',
-              header: t('table.place'),
-              render: (b) => {
-                const facility = facilities.data?.find((f) => f.id === b.facilityId);
-                return facility ? `${facility.name} · ${subspaceName(facility, b.subspaceId)}` : '';
+        {/* Each row is named by its club, so the table waits for every list it reads. */}
+        {bookings.data && entities.data && facilities.data ? (
+          <DataTable
+            caption={t('seasons.schedules')}
+            hideCaption
+            rows={rows}
+            rowKey={(b) => b.id}
+            columns={[
+              { key: 'entity', header: t('seasons.entity'), isRowHeader: true, render: entityName },
+              {
+                key: 'place',
+                header: t('table.place'),
+                render: (b) => {
+                  const facility = facilities.data.find((f) => f.id === b.facilityId);
+                  return facility
+                    ? `${facility.name} · ${subspaceName(facility, b.subspaceId)}`
+                    : '';
+                },
               },
-            },
-            {
-              key: 'when',
-              header: t('seasons.when'),
-              render: (b) =>
-                t('seasons.weekly', {
-                  day: weekdayName(b.weekday),
-                  time: format.timeRange(b.times.start, b.times.end),
-                }),
-            },
-            {
-              key: 'season',
-              header: t('seasons.season'),
-              render: (b) =>
-                t('blocks.dateRange', {
-                  from: format.fullDate(b.season.from),
-                  to: format.fullDate(b.season.to),
-                }),
-            },
-            {
-              key: 'skipped',
-              header: t('seasons.skipped'),
-              align: 'end',
-              render: (b) => String(b.exceptions.length),
-            },
-          ]}
-        />
+              {
+                key: 'when',
+                header: t('seasons.when'),
+                render: (b) =>
+                  t('seasons.weekly', {
+                    day: weekdayName(b.weekday),
+                    time: format.timeRange(b.times.start, b.times.end),
+                  }),
+              },
+              {
+                key: 'season',
+                header: t('seasons.season'),
+                render: (b) =>
+                  t('blocks.dateRange', {
+                    from: format.fullDate(b.season.from),
+                    to: format.fullDate(b.season.to),
+                  }),
+              },
+              {
+                key: 'skipped',
+                header: t('seasons.skipped'),
+                align: 'end',
+                render: (b) => String(b.exceptions.length),
+              },
+            ]}
+          />
+        ) : (
+          <p aria-busy="true">{t('common:loading')}</p>
+        )}
       </section>
 
       <section className={layout.section} aria-labelledby="seasons-entities">

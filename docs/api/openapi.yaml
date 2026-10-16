@@ -1,0 +1,1748 @@
+# SPDX-License-Identifier: EUPL-1.2
+openapi: 3.1.0
+info:
+  title: Quenda API
+  version: 1.0.0
+  summary: Reserva de instalacións deportivas municipais para concellos e deputacións.
+  description: |
+    API REST do sistema completo. O prototipo implementa este mesmo contrato no navegador
+    (`src/data/ports`); o adaptador `src/data/adapters/http` consúmeo tal como se describe aquí.
+
+    - Todos os recursos dun concello cólganse de `/tenants/{tenantId}` e ningunha resposta
+      inclúe datos doutro concello (illamento por fila en PostgreSQL).
+    - A identidade chega nun token OIDC. A cidadanía accede con Cl@ve ou Chave365 e o persoal
+      con contas locais ou co directorio do concello.
+    - Permisos: a cidadanía só ve as súas reservas, o seu perfil e os seus avisos; o persoal
+      (`staff` e `admin`) ve todo o seu concello; só `admin` cambia a configuración e le o
+      rexistro de actividade; a deputación ve os seus concellos e dá de alta outros novos.
+    - Os erros seguen a RFC 9457 (`application/problem+json`).
+    - Datas en `YYYY-MM-DD` e horas en `HH:mm`, sempre na zona horaria do concello;
+      instantes en ISO 8601 (UTC). Importes en céntimos de euro.
+  license:
+    name: EUPL-1.2
+    identifier: EUPL-1.2
+  contact:
+    name: Quenda
+    url: https://github.com/dacalite/quenda
+servers:
+  - url: https://reservas.example.org/api/v1
+    description: Instancia de exemplo (compartida por unha deputación ou propia dun concello)
+security:
+  - oidc: []
+tags:
+  - name: Concellos
+    description: Datos, imaxe, idiomas, textos legais e normas xerais de cada concello.
+  - name: Instalacións
+    description: Instalacións, espazos reservables, dispoñibilidade e recomendacións.
+  - name: Horarios
+    description: Horario semanal, excepcións, festivos e bloqueos.
+  - name: Reservas
+    description: Reservas da cidadanía e do persoal, con prezo, normas e asistencia.
+  - name: Tempada
+    description: Reservas recorrentes de clubs e asociacións.
+  - name: Persoas
+    description: Persoas usuarias e entidades.
+  - name: Avisos
+    description: Avisos na aplicación, por correo ou por SMS.
+  - name: Seguimento
+    description: Indicadores de uso e rexistro de actividade.
+  - name: Deputación
+    description: Xestión multimunicipio dunha instancia compartida.
+
+paths:
+  /tenants:
+    get:
+      tags: [Concellos]
+      operationId: listTenants
+      summary: Concellos da instancia
+      security: [{}]
+      responses:
+        '200':
+          description: Concellos con servizo nesta instancia.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Tenant' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+  /sites/{slug}:
+    get:
+      tags: [Concellos]
+      operationId: getTenantBySlug
+      summary: Concello polo seu enderezo web
+      description: Resolve o enderezo público do concello, p. ex. `/bouzalonga`.
+      security: [{}]
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/Slug' }
+      responses:
+        '200':
+          description: O concello.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenant' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    patch:
+      tags: [Concellos]
+      operationId: updateTenant
+      summary: Cambiar a configuración do concello
+      description: Só para a administración do concello. Queda no rexistro de actividade.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TenantPatch' }
+      responses:
+        '200':
+          description: Concello actualizado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenant' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /tenants/{tenantId}/facilities:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    get:
+      tags: [Instalacións]
+      operationId: listFacilities
+      summary: Instalacións do concello
+      security: [{}]
+      responses:
+        '200':
+          description: Instalacións, activas e inactivas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Facility' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [Instalacións]
+      operationId: createFacility
+      summary: Dar de alta unha instalación
+      description: Só para a administración. Créase cun horario de partida.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FacilityInput' }
+      responses:
+        '201':
+          description: Instalación creada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Facility' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /tenants/{tenantId}/facilities/{facilityId}:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - $ref: '#/components/parameters/FacilityId'
+    get:
+      tags: [Instalacións]
+      operationId: getFacility
+      summary: Unha instalación
+      security: [{}]
+      responses:
+        '200':
+          description: A instalación.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Facility' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Instalacións]
+      operationId: updateFacility
+      summary: Cambiar unha instalación
+      description: Só para a administración. As instalacións non se borran, desactívanse.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FacilityPatch' }
+      responses:
+        '200':
+          description: Instalación actualizada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Facility' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/facilities/{facilityId}/availability:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - $ref: '#/components/parameters/FacilityId'
+    get:
+      tags: [Instalacións]
+      operationId: getAvailability
+      summary: Estado de cada franxa dun día
+      description: Público. Non revela quen reservou.
+      security: [{}]
+      parameters:
+        - $ref: '#/components/parameters/Date'
+      responses:
+        '200':
+          description: Franxas de todos os espazos reservables.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AvailabilitySlot' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/facilities/{facilityId}/recommendations:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - $ref: '#/components/parameters/FacilityId'
+    get:
+      tags: [Instalacións]
+      operationId: getRecommendations
+      summary: Horas libres que adoitan estar tranquilas
+      description: >-
+        Público. Media de ocupación das últimas oito semanas no mesmo día da semana; só se
+        propoñen as franxas libres con ocupación media ata o 40 %.
+      security: [{}]
+      parameters:
+        - $ref: '#/components/parameters/Date'
+      responses:
+        '200':
+          description: Recomendacións ordenadas da máis tranquila á menos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Recommendation' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/facilities/{facilityId}/schedule:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - $ref: '#/components/parameters/FacilityId'
+    get:
+      tags: [Horarios]
+      operationId: getSchedule
+      summary: Horario dunha instalación
+      security: [{}]
+      responses:
+        '200':
+          description: Horario semanal e excepcións.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Schedule' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Horarios]
+      operationId: saveSchedule
+      summary: Gardar o horario dunha instalación
+      description: Só para a administración.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Schedule' }
+      responses:
+        '200':
+          description: Horario gardado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Schedule' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /tenants/{tenantId}/holidays:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    get:
+      tags: [Horarios]
+      operationId: listHolidays
+      summary: Festivos do concello
+      security: [{}]
+      responses:
+        '200':
+          description: Festivos por orde de data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Holiday' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [Horarios]
+      operationId: createHoliday
+      summary: Engadir un festivo
+      description: Só para a administración. Un por data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HolidayInput' }
+      responses:
+        '201':
+          description: Festivo creado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Holiday' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /tenants/{tenantId}/holidays/{holidayId}:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - name: holidayId
+        in: path
+        required: true
+        schema: { $ref: '#/components/schemas/Id' }
+    delete:
+      tags: [Horarios]
+      operationId: deleteHoliday
+      summary: Quitar un festivo
+      responses:
+        '204': { description: Festivo eliminado. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /tenants/{tenantId}/blocks:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    get:
+      tags: [Horarios]
+      operationId: listBlocks
+      summary: Bloqueos por mantemento ou eventos
+      security: [{}]
+      parameters:
+        - $ref: '#/components/parameters/FacilityFilter'
+        - $ref: '#/components/parameters/From'
+        - $ref: '#/components/parameters/To'
+      responses:
+        '200':
+          description: Bloqueos que tocan o rango indicado.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Block' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [Horarios]
+      operationId: createBlock
+      summary: Crear un bloqueo
+      description: >-
+        Só para a administración. Cancela as reservas afectadas e avisa a cada persoa,
+        ofrecéndolle outra hora.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BlockInput' }
+      responses:
+        '201':
+          description: Bloqueo creado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Block' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/blocks/preview:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    post:
+      tags: [Horarios]
+      operationId: previewBlock
+      summary: Reservas que cancelaría un bloqueo
+      description: Non garda nada.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BlockInput' }
+      responses:
+        '200':
+          description: Reservas futuras afectadas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Reservation' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/blocks/{blockId}:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - name: blockId
+        in: path
+        required: true
+        schema: { $ref: '#/components/schemas/Id' }
+    delete:
+      tags: [Horarios]
+      operationId: deleteBlock
+      summary: Quitar un bloqueo
+      responses:
+        '204': { description: Bloqueo eliminado. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /tenants/{tenantId}/reservations:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    get:
+      tags: [Reservas]
+      operationId: listReservations
+      summary: Reservas
+      description: A cidadanía só recibe as súas; o persoal, todas as do concello.
+      parameters:
+        - $ref: '#/components/parameters/FacilityFilter'
+        - name: holder
+          in: query
+          description: Titular, como `user:{id}` ou `entity:{id}`.
+          schema:
+            type: string
+            pattern: '^(user|entity):.+$'
+        - $ref: '#/components/parameters/From'
+        - $ref: '#/components/parameters/To'
+        - name: status
+          in: query
+          description: Estados separados por comas.
+          style: form
+          explode: false
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/ReservationStatus' }
+      responses:
+        '200':
+          description: Reservas por orde de data e hora.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Reservation' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Reservas]
+      operationId: createReservation
+      summary: Reservar
+      description: >-
+        A cidadanía reserva para si mesma pola web; o persoal pode reservar en nome de
+        calquera persoa ou entidade por teléfono ou no mostrador.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReservationInput' }
+      responses:
+        '201':
+          description: Reserva confirmada, con prezo e código.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/RuleViolation' }
+  /tenants/{tenantId}/reservations/quote:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    post:
+      tags: [Reservas]
+      operationId: quoteReservation
+      summary: Prezo e normas antes de reservar
+      description: Non reserva nada. Con `replaces`, valora o cambio dunha reserva existente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/ReservationInput'
+                - type: object
+                  properties:
+                    replaces: { $ref: '#/components/schemas/Id' }
+      responses:
+        '200':
+          description: Prezo e normas incumpridas (baleiro se se pode reservar).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReservationQuote' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/reservation-codes/{code}:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - name: code
+        in: path
+        required: true
+        description: Código que figura no QR, p. ex. `QDA-7K3M`.
+        schema:
+          type: string
+          pattern: '^QDA-[A-Z0-9]{4}$'
+    get:
+      tags: [Reservas]
+      operationId: getReservationByCode
+      summary: Reserva polo seu código (control de acceso)
+      responses:
+        '200':
+          description: A reserva.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/reservations/{reservationId}:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - $ref: '#/components/parameters/ReservationId'
+    get:
+      tags: [Reservas]
+      operationId: getReservation
+      summary: Unha reserva
+      responses:
+        '200':
+          description: A reserva, co seu historial.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/reservations/{reservationId}/reschedule:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - $ref: '#/components/parameters/ReservationId'
+    post:
+      tags: [Reservas]
+      operationId: rescheduleReservation
+      summary: Cambiar a hora ou o día
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Slot' }
+      responses:
+        '200':
+          description: Reserva cambiada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/RuleViolation' }
+  /tenants/{tenantId}/reservations/{reservationId}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - $ref: '#/components/parameters/ReservationId'
+    post:
+      tags: [Reservas]
+      operationId: cancelReservation
+      summary: Cancelar
+      responses:
+        '200':
+          description: Reserva cancelada; a franxa queda libre.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/RuleViolation' }
+  /tenants/{tenantId}/reservations/{reservationId}/check-in:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - $ref: '#/components/parameters/ReservationId'
+    post:
+      tags: [Reservas]
+      operationId: checkInReservation
+      summary: Rexistrar a entrada
+      description: Persoal. Só o día da reserva e antes de que remate.
+      responses:
+        '200':
+          description: Entrada rexistrada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /tenants/{tenantId}/reservations/{reservationId}/no-show:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - $ref: '#/components/parameters/ReservationId'
+    post:
+      tags: [Reservas]
+      operationId: markNoShow
+      summary: Marcar como non presentada
+      description: Persoal. Só cando a franxa xa rematou.
+      responses:
+        '200':
+          description: Reserva marcada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /tenants/{tenantId}/recurring-bookings:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    get:
+      tags: [Tempada]
+      operationId: listRecurringBookings
+      summary: Reservas de tempada
+      parameters:
+        - name: entityId
+          in: query
+          schema: { $ref: '#/components/schemas/Id' }
+        - $ref: '#/components/parameters/FacilityFilter'
+      responses:
+        '200':
+          description: Reservas de tempada.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/RecurringBooking' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Tempada]
+      operationId: createRecurringBooking
+      summary: Crear unha reserva de tempada
+      description: Só para a administración. Reserva cada data sen conflito, de balde para a entidade.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RecurringBookingInput' }
+      responses:
+        '201':
+          description: Reserva de tempada creada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RecurringBooking' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/recurring-bookings/preview:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    post:
+      tags: [Tempada]
+      operationId: previewRecurringBooking
+      summary: Conflitos dunha reserva de tempada
+      description: Non garda nada.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RecurringBookingInput' }
+      responses:
+        '200':
+          description: Datas con conflito e o motivo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/RecurringConflict' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /tenants/{tenantId}/users:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    get:
+      tags: [Persoas]
+      operationId: listUsers
+      summary: Persoas usuarias
+      description: Persoal. Busca por nome, teléfono ou correo.
+      parameters:
+        - name: roles
+          in: query
+          style: form
+          explode: false
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/Role' }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Persoas que coinciden.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/User' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Persoas]
+      operationId: createUser
+      summary: Alta rápida dunha persoa (mostrador ou teléfono)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserInput' }
+      responses:
+        '201':
+          description: Persoa creada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /tenants/{tenantId}/users/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - $ref: '#/components/parameters/UserId'
+    get:
+      tags: [Persoas]
+      operationId: getUser
+      summary: Unha persoa
+      description: Cada persoa ve o seu perfil; o persoal, o de calquera.
+      responses:
+        '200':
+          description: A persoa.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Persoas]
+      operationId: updateUser
+      summary: Cambiar o perfil ou as preferencias
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserPatch' }
+      responses:
+        '200':
+          description: Perfil actualizado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/users/{userId}/notifications:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - $ref: '#/components/parameters/UserId'
+    get:
+      tags: [Avisos]
+      operationId: listNotifications
+      summary: Avisos dunha persoa
+      responses:
+        '200':
+          description: Avisos, os máis recentes primeiro.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Notification' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /calendar-feeds/{feedToken}.ics:
+    parameters:
+      - name: feedToken
+        in: path
+        required: true
+        description: Segredo propio de cada persoa, que pode revogar desde o seu perfil.
+        schema: { type: string, minLength: 16 }
+    get:
+      tags: [Reservas]
+      operationId: getCalendarFeed
+      summary: Subscrición ao calendario persoal
+      description: >-
+        Calendario iCalendar (RFC 5545) coas reservas confirmadas da persoa, en hora de
+        Europe/Madrid. As aplicacións de calendario non poden identificarse con OIDC, así que
+        o acceso vai polo segredo do enderezo.
+      security: []
+      responses:
+        '200':
+          description: Calendario coas reservas.
+          content:
+            text/calendar:
+              schema: { type: string }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/notifications/{notificationId}/read:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - name: notificationId
+        in: path
+        required: true
+        schema: { $ref: '#/components/schemas/Id' }
+    post:
+      tags: [Avisos]
+      operationId: markNotificationRead
+      summary: Marcar un aviso como lido
+      responses:
+        '200':
+          description: Aviso marcado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Notification' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{tenantId}/entities:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    get:
+      tags: [Persoas]
+      operationId: listEntities
+      summary: Clubs e asociacións
+      responses:
+        '200':
+          description: Entidades do rexistro municipal.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Entity' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /tenants/{tenantId}/entities/{entityId}:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - name: entityId
+        in: path
+        required: true
+        schema: { $ref: '#/components/schemas/Id' }
+    get:
+      tags: [Persoas]
+      operationId: getEntity
+      summary: Unha entidade
+      responses:
+        '200':
+          description: A entidade.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Entity' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /tenants/{tenantId}/indicators:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    get:
+      tags: [Seguimento]
+      operationId: getIndicators
+      summary: Indicadores de uso
+      description: Persoal.
+      parameters:
+        - $ref: '#/components/parameters/RequiredFrom'
+        - $ref: '#/components/parameters/RequiredTo'
+      responses:
+        '200':
+          description: Indicadores do período.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Indicators' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /tenants/{tenantId}/audit-log:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    get:
+      tags: [Seguimento]
+      operationId: listAuditLog
+      summary: Rexistro de actividade
+      description: Só para a administración. Quen creou, cambiou ou cancelou que e cando.
+      responses:
+        '200':
+          description: Entradas, as máis recentes primeiro.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AuditEntry' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /deputacions/{deputacionId}:
+    parameters:
+      - $ref: '#/components/parameters/DeputacionId'
+    get:
+      tags: [Deputación]
+      operationId: getDeputacion
+      summary: Unha deputación
+      security: [{}]
+      responses:
+        '200':
+          description: A deputación.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Deputacion' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /deputacions/{deputacionId}/councils:
+    parameters:
+      - $ref: '#/components/parameters/DeputacionId'
+    get:
+      tags: [Deputación]
+      operationId: listCouncils
+      summary: Concellos adheridos
+      responses:
+        '200':
+          description: Concellos da instancia compartida.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Tenant' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Deputación]
+      operationId: createCouncil
+      summary: Dar de alta un concello
+      description: Crea o concello coas instalacións iniciais e os seus horarios, listo para reservar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NewCouncil' }
+      responses:
+        '201':
+          description: Concello creado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenant' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /deputacions/{deputacionId}/indicators:
+    parameters:
+      - $ref: '#/components/parameters/DeputacionId'
+    get:
+      tags: [Deputación]
+      operationId: getDeputacionIndicators
+      summary: Indicadores comparados
+      parameters:
+        - $ref: '#/components/parameters/RequiredFrom'
+        - $ref: '#/components/parameters/RequiredTo'
+      responses:
+        '200':
+          description: Indicadores de cada concello e do conxunto.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeputacionIndicators' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+components:
+  securitySchemes:
+    oidc:
+      type: openIdConnect
+      openIdConnectUrl: https://identidade.example.org/.well-known/openid-configuration
+      description: >-
+        Cl@ve e Chave365 (SAML 2.0 ou OIDC, a través dunha pasarela) para a cidadanía; contas
+        locais ou o directorio do concello para o persoal.
+
+  parameters:
+    TenantId:
+      name: tenantId
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/Id' }
+    FacilityId:
+      name: facilityId
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/Id' }
+    ReservationId:
+      name: reservationId
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/Id' }
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/Id' }
+    DeputacionId:
+      name: deputacionId
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/Id' }
+    Date:
+      name: date
+      in: query
+      required: true
+      schema: { $ref: '#/components/schemas/IsoDate' }
+    FacilityFilter:
+      name: facilityId
+      in: query
+      schema: { $ref: '#/components/schemas/Id' }
+    From:
+      name: from
+      in: query
+      schema: { $ref: '#/components/schemas/IsoDate' }
+    To:
+      name: to
+      in: query
+      schema: { $ref: '#/components/schemas/IsoDate' }
+    RequiredFrom:
+      name: from
+      in: query
+      required: true
+      schema: { $ref: '#/components/schemas/IsoDate' }
+    RequiredTo:
+      name: to
+      in: query
+      required: true
+      schema: { $ref: '#/components/schemas/IsoDate' }
+
+  responses:
+    BadRequest:
+      description: Datos incompletos ou fóra de rango, campo a campo.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ValidationProblem' }
+    Forbidden:
+      description: A persoa identificada non pode facer isto.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    NotFound:
+      description: O recurso non existe neste concello.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/NotFoundProblem' }
+    Conflict:
+      description: Choca co estado actual, p. ex. alguén acaba de reservar a franxa.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    RuleViolation:
+      description: Incumpre unha ou máis normas de reserva.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/RuleViolationProblem' }
+
+  schemas:
+    Id:
+      type: string
+      minLength: 1
+    Slug:
+      type: string
+      pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+    IsoDate:
+      type: string
+      format: date
+      description: Data do calendario do concello.
+    Time:
+      type: string
+      pattern: '^([01]\d|2[0-3]):[0-5]\d$'
+      description: Hora local do concello.
+    Instant:
+      type: string
+      format: date-time
+    Cents:
+      type: integer
+      minimum: 0
+      description: Importe en céntimos de euro.
+    Weekday:
+      type: integer
+      minimum: 1
+      maximum: 7
+      description: Día ISO da semana; 1 é o luns.
+    Language:
+      type: string
+      enum: [gl, es]
+    LocalizedText:
+      type: object
+      required: [gl, es]
+      properties:
+        gl: { type: string }
+        es: { type: string }
+    TimeRange:
+      type: object
+      required: [start, end]
+      properties:
+        start: { $ref: '#/components/schemas/Time' }
+        end: { $ref: '#/components/schemas/Time' }
+    DateRange:
+      type: object
+      required: [from, to]
+      properties:
+        from: { $ref: '#/components/schemas/IsoDate' }
+        to: { $ref: '#/components/schemas/IsoDate' }
+
+    NoShowPolicy:
+      type: object
+      required: [strikesForSuspension, windowDays, suspensionDays]
+      properties:
+        strikesForSuspension: { type: integer, minimum: 0 }
+        windowDays: { type: integer, minimum: 0 }
+        suspensionDays: { type: integer, minimum: 0 }
+    BookingRules:
+      type: object
+      required:
+        - minAdvanceHours
+        - maxAdvanceDays
+        - minDurationMinutes
+        - maxDurationMinutes
+        - maxBookingsPerWeek
+        - freeCancellationHours
+        - noShow
+        - eligibility
+      properties:
+        minAdvanceHours: { type: integer, minimum: 0 }
+        maxAdvanceDays: { type: integer, minimum: 0 }
+        minDurationMinutes: { type: integer, minimum: 0 }
+        maxDurationMinutes: { type: integer, minimum: 0 }
+        maxBookingsPerWeek: { type: integer, minimum: 0 }
+        freeCancellationHours: { type: integer, minimum: 0 }
+        noShow: { $ref: '#/components/schemas/NoShowPolicy' }
+        eligibility:
+          type: string
+          enum: [everyone, residents, entities]
+
+    Deputacion:
+      type: object
+      required: [id, name]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        name: { type: string }
+    Tenant:
+      type: object
+      required: [id, slug, name, primaryColor, emblem, languages, timeZone, legal, defaultRules]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        slug: { $ref: '#/components/schemas/Slug' }
+        name: { type: string }
+        deputacionId: { $ref: '#/components/schemas/Id' }
+        primaryColor:
+          type: string
+          pattern: '^#[0-9a-fA-F]{6}$'
+          description: Cor corporativa; a interface usa unha variante con contraste 4,5:1 se fai falta.
+        emblem:
+          type: string
+          enum: [tower, bridge, oak, wave]
+          description: No prototipo, escudos xenéricos; no sistema real, o escudo que suba o concello.
+        languages:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/Language' }
+        timeZone: { type: string, examples: [Europe/Madrid] }
+        legal:
+          type: object
+          required: [legalNotice, privacy, accessibility]
+          properties:
+            legalNotice: { $ref: '#/components/schemas/LocalizedText' }
+            privacy: { $ref: '#/components/schemas/LocalizedText' }
+            accessibility: { $ref: '#/components/schemas/LocalizedText' }
+        defaultRules: { $ref: '#/components/schemas/BookingRules' }
+    TenantPatch:
+      type: object
+      properties:
+        name: { type: string }
+        primaryColor: { type: string, pattern: '^#[0-9a-fA-F]{6}$' }
+        emblem: { type: string, enum: [tower, bridge, oak, wave] }
+        languages:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/Language' }
+        legal: { $ref: '#/components/schemas/Tenant/properties/legal' }
+        defaultRules: { $ref: '#/components/schemas/BookingRules' }
+    NewCouncil:
+      type: object
+      required: [name, slug, languages, emblem, primaryColor, facilityTypes, address]
+      properties:
+        name: { type: string, minLength: 1 }
+        slug: { $ref: '#/components/schemas/Slug' }
+        languages:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/Language' }
+        emblem: { type: string, enum: [tower, bridge, oak, wave] }
+        primaryColor: { type: string, pattern: '^#[0-9a-fA-F]{6}$' }
+        facilityTypes:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/FacilityType' }
+        address: { type: string, minLength: 1 }
+
+    FacilityType:
+      type: string
+      enum:
+        [sportsHall, paddleCourt, tennisCourt, footballPitch, swimmingPool, multipurposeRoom, gym]
+    Subspace:
+      type: object
+      required: [id, name, capacity, contains]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        name: { $ref: '#/components/schemas/LocalizedText' }
+        capacity:
+          type: integer
+          minimum: 1
+          description: Reservas simultáneas; 1 é uso exclusivo.
+        contains:
+          type: array
+          description: Espazos que tamén ocupa, p. ex. o campo enteiro contén os dous medios.
+          items: { $ref: '#/components/schemas/Id' }
+    Pricing:
+      type: object
+      required: [residentCents, nonResidentCents, concessions, entitiesFree]
+      properties:
+        residentCents: { $ref: '#/components/schemas/Cents' }
+        nonResidentCents: { $ref: '#/components/schemas/Cents' }
+        concessions:
+          type: object
+          description: Desconto en porcentaxe por colectivo; só se aplica o mellor.
+          properties:
+            minor: { type: number, minimum: 0, maximum: 100 }
+            senior: { type: number, minimum: 0, maximum: 100 }
+            disability: { type: number, minimum: 0, maximum: 100 }
+            largeFamily: { type: number, minimum: 0, maximum: 100 }
+        entitiesFree: { type: boolean }
+    FacilityInput:
+      type: object
+      required:
+        - name
+        - type
+        - description
+        - address
+        - coordinates
+        - capacity
+        - subspaces
+        - accessibility
+        - photos
+        - usageRules
+        - status
+        - rules
+        - pricing
+      properties:
+        name: { type: string, minLength: 1 }
+        type: { $ref: '#/components/schemas/FacilityType' }
+        description: { $ref: '#/components/schemas/LocalizedText' }
+        address: { type: string, minLength: 1 }
+        coordinates:
+          type: object
+          required: [lat, lng]
+          properties:
+            lat: { type: number, minimum: -90, maximum: 90 }
+            lng: { type: number, minimum: -180, maximum: 180 }
+        capacity: { type: integer, minimum: 1 }
+        subspaces:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/Subspace' }
+        accessibility:
+          type: array
+          items:
+            type: string
+            enum: [stepFreeAccess, adaptedChangingRoom, adaptedToilet, reservedParking, hearingLoop]
+        photos:
+          type: array
+          items:
+            type: object
+            required: [id, alt]
+            properties:
+              id: { $ref: '#/components/schemas/Id' }
+              alt: { $ref: '#/components/schemas/LocalizedText' }
+        usageRules: { $ref: '#/components/schemas/LocalizedText' }
+        status: { type: string, enum: [active, inactive] }
+        rules:
+          description: Normas propias; as que faltan herdan as do concello.
+          allOf:
+            - $ref: '#/components/schemas/BookingRulesPatch'
+        pricing: { $ref: '#/components/schemas/Pricing' }
+    FacilityPatch:
+      description: Calquera subconxunto dos campos da instalación.
+      allOf:
+        - $ref: '#/components/schemas/FacilityInput'
+      required: []
+    BookingRulesPatch:
+      type: object
+      properties:
+        minAdvanceHours: { type: integer, minimum: 0 }
+        maxAdvanceDays: { type: integer, minimum: 0 }
+        minDurationMinutes: { type: integer, minimum: 0 }
+        maxDurationMinutes: { type: integer, minimum: 0 }
+        maxBookingsPerWeek: { type: integer, minimum: 0 }
+        freeCancellationHours: { type: integer, minimum: 0 }
+        noShow: { $ref: '#/components/schemas/NoShowPolicy' }
+        eligibility: { type: string, enum: [everyone, residents, entities] }
+    Facility:
+      allOf:
+        - $ref: '#/components/schemas/FacilityInput'
+        - type: object
+          required: [id, tenantId]
+          properties:
+            id: { $ref: '#/components/schemas/Id' }
+            tenantId: { $ref: '#/components/schemas/Id' }
+
+    Schedule:
+      type: object
+      required: [tenantId, facilityId, slotMinutes, weekly, exceptions]
+      properties:
+        tenantId: { $ref: '#/components/schemas/Id' }
+        facilityId: { $ref: '#/components/schemas/Id' }
+        slotMinutes: { type: integer, enum: [30, 60, 90] }
+        weekly:
+          type: object
+          description: Tramos de apertura por día ISO da semana (1 a 7).
+          propertyNames: { pattern: '^[1-7]$' }
+          additionalProperties:
+            type: array
+            items: { $ref: '#/components/schemas/TimeRange' }
+        exceptions:
+          type: array
+          items:
+            type: object
+            required: [date, ranges, reason]
+            properties:
+              date: { $ref: '#/components/schemas/IsoDate' }
+              ranges:
+                type: array
+                description: Baleiro se pecha todo o día.
+                items: { $ref: '#/components/schemas/TimeRange' }
+              reason: { type: string }
+    HolidayInput:
+      type: object
+      required: [date, name]
+      properties:
+        date: { $ref: '#/components/schemas/IsoDate' }
+        name: { $ref: '#/components/schemas/LocalizedText' }
+    Holiday:
+      allOf:
+        - $ref: '#/components/schemas/HolidayInput'
+        - type: object
+          required: [id, tenantId]
+          properties:
+            id: { $ref: '#/components/schemas/Id' }
+            tenantId: { $ref: '#/components/schemas/Id' }
+    BlockInput:
+      type: object
+      required: [facilityId, subspaceId, dates, times, reason, note]
+      properties:
+        facilityId: { $ref: '#/components/schemas/Id' }
+        subspaceId:
+          description: '`null` bloquea todos os espazos.'
+          oneOf:
+            - $ref: '#/components/schemas/Id'
+            - type: 'null'
+        dates: { $ref: '#/components/schemas/DateRange' }
+        times: { $ref: '#/components/schemas/TimeRange' }
+        reason: { type: string, enum: [maintenance, event, other] }
+        note: { type: string }
+    Block:
+      allOf:
+        - $ref: '#/components/schemas/BlockInput'
+        - type: object
+          required: [id, tenantId, createdAt, createdBy]
+          properties:
+            id: { $ref: '#/components/schemas/Id' }
+            tenantId: { $ref: '#/components/schemas/Id' }
+            createdAt: { $ref: '#/components/schemas/Instant' }
+            createdBy: { $ref: '#/components/schemas/Id' }
+
+    Slot:
+      type: object
+      required: [facilityId, subspaceId, date, start, end]
+      properties:
+        facilityId: { $ref: '#/components/schemas/Id' }
+        subspaceId: { $ref: '#/components/schemas/Id' }
+        date: { $ref: '#/components/schemas/IsoDate' }
+        start: { $ref: '#/components/schemas/Time' }
+        end: { $ref: '#/components/schemas/Time' }
+    AvailabilitySlot:
+      allOf:
+        - $ref: '#/components/schemas/Slot'
+        - type: object
+          required: [status, capacity, taken]
+          properties:
+            status: { type: string, enum: [free, booked, blocked, closed, past] }
+            capacity: { type: integer, minimum: 1 }
+            taken: { type: integer, minimum: 0 }
+    Recommendation:
+      type: object
+      required: [start, end, expectedOccupancy]
+      properties:
+        start: { $ref: '#/components/schemas/Time' }
+        end: { $ref: '#/components/schemas/Time' }
+        expectedOccupancy: { type: number, minimum: 0, maximum: 1 }
+    Holder:
+      oneOf:
+        - $ref: '#/components/schemas/UserHolder'
+        - $ref: '#/components/schemas/EntityHolder'
+      discriminator:
+        propertyName: kind
+        mapping:
+          user: '#/components/schemas/UserHolder'
+          entity: '#/components/schemas/EntityHolder'
+    UserHolder:
+      type: object
+      required: [kind, userId]
+      properties:
+        kind: { const: user }
+        userId: { $ref: '#/components/schemas/Id' }
+    EntityHolder:
+      type: object
+      required: [kind, entityId]
+      properties:
+        kind: { const: entity }
+        entityId: { $ref: '#/components/schemas/Id' }
+    ReservationStatus:
+      type: string
+      enum: [confirmed, cancelled, completed, noShow]
+    Channel:
+      type: string
+      enum: [web, phone, inPerson]
+    ReservationInput:
+      allOf:
+        - $ref: '#/components/schemas/Slot'
+        - type: object
+          required: [holder, channel]
+          properties:
+            holder: { $ref: '#/components/schemas/Holder' }
+            channel: { $ref: '#/components/schemas/Channel' }
+            notes: { type: string }
+            confirmBy:
+              type: string
+              enum: [email, sms]
+              description: Reservas do persoal; envía a confirmación por esta canle.
+    PriceQuote:
+      type: object
+      required: [tariff, units, unitCents, concession, discountPercent, totalCents]
+      properties:
+        tariff: { type: string, enum: [resident, nonResident, entity] }
+        units: { type: integer, minimum: 1 }
+        unitCents: { $ref: '#/components/schemas/Cents' }
+        concession:
+          oneOf:
+            - { type: string, enum: [minor, senior, disability, largeFamily] }
+            - { type: 'null' }
+        discountPercent: { type: number, minimum: 0, maximum: 100 }
+        totalCents: { $ref: '#/components/schemas/Cents' }
+    RuleViolation:
+      type: object
+      required: [code]
+      description: >-
+        Norma incumprida, cos datos para explicala: `slotMinutes`, `hours`, `days`, `minutes`,
+        `max` ou `until` segundo o código.
+      properties:
+        code:
+          type: string
+          enum:
+            - facilityInactive
+            - past
+            - closed
+            - unavailable
+            - outsideOpeningHours
+            - misaligned
+            - tooSoon
+            - tooFarAhead
+            - tooShort
+            - tooLong
+            - weeklyLimit
+            - residentsOnly
+            - entitiesOnly
+            - suspended
+            - notCancellable
+            - alreadyStarted
+            - modificationWindowClosed
+        slotMinutes: { type: integer }
+        hours: { type: integer }
+        days: { type: integer }
+        minutes: { type: integer }
+        max: { type: integer }
+        until: { $ref: '#/components/schemas/IsoDate' }
+    ReservationQuote:
+      type: object
+      required: [price, violations]
+      properties:
+        price: { $ref: '#/components/schemas/PriceQuote' }
+        violations:
+          type: array
+          items: { $ref: '#/components/schemas/RuleViolation' }
+    Reservation:
+      allOf:
+        - $ref: '#/components/schemas/Slot'
+        - type: object
+          required:
+            - id
+            - tenantId
+            - code
+            - holder
+            - status
+            - channel
+            - amountCents
+            - payment
+            - notes
+            - createdAt
+            - createdBy
+            - history
+          properties:
+            id: { $ref: '#/components/schemas/Id' }
+            tenantId: { $ref: '#/components/schemas/Id' }
+            code: { type: string, pattern: '^QDA-[A-Z0-9]{4}$' }
+            holder: { $ref: '#/components/schemas/Holder' }
+            status: { $ref: '#/components/schemas/ReservationStatus' }
+            channel: { $ref: '#/components/schemas/Channel' }
+            amountCents: { $ref: '#/components/schemas/Cents' }
+            payment:
+              type: string
+              enum: [free, pending, paid]
+              description: No prototipo non se cobra; no sistema real, a pasarela de pagos do concello.
+            notes: { type: string }
+            createdAt: { $ref: '#/components/schemas/Instant' }
+            createdBy: { $ref: '#/components/schemas/Id' }
+            recurringBookingId: { $ref: '#/components/schemas/Id' }
+            checkedInAt: { $ref: '#/components/schemas/Instant' }
+            history:
+              type: array
+              items:
+                type: object
+                required: [at, by, type]
+                properties:
+                  at: { $ref: '#/components/schemas/Instant' }
+                  by: { $ref: '#/components/schemas/Id' }
+                  type:
+                    type: string
+                    enum: [created, rescheduled, cancelled, checkedIn, noShow]
+                  detail: { type: string }
+
+    RecurringBookingInput:
+      type: object
+      required: [entityId, facilityId, subspaceId, weekday, times, season, exceptions]
+      properties:
+        entityId: { $ref: '#/components/schemas/Id' }
+        facilityId: { $ref: '#/components/schemas/Id' }
+        subspaceId: { $ref: '#/components/schemas/Id' }
+        weekday: { $ref: '#/components/schemas/Weekday' }
+        times: { $ref: '#/components/schemas/TimeRange' }
+        season: { $ref: '#/components/schemas/DateRange' }
+        exceptions:
+          type: array
+          description: Datas saltadas a propósito, p. ex. para resolver un conflito.
+          items: { $ref: '#/components/schemas/IsoDate' }
+    RecurringBooking:
+      allOf:
+        - $ref: '#/components/schemas/RecurringBookingInput'
+        - type: object
+          required: [id, tenantId, createdAt]
+          properties:
+            id: { $ref: '#/components/schemas/Id' }
+            tenantId: { $ref: '#/components/schemas/Id' }
+            createdAt: { $ref: '#/components/schemas/Instant' }
+    RecurringConflict:
+      type: object
+      required: [date, problem]
+      properties:
+        date: { $ref: '#/components/schemas/IsoDate' }
+        problem:
+          type: string
+          enum: [booked, blocked, closed, past, outsideOpeningHours, misaligned]
+
+    Role:
+      type: string
+      enum: [citizen, staff, admin]
+    UserInput:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - maskedDni
+        - email
+        - phone
+        - resident
+        - concessions
+        - role
+        - preferences
+      properties:
+        firstName: { type: string }
+        lastName: { type: string }
+        maskedDni:
+          type: string
+          description: Só se garda enmascarado, p. ex. `***4521**`.
+        email: { type: string, format: email }
+        phone: { type: string }
+        resident:
+          type: boolean
+          description: Empadroamento; decide a tarifa e algunhas normas.
+        concessions:
+          type: array
+          items: { type: string, enum: [minor, senior, disability, largeFamily] }
+        role: { $ref: '#/components/schemas/Role' }
+        preferences:
+          type: object
+          required: [language, channels, accessibility]
+          properties:
+            language: { $ref: '#/components/schemas/Language' }
+            channels:
+              type: array
+              items: { type: string, enum: [app, email, sms] }
+            accessibility:
+              type: object
+              required: [textSize, highContrast, reducedMotion]
+              properties:
+                textSize: { type: string, enum: [normal, large, xlarge] }
+                highContrast: { type: boolean }
+                reducedMotion: { type: boolean }
+    UserPatch:
+      description: Calquera subconxunto dos campos da persoa.
+      allOf:
+        - $ref: '#/components/schemas/UserInput'
+      required: []
+    User:
+      allOf:
+        - $ref: '#/components/schemas/UserInput'
+        - type: object
+          required: [id, tenantId]
+          properties:
+            id: { $ref: '#/components/schemas/Id' }
+            tenantId: { $ref: '#/components/schemas/Id' }
+    Entity:
+      type: object
+      required: [id, tenantId, name, kind, registryNumber, contactName, phone, email]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        tenantId: { $ref: '#/components/schemas/Id' }
+        name: { type: string }
+        kind: { type: string, enum: [club, association] }
+        registryNumber:
+          type: string
+          description: Número do rexistro municipal de entidades.
+        contactName: { type: string }
+        phone: { type: string }
+        email: { type: string, format: email }
+    Notification:
+      type: object
+      required: [id, tenantId, userId, type, channel, createdAt]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        tenantId: { $ref: '#/components/schemas/Id' }
+        userId: { $ref: '#/components/schemas/Id' }
+        type:
+          type: string
+          enum: [confirmation, reminder, change, cancellation, councilNotice, slotReleased]
+        channel: { type: string, enum: [app, email, sms] }
+        createdAt: { $ref: '#/components/schemas/Instant' }
+        readAt: { $ref: '#/components/schemas/Instant' }
+        reservationId: { $ref: '#/components/schemas/Id' }
+    AuditEntry:
+      type: object
+      required: [id, tenantId, at, actorId, action, subject, subjectId, label]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        tenantId: { $ref: '#/components/schemas/Id' }
+        at: { $ref: '#/components/schemas/Instant' }
+        actorId: { $ref: '#/components/schemas/Id' }
+        action:
+          type: string
+          enum: [create, update, delete, cancel, reschedule, checkIn, noShow]
+        subject:
+          type: string
+          enum: [tenant, facility, schedule, block, reservation, recurringBooking, user]
+        subjectId: { $ref: '#/components/schemas/Id' }
+        label:
+          type: string
+          description: Nome lexible do obxecto nese momento, p. ex. un código de reserva.
+
+    Indicators:
+      type: object
+      required:
+        - range
+        - bookings
+        - cancellations
+        - cancellationRate
+        - noShows
+        - noShowRate
+        - occupancy
+        - byChannel
+        - byHolder
+        - facilities
+      properties:
+        range: { $ref: '#/components/schemas/DateRange' }
+        bookings: { type: integer, minimum: 0, description: Reservas non canceladas. }
+        cancellations: { type: integer, minimum: 0 }
+        cancellationRate: { type: number, minimum: 0, maximum: 1 }
+        noShows: { type: integer, minimum: 0 }
+        noShowRate: { type: number, minimum: 0, maximum: 1 }
+        occupancy:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Parte das prazas reservables ocupadas; non conta as horas pechadas nin bloqueadas.
+        byChannel:
+          type: object
+          required: [web, phone, inPerson]
+          properties:
+            web: { type: integer, minimum: 0 }
+            phone: { type: integer, minimum: 0 }
+            inPerson: { type: integer, minimum: 0 }
+        byHolder:
+          type: object
+          required: [user, entity]
+          properties:
+            user: { type: integer, minimum: 0 }
+            entity: { type: integer, minimum: 0 }
+        facilities:
+          type: array
+          items:
+            type: object
+            required: [facilityId, bookings, occupancy, heatmap]
+            properties:
+              facilityId: { $ref: '#/components/schemas/Id' }
+              bookings: { type: integer, minimum: 0 }
+              occupancy: { type: number, minimum: 0, maximum: 1 }
+              heatmap:
+                type: array
+                items:
+                  type: object
+                  required: [weekday, start, occupancy]
+                  properties:
+                    weekday: { $ref: '#/components/schemas/Weekday' }
+                    start: { $ref: '#/components/schemas/Time' }
+                    occupancy: { type: number, minimum: 0, maximum: 1 }
+    DeputacionIndicators:
+      type: object
+      required: [councils, total]
+      properties:
+        councils:
+          type: array
+          items:
+            type: object
+            required: [tenantId, indicators]
+            properties:
+              tenantId: { $ref: '#/components/schemas/Id' }
+              indicators: { $ref: '#/components/schemas/Indicators' }
+        total: { $ref: '#/components/schemas/Indicators' }
+
+    Problem:
+      type: object
+      description: Detalle do problema segundo a RFC 9457.
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri-reference }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+    ValidationProblem:
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          required: [problems]
+          properties:
+            problems:
+              type: array
+              items:
+                type: object
+                required: [field, code]
+                properties:
+                  field:
+                    type: string
+                    description: Ruta do campo, p. ex. `subspaces.0.name.gl`.
+                  code:
+                    type: string
+                    enum: [required, positive, range, order, overlap, format, taken]
+    NotFoundProblem:
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          properties:
+            resource: { type: string }
+            id: { type: string }
+    RuleViolationProblem:
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          required: [violations]
+          properties:
+            violations:
+              type: array
+              items: { $ref: '#/components/schemas/RuleViolation' }

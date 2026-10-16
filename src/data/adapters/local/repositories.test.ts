@@ -10,10 +10,11 @@ import {
   RuleViolationError,
   ValidationError,
 } from '../../ports/errors';
-import { generateSeed, personaUserId } from '../../seed/generate';
+import { DEPUTACION } from '../../seed/catalog';
+import { generateSeed, personaUsers, personaUserId } from '../../seed/generate';
 import { createRandom } from '../../seed/random';
 import { createLocalDatabase, type Database } from './database';
-import { createLocalRepositories } from './repositories';
+import { createLocalRepositories, type Session } from './repositories';
 
 const TODAY = '2026-10-15';
 const NOW = new Date('2026-10-15T08:00:00Z'); // 10:00 in Galicia
@@ -55,21 +56,25 @@ function setup({
   userId = STAFF_B,
   storage = new MemoryStorage(),
 }: { userId?: string | null; storage?: MemoryStorage } = {}) {
-  let session = userId;
+  let session: Session | null = userId ? { userId } : null;
   let clock = NOW;
   const db = createLocalDatabase(storage, 'test.db', () => structuredClone(SEED));
   const repos = createLocalRepositories({
     db,
-    session: () => (session ? { userId: session } : null),
+    session: () => session,
     now: () => clock,
     latency: false,
     random: createRandom(7).next,
+    initialUsers: personaUsers,
   });
   return {
     repos,
     db,
     actAs: (id: string | null) => {
-      session = id;
+      session = id ? { userId: id } : null;
+    },
+    actForDeputacion: (deputacionId = DEPUTACION.id) => {
+      session = { userId: 'deputacion-staff', deputacionId };
     },
     travelTo: (instant: Date) => {
       clock = instant;
@@ -648,6 +653,89 @@ describe('other repositories', () => {
     const read = await repos.notifications.markRead(B, notification.id);
     expect(read.readAt).toBeDefined();
     expect((await repos.notifications.markRead(B, notification.id)).readAt).toBe(read.readAt);
+  });
+});
+
+describe('deputación', () => {
+  const RANGE = { from: addDays(TODAY, -28), to: addDays(TODAY, -1) };
+  const council = {
+    name: 'Concello de Vilarmoura',
+    slug: 'vilarmoura',
+    languages: ['gl' as const],
+    emblem: 'bridge' as const,
+    primaryColor: '#7a2e8c',
+    facilityTypes: ['sportsHall' as const, 'paddleCourt' as const],
+    address: 'Praza do Concello, 1, Vilarmoura',
+  };
+
+  it('compares its councils and adds their figures together', async () => {
+    const { repos, actForDeputacion } = setup();
+    actForDeputacion();
+    const councils = await repos.deputacions.listCouncils(DEPUTACION.id);
+    expect(councils.map((t) => t.slug)).toEqual([A, B]);
+
+    const { councils: figures, total } = await repos.deputacions.indicators(DEPUTACION.id, RANGE);
+    expect(figures.map((c) => c.tenantId)).toEqual([A, B]);
+    const sum = (key: 'bookings' | 'cancellations' | 'noShows') =>
+      figures.reduce((acc, c) => acc + c.indicators[key], 0);
+    expect(total.bookings).toBe(sum('bookings'));
+    expect(total.cancellations).toBe(sum('cancellations'));
+    expect(total.noShows).toBe(sum('noShows'));
+    expect(total.facilities).toHaveLength(figures.flatMap((c) => c.indicators.facilities).length);
+  });
+
+  it('keeps its back office from council staff, residents, visitors and other deputacións', async () => {
+    const { repos, actAs, actForDeputacion } = setup();
+    for (const id of [STAFF_B, uxia.userId, null]) {
+      actAs(id);
+      await expect(repos.deputacions.listCouncils(DEPUTACION.id)).rejects.toThrow(ForbiddenError);
+      await expect(repos.deputacions.indicators(DEPUTACION.id, RANGE)).rejects.toThrow(
+        ForbiddenError,
+      );
+      await expect(repos.deputacions.createCouncil(DEPUTACION.id, council)).rejects.toThrow(
+        ForbiddenError,
+      );
+    }
+    actForDeputacion('another');
+    await expect(repos.deputacions.listCouncils(DEPUTACION.id)).rejects.toThrow(ForbiddenError);
+    expect((await repos.deputacions.get(DEPUTACION.id)).name).toBe(DEPUTACION.name);
+    await expect(repos.deputacions.get('another')).rejects.toThrow(NotFoundError);
+  });
+
+  it('signs up a council that takes bookings straight away', async () => {
+    const { repos, actAs, actForDeputacion } = setup();
+    actForDeputacion();
+    const tenant = await repos.deputacions.createCouncil(DEPUTACION.id, council);
+    expect(tenant).toMatchObject({ slug: 'vilarmoura', deputacionId: DEPUTACION.id });
+    expect((await repos.tenants.getBySlug('vilarmoura')).id).toBe(tenant.id);
+
+    const facilities = await repos.facilities.list(tenant.id);
+    expect(facilities.map((f) => f.type)).toEqual(['sportsHall', 'paddleCourt']);
+    const [hall] = facilities;
+    if (!hall) throw new Error('missing facility');
+    const slots = await repos.facilities.availability(tenant.id, hall.id, addDays(TODAY, 5));
+    expect(slots.some((slot) => slot.status === 'free')).toBe(true);
+
+    actAs(personaUserId(tenant.id, 'carme'));
+    const log = await repos.audit.list(tenant.id);
+    expect(log.map((e) => `${e.action} ${e.subject} ${e.actorId}`).sort()).toEqual([
+      'create facility deputacion-staff',
+      'create facility deputacion-staff',
+      'create tenant deputacion-staff',
+    ]);
+  });
+
+  it('validates new councils as the server would', async () => {
+    const { repos, actForDeputacion } = setup();
+    actForDeputacion();
+    const error: unknown = await repos.deputacions
+      .createCouncil(DEPUTACION.id, { ...council, slug: B, facilityTypes: [] })
+      .catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(ValidationError);
+    expect((error as ValidationError).problems).toEqual([
+      { field: 'slug', code: 'taken' },
+      { field: 'facilityTypes', code: 'required' },
+    ]);
   });
 });
 

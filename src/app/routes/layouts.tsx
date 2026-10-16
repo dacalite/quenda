@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: EUPL-1.2
-import { useEffect } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 import { RouterProvider as AriaRouterProvider } from 'react-aria-components';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useHref, useNavigate, useParams } from 'react-router';
@@ -9,6 +9,8 @@ import { DEPUTACION } from '../../data/seed/catalog';
 import { StaffNav } from '../../features/admin/StaffNav';
 import { CitizenNav } from '../../features/citizen/CitizenNav';
 import { DemoBar } from '../../features/demo/DemoBar';
+import { GuidedTour } from '../../features/demo/GuidedTour';
+import { DeputacionNav } from '../../features/deputacion/DeputacionNav';
 import { currentLanguage } from '../../i18n';
 import { accessibleColor } from '../../ui/contrast';
 import { SkipLink } from '../../ui/SkipLink';
@@ -17,7 +19,7 @@ import { ErrorPage, NotFoundPage } from '../pages';
 import { useTenantBySlug, useTenants } from '../queries';
 import { SiteFrame } from '../SiteFrame';
 import { useDemo, usePreferences } from '../state';
-import { citizenPaths, DEPUTACION_PATH, LEGAL_PAGES, roleHome } from './paths';
+import { citizenPaths, deputacionPaths, LEGAL_PAGES, roleHome } from './paths';
 
 function useApplyPreferences() {
   const { textSize, highContrast, reducedMotion } = usePreferences();
@@ -50,6 +52,7 @@ export function AppShell() {
       <SkipLink targetId="main">{t('skipLink')}</SkipLink>
       <DemoBar />
       <Outlet />
+      <GuidedTour />
     </AriaRouterProvider>
   );
 }
@@ -144,10 +147,25 @@ export function TenantLayout() {
   );
 }
 
+// The deputación area has a single identity, so opening it is enough to act as the deputación.
 export function DeputacionLayout() {
+  const role = useDemo((state) => state.role);
+  const setRole = useDemo((state) => state.setRole);
+  // Only on arrival: leaving for a council changes the role on purpose.
+  const enter = useEffectEvent(() => {
+    if (role !== 'deputacion') setRole('deputacion');
+  });
+  useEffect(() => {
+    enter();
+  }, []);
+
   return (
-    <SiteFrame name={DEPUTACION.name} homeHref={`/${DEPUTACION_PATH}`}>
-      <Outlet />
+    <SiteFrame
+      name={DEPUTACION.name}
+      homeHref={deputacionPaths.home}
+      nav={role === 'deputacion' ? <DeputacionNav /> : undefined}
+    >
+      {role === 'deputacion' ? <Outlet /> : <Loading />}
     </SiteFrame>
   );
 }

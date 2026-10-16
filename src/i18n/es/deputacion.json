@@ -1,0 +1,78 @@
+{
+  "nav": {
+    "label": "Menú de la diputación",
+    "home": "Ayuntamientos",
+    "newCouncil": "Alta de un ayuntamiento",
+    "session": "Personal técnico de la diputación"
+  },
+  "home": {
+    "title": "Ayuntamientos adheridos",
+    "intro": "La {{name}} ofrece el servicio de reservas a sus ayuntamientos en una instancia compartida. Desde aquí comparas sus indicadores y das de alta ayuntamientos nuevos sin instalar nada.",
+    "newCouncil": "Dar de alta un ayuntamiento nuevo",
+    "created": "El {{name}} ya está dado de alta y puede recibir reservas.",
+    "createdAnnouncement": "Ayuntamiento dado de alta: {{name}}.",
+    "councils": "Ayuntamientos",
+    "facilities_one": "{{count}} instalación",
+    "facilities_other": "{{count}} instalaciones",
+    "languages": "Idiomas: {{list}}",
+    "address": "Dirección web: /{{slug}}",
+    "visit": "Ver la web de {{name}}",
+    "manage": "Gestionar {{name}}",
+    "manageHelp": "Entras como Carme, la administradora de demostración del ayuntamiento."
+  },
+  "compare": {
+    "title": "Indicadores comparados",
+    "period": "Periodo",
+    "periods": {
+      "last4": "Últimas 4 semanas",
+      "last8": "Últimas 8 semanas"
+    },
+    "range": "Del {{from}} al {{to}}",
+    "caption": "Indicadores de cada ayuntamiento y del conjunto de la diputación",
+    "council": "Ayuntamiento",
+    "bookings": "Reservas",
+    "occupancy": "Ocupación",
+    "cancellationRate": "Cancelaciones",
+    "noShowRate": "No presentadas",
+    "assistedShare": "Por teléfono o presencial",
+    "total": "Total de la diputación",
+    "summary": "En conjunto hubo {{bookings}} reservas y una ocupación del {{occupancy}}. La mayor ocupación la tiene el {{busiest}} ({{busiestOccupancy}}), y la mayor tasa de no presentadas, el {{absent}} ({{absentRate}}).",
+    "loading": "Calculando los indicadores…"
+  },
+  "deployment": {
+    "title": "Dos modelos de despliegue",
+    "intro": "El mismo software libre sirve para los dos modelos, y un ayuntamiento puede pasar de uno a otro llevándose sus datos.",
+    "shared": {
+      "title": "Instancia compartida de la diputación",
+      "body": "La diputación mantiene una única instalación para todos los ayuntamientos adheridos. Cada ayuntamiento tiene su dirección, su imagen y sus normas, y sus datos están aislados de los del resto. Es la opción indicada para ayuntamientos pequeños sin personal técnico."
+    },
+    "own": {
+      "title": "Instancia propia del ayuntamiento",
+      "body": "El ayuntamiento instala el servicio en sus servidores o en los de su proveedor, con las mismas funciones. Encaja cuando ya tiene sistemas propios o quiere integrarlo con ellos."
+    }
+  },
+  "wizard": {
+    "title": "Alta de un ayuntamiento nuevo",
+    "intro": "En tres pasos el ayuntamiento queda listo para recibir reservas. Después podrá completar las instalaciones, los horarios y las normas desde su propia gestión.",
+    "progress": "Paso {{current}} de {{total}}: {{name}}",
+    "stepItem": "{{number}}. {{name}}",
+    "steps": {
+      "details": "Datos",
+      "image": "Imagen",
+      "facilities": "Instalaciones iniciales"
+    },
+    "name": "Nombre del ayuntamiento",
+    "nameHelp": "Tal como aparecerá en la cabecera, por ejemplo «Concello de Vilarmoura».",
+    "slug": "Dirección web",
+    "slugHelp": "Solo letras minúsculas sin tildes, números y guiones. La web del ayuntamiento quedará en /{{slug}}.",
+    "slugFormat": "«Dirección web» solo puede llevar letras minúsculas sin tildes, números y guiones entre palabras.",
+    "facilityTypes": "Instalaciones iniciales",
+    "facilityTypesHelp": "Se crean con un horario y unas tarifas de partida que el ayuntamiento puede cambiar.",
+    "address": "Dirección de las instalaciones",
+    "addressHelp": "Dónde están las instalaciones iniciales. El ayuntamiento puede cambiarla en cada una.",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "submit": "Dar de alta el ayuntamiento",
+    "cancel": "Cancelar"
+  }
+}

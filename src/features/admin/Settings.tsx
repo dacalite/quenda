@@ -4,28 +4,22 @@ import { useTranslation } from 'react-i18next';
 import { Page } from '../../app/Page';
 import { LANGUAGE_NAMES, LANGUAGES } from '../../config/app';
 import { ValidationError } from '../../data/ports/errors';
-import type { Emblem, NoShowPolicy, Tenant } from '../../domain/types';
-import { isHexColor, NUMERIC_RULES, validateTenant } from '../../domain/validation';
-import { useFormat } from '../../i18n/format';
+import type { NoShowPolicy, Tenant } from '../../domain/types';
+import { NUMERIC_RULES, validateTenant } from '../../domain/validation';
 import { Button } from '../../ui/Button';
-import { Checkbox } from '../../ui/Checkbox';
-import { accessibleColor, contrastRatio } from '../../ui/contrast';
 import { ErrorSummary, type FormError } from '../../ui/ErrorSummary';
 import layout from '../../ui/layout.module.css';
 import { NumberField } from '../../ui/NumberField';
-import { RadioGroup } from '../../ui/RadioGroup';
 import { TextField } from '../../ui/TextField';
 import { useToast } from '../../ui/toasts';
-import styles from './admin.module.css';
 import { fieldId, useProblemMessages } from './problems';
 import { useStaff, useStaffMutation } from './queries';
+import { BrandFields, LanguagesField } from './BrandFields';
 import { RulesFields } from './RulesFields';
 
 const FORM = 'settings';
-const EMBLEMS: Emblem[] = ['tower', 'bridge', 'oak', 'wave'];
 const LEGAL = ['legalNotice', 'privacy', 'accessibility'] as const;
 const NO_SHOW = ['strikesForSuspension', 'windowDays', 'suspensionDays'] as const;
-const MIN_CONTRAST = 4.5;
 
 type Draft = Omit<Tenant, 'id' | 'slug' | 'deputacionId' | 'timeZone'>;
 
@@ -39,7 +33,6 @@ export function Settings() {
 function SettingsForm({ initial }: { initial: Draft }) {
   const { t } = useTranslation(['admin', 'domain', 'common']);
   const toast = useToast();
-  const format = useFormat();
   const [draft, setDraft] = useState(initial);
   const [errors, setErrors] = useState<FormError[]>([]);
   const save = useStaffMutation((r, id, patch: Draft) => r.tenants.update(id, patch));
@@ -63,9 +56,6 @@ function SettingsForm({ initial }: { initial: Draft }) {
     return { id, errorMessage: errorOf(id) };
   };
 
-  const validColor = isHexColor(draft.primaryColor);
-  const contrast = validColor ? contrastRatio(draft.primaryColor, '#ffffff') : null;
-  const suggestion = validColor ? accessibleColor(draft.primaryColor) : null;
   const setNoShow = (key: keyof NoShowPolicy, value: number | null) => {
     update({
       defaultRules: {
@@ -113,94 +103,21 @@ function SettingsForm({ initial }: { initial: Draft }) {
             }}
             isRequired
           />
-          <RadioGroup
-            label={t('settings.emblem')}
-            description={t('settings.emblemHelp')}
-            value={draft.emblem}
-            onChange={(emblem) => {
-              update({ emblem: emblem as Emblem });
-            }}
-            options={EMBLEMS.map((e) => ({ id: e, label: t(`settings.emblems.${e}`) }))}
+          <BrandFields
+            emblem={draft.emblem}
+            primaryColor={draft.primaryColor}
+            colorField={field('primaryColor')}
+            onChange={update}
           />
-          <div className={layout.row}>
-            <TextField
-              {...field('primaryColor')}
-              label={t('settings.color')}
-              description={t('settings.colorHelp')}
-              value={draft.primaryColor}
-              onChange={(primaryColor) => {
-                update({ primaryColor: primaryColor.trim() });
-              }}
-              autoComplete="off"
-              spellCheck="false"
-              isRequired
-            />
-            {validColor && (
-              <span
-                className={styles.swatch}
-                style={{ background: draft.primaryColor }}
-                aria-hidden="true"
-              />
-            )}
-          </div>
-          <div aria-live="polite">
-            {contrast !== null && suggestion !== null && (
-              <p
-                className={layout.notice}
-                data-tone={contrast >= MIN_CONTRAST ? 'success' : 'warning'}
-              >
-                {contrast >= MIN_CONTRAST
-                  ? t('settings.contrastOk', { ratio: format.decimal(contrast) })
-                  : t('settings.contrastLow', {
-                      ratio: format.decimal(contrast),
-                      minimum: format.decimal(MIN_CONTRAST),
-                      suggestion,
-                    })}
-              </p>
-            )}
-          </div>
-          {contrast !== null && contrast < MIN_CONTRAST && suggestion && (
-            <p className={layout.row}>
-              <span
-                className={styles.swatch}
-                style={{ background: suggestion }}
-                aria-hidden="true"
-              />
-              <Button
-                onPress={() => {
-                  update({ primaryColor: suggestion });
-                }}
-              >
-                {t('settings.useSuggestion', { color: suggestion })}
-              </Button>
-            </p>
-          )}
         </fieldset>
 
-        <fieldset className={layout.section} id={fieldId(FORM, 'languages')}>
-          <legend>{t('settings.languages')}</legend>
-          <p className={layout.meta}>{t('settings.languagesHelp')}</p>
-          {errorOf(fieldId(FORM, 'languages')) && (
-            <p className={layout.notice} data-tone="danger">
-              {errorOf(fieldId(FORM, 'languages'))}
-            </p>
-          )}
-          {LANGUAGES.map((language) => (
-            <Checkbox
-              key={language}
-              isSelected={draft.languages.includes(language)}
-              onChange={(selected) => {
-                update({
-                  languages: selected
-                    ? LANGUAGES.filter((l) => l === language || draft.languages.includes(l))
-                    : draft.languages.filter((l) => l !== language),
-                });
-              }}
-            >
-              <span lang={language}>{LANGUAGE_NAMES[language]}</span>
-            </Checkbox>
-          ))}
-        </fieldset>
+        <LanguagesField
+          {...field('languages')}
+          value={draft.languages}
+          onChange={(languages) => {
+            update({ languages });
+          }}
+        />
 
         <fieldset className={layout.section}>
           <legend>{t('settings.rules')}</legend>

@@ -20,6 +20,7 @@ import { Icon } from '../../ui/Icon';
 import { Select } from '../../ui/Select';
 import { useToast } from '../../ui/toasts';
 import styles from './DemoBar.module.css';
+import { useStartTour } from './tours';
 
 const ROLES: DemoRole[] = ['citizen', 'staff', 'deputacion'];
 const CITIZENS: CitizenPersona[] = ['uxia', 'manuel', 'brais'];
@@ -34,6 +35,7 @@ export function DemoBar() {
   const demo = useDemo();
   const updatePreferences = usePreferences((state) => state.update);
   const controlsId = useId();
+  const startTour = useStartTour();
 
   const tenant = tenants.data?.find((item) => item.id === demo.tenantId) ?? tenants.data?.[0];
 
@@ -108,6 +110,14 @@ export function DemoBar() {
               />
             </>
           )}
+          <Button
+            onPress={() => {
+              startTour(demo.role);
+            }}
+          >
+            <Icon name="info" />
+            {t('tour.start')}
+          </Button>
           <DialogTrigger>
             <Button>
               <Icon name="refresh" />

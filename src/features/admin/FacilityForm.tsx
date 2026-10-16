@@ -15,6 +15,7 @@ import type {
   FacilityStatus,
   FacilityType,
 } from '../../domain/types';
+import { DEFAULT_COORDINATES } from '../../domain/councils';
 import { NUMERIC_RULES, validateFacility } from '../../domain/validation';
 import { Button } from '../../ui/Button';
 import { Checkbox } from '../../ui/Checkbox';
@@ -58,7 +59,7 @@ const blankFacility = (): FacilityInput => ({
   type: 'sportsHall',
   description: text(),
   address: '',
-  coordinates: { lat: 42.88, lng: -8.54 },
+  coordinates: DEFAULT_COORDINATES,
   capacity: 10,
   subspaces: [newSpace()],
   accessibility: [],

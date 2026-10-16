@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: EUPL-1.2
+import type { RESERVED_SLUGS } from '../../domain/councils';
 import type { Id, IsoDate, Time } from '../../domain/types';
 import type { DemoRole } from '../state';
 
 export const ADMIN_PATH = 'xestion';
-export const DEPUTACION_PATH = 'deputacion';
+export const DEPUTACION_PATH = 'deputacion' satisfies (typeof RESERVED_SLUGS)[number];
 
 export const roleHome = (role: DemoRole, tenantSlug: string) =>
   role === 'deputacion'
@@ -106,4 +107,10 @@ export const adminPaths = (slug: string) => {
     settings: `${base}/configuracion`,
     activity: `${base}/actividade`,
   };
+};
+
+export const deputacionPaths = {
+  home: `/${DEPUTACION_PATH}`,
+  created: (slug: string) => `/${DEPUTACION_PATH}${query({ novo: slug })}`,
+  newCouncil: `/${DEPUTACION_PATH}/novo-concello`,
 };

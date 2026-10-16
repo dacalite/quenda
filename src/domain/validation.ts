@@ -2,7 +2,8 @@
 import { toMinutes } from './time';
 import type { BookingRules, Facility, Schedule, Tenant, TimeRange } from './types';
 
-export type ProblemCode = 'required' | 'positive' | 'range' | 'order' | 'overlap' | 'format';
+export type ProblemCode =
+  'required' | 'positive' | 'range' | 'order' | 'overlap' | 'format' | 'taken';
 
 /** A field path such as `subspaces.0.name.gl`, with what is wrong with it. */
 export interface FieldProblem {

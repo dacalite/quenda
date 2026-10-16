@@ -120,7 +120,7 @@ function Wizard({
   useEffect(() => {
     // Moving between steps keeps the page, so focus goes to the new step's heading.
     if (moved.current) heading.current?.focus();
-    moved.current = true;
+    moved.current = false;
   }, [step]);
 
   const problems = (current: Step): FormError[] => {
@@ -150,6 +150,7 @@ function Wizard({
       setConflicts(null);
       preview.mutate(input, { onSuccess: setConflicts });
     }
+    moved.current = true;
     setStep(next);
   };
 

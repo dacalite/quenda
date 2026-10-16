@@ -1,0 +1,78 @@
+{
+  "nav": {
+    "label": "Menú da deputación",
+    "home": "Concellos",
+    "newCouncil": "Alta dun concello",
+    "session": "Persoal técnico da deputación"
+  },
+  "home": {
+    "title": "Concellos adheridos",
+    "intro": "A {{name}} ofrece o servizo de reservas aos seus concellos nunha instancia compartida. Desde aquí comparas os seus indicadores e das de alta concellos novos sen instalar nada.",
+    "newCouncil": "Dar de alta un concello novo",
+    "created": "O {{name}} xa está dado de alta e pode recibir reservas.",
+    "createdAnnouncement": "Concello dado de alta: {{name}}.",
+    "councils": "Concellos",
+    "facilities_one": "{{count}} instalación",
+    "facilities_other": "{{count}} instalacións",
+    "languages": "Idiomas: {{list}}",
+    "address": "Enderezo web: /{{slug}}",
+    "visit": "Ver a web de {{name}}",
+    "manage": "Xestionar {{name}}",
+    "manageHelp": "Entras como Carme, a administradora de demostración do concello."
+  },
+  "compare": {
+    "title": "Indicadores comparados",
+    "period": "Período",
+    "periods": {
+      "last4": "Últimas 4 semanas",
+      "last8": "Últimas 8 semanas"
+    },
+    "range": "Do {{from}} ao {{to}}",
+    "caption": "Indicadores de cada concello e do conxunto da deputación",
+    "council": "Concello",
+    "bookings": "Reservas",
+    "occupancy": "Ocupación",
+    "cancellationRate": "Cancelacións",
+    "noShowRate": "Non presentadas",
+    "assistedShare": "Por teléfono ou presencial",
+    "total": "Total da deputación",
+    "summary": "No conxunto houbo {{bookings}} reservas e unha ocupación do {{occupancy}}. A maior ocupación tena o {{busiest}} ({{busiestOccupancy}}), e a maior taxa de non presentadas, o {{absent}} ({{absentRate}}).",
+    "loading": "Calculando os indicadores…"
+  },
+  "deployment": {
+    "title": "Dous modelos de despregamento",
+    "intro": "O mesmo software libre serve para os dous modelos, e un concello pode pasar dun a outro levando os seus datos.",
+    "shared": {
+      "title": "Instancia compartida da deputación",
+      "body": "A deputación mantén unha única instalación para todos os concellos adheridos. Cada concello ten o seu enderezo, a súa imaxe e as súas normas, e os seus datos están illados dos do resto. É a opción indicada para concellos pequenos sen persoal técnico."
+    },
+    "own": {
+      "title": "Instancia propia do concello",
+      "body": "O concello instala o servizo nos seus servidores ou nos do seu provedor, coas mesmas funcións. Encaixa cando xa ten sistemas propios ou quere integralo con eles."
+    }
+  },
+  "wizard": {
+    "title": "Alta dun concello novo",
+    "intro": "En tres pasos o concello queda listo para recibir reservas. Despois poderá completar as instalacións, os horarios e as normas desde a súa propia xestión.",
+    "progress": "Paso {{current}} de {{total}}: {{name}}",
+    "stepItem": "{{number}}. {{name}}",
+    "steps": {
+      "details": "Datos",
+      "image": "Imaxe",
+      "facilities": "Instalacións iniciais"
+    },
+    "name": "Nome do concello",
+    "nameHelp": "Tal como aparecerá na cabeceira, por exemplo «Concello de Vilarmoura».",
+    "slug": "Enderezo web",
+    "slugHelp": "Só letras minúsculas sen acentos, números e guións. A web do concello quedará en /{{slug}}.",
+    "slugFormat": "«Enderezo web» só pode levar letras minúsculas sen acentos, números e guións entre palabras.",
+    "facilityTypes": "Instalacións iniciais",
+    "facilityTypesHelp": "Créanse cun horario e unhas tarifas de partida que o concello pode cambiar.",
+    "address": "Enderezo das instalacións",
+    "addressHelp": "Onde están as instalacións iniciais. O concello pode cambialo en cada unha.",
+    "previous": "Anterior",
+    "next": "Seguinte",
+    "submit": "Dar de alta o concello",
+    "cancel": "Cancelar"
+  }
+}

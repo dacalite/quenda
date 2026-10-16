@@ -24,7 +24,8 @@ export function CalendarPage() {
     (r) => r.status === 'confirmed' && r.date >= today,
   );
   // Simulated: the real service would issue a random, revocable token per person.
-  const url = `${window.location.origin}${import.meta.env.BASE_URL}api/${tenant.slug}/calendario/${btoa(userId ?? '').replace(/=/g, '')}.ics`;
+  // In the real system, a revocable secret per person, so calendar apps can read it without signing in.
+  const url = `${window.location.origin}${import.meta.env.BASE_URL}api/v1/calendar-feeds/${btoa(`${tenant.slug}:${userId ?? ''}`).replace(/=/g, '')}.ics`;
 
   return (
     <Page title={t('calendar.title')}>

@@ -6,12 +6,14 @@ import esAdmin from './es/admin.json';
 import esCitizen from './es/citizen.json';
 import esCommon from './es/common.json';
 import esDemo from './es/demo.json';
+import esDeputacion from './es/deputacion.json';
 import esDomain from './es/domain.json';
 import esUi from './es/ui.json';
 import glAdmin from './gl/admin.json';
 import glCitizen from './gl/citizen.json';
 import glCommon from './gl/common.json';
 import glDemo from './gl/demo.json';
+import glDeputacion from './gl/deputacion.json';
 import glDomain from './gl/domain.json';
 import glUi from './gl/ui.json';
 import { installGalicianIntl } from './galicianIntl';
@@ -25,6 +27,7 @@ export const resources = {
     domain: glDomain,
     citizen: glCitizen,
     admin: glAdmin,
+    deputacion: glDeputacion,
   },
   es: {
     common: esCommon,
@@ -33,6 +36,7 @@ export const resources = {
     domain: esDomain,
     citizen: esCitizen,
     admin: esAdmin,
+    deputacion: esDeputacion,
   },
 } as const;
 

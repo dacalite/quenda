@@ -15,7 +15,7 @@ async function choose(page: Page, label: RegExp, option: string) {
 test.describe('every view passes axe', () => {
   for (const [path, title] of [
     ['/bouzalonga', 'Reserva de instalacións deportivas'],
-    ['/deputacion', 'Vista da deputación'],
+    ['/deputacion', 'Concellos adheridos'],
     ['/non-existe', 'Non atopamos esta páxina'],
   ] as const) {
     test(path, async ({ page }) => {
