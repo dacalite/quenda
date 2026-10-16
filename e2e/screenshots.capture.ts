@@ -51,6 +51,8 @@ async function capture(page: Page, name: string) {
     path: `docs/capturas/${test.info().project.name}/${name}.png`,
     fullPage: true,
     animations: 'disabled',
+    // A transformed ancestor holds the residents' fixed tab bar, so it lands at the end of the page.
+    style: '[data-tabbar] { transform: translateZ(0); }',
   });
 }
 
