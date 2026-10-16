@@ -6,11 +6,11 @@ import { Navigate, Outlet, useHref, useNavigate, useParams } from 'react-router'
 import { APP_DISPLAY_NAME } from '../../config/app';
 import { NotFoundError } from '../../data/ports/errors';
 import { DEPUTACION } from '../../data/seed/catalog';
-import { StaffNav } from '../../features/admin/StaffNav';
-import { CitizenNav } from '../../features/citizen/CitizenNav';
+import { StaffNav, StaffSession } from '../../features/admin/StaffNav';
+import { CitizenNav, CitizenSession } from '../../features/citizen/CitizenNav';
 import { DemoBar } from '../../features/demo/DemoBar';
 import { GuidedTour } from '../../features/demo/GuidedTour';
-import { DeputacionNav } from '../../features/deputacion/DeputacionNav';
+import { DeputacionNav, DeputacionSession } from '../../features/deputacion/DeputacionNav';
 import { currentLanguage } from '../../i18n';
 import { accessibleColor } from '../../ui/contrast';
 import { SkipLink } from '../../ui/SkipLink';
@@ -112,12 +112,22 @@ export function TenantLayout() {
         name={tenant.data?.name ?? APP_DISPLAY_NAME}
         emblem={tenant.data?.emblem}
         homeHref={tenant.data ? `/${tenant.data.slug}` : '/'}
+        surface={role === 'citizen' ? 'citizen' : 'staff'}
         nav={
           tenant.data ? (
             role === 'citizen' ? (
               <CitizenNav />
             ) : role === 'staff' ? (
               <StaffNav />
+            ) : undefined
+          ) : undefined
+        }
+        session={
+          tenant.data ? (
+            role === 'citizen' ? (
+              <CitizenSession />
+            ) : role === 'staff' ? (
+              <StaffSession />
             ) : undefined
           ) : undefined
         }
@@ -165,7 +175,9 @@ export function DeputacionLayout() {
     <SiteFrame
       name={DEPUTACION.name}
       homeHref={deputacionPaths.home}
+      surface="staff"
       nav={role === 'deputacion' ? <DeputacionNav /> : undefined}
+      session={role === 'deputacion' ? <DeputacionSession /> : undefined}
     >
       {role === 'deputacion' ? (
         <Suspense fallback={<Loading />}>

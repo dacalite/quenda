@@ -8,11 +8,16 @@ export function DeputacionNav() {
   return (
     <SiteNav
       label={t('nav.label')}
+      variant="menu"
       items={[
         { href: deputacionPaths.home, label: t('nav.home') },
         { href: deputacionPaths.newCouncil, label: t('nav.newCouncil') },
       ]}
-      session={<span>{t('nav.session')}</span>}
     />
   );
+}
+
+export function DeputacionSession() {
+  const { t } = useTranslation('deputacion');
+  return <span>{t('nav.session')}</span>;
 }

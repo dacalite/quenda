@@ -14,55 +14,70 @@ export function CitizenNav() {
   const { t } = useTranslation('citizen');
   const { tenant, signedIn } = useCitizen();
   const paths = citizenPaths(tenant.slug);
+  const unread = (useNotifications().data ?? []).filter((n) => !n.readAt).length;
+
+  return (
+    <SiteNav
+      label={t('nav.label')}
+      variant="tabs"
+      items={[
+        { href: paths.home, label: t('nav.home'), icon: 'home' },
+        { href: paths.facilities(), label: t('nav.facilities'), icon: 'place' },
+        ...(signedIn
+          ? [
+              { href: paths.reservations, label: t('nav.reservations'), icon: 'ticket' as const },
+              {
+                href: paths.notifications,
+                label: t('nav.notifications'),
+                icon: 'bell' as const,
+                badge:
+                  unread > 0
+                    ? { value: String(unread), label: t('nav.unread', { count: unread }) }
+                    : undefined,
+              },
+              {
+                href: paths.calendar,
+                label: t('nav.calendar'),
+                icon: 'calendar' as const,
+                secondary: true,
+              },
+              { href: paths.profile, label: t('nav.profile'), icon: 'user' as const },
+            ]
+          : []),
+      ]}
+    />
+  );
+}
+
+export function CitizenSession() {
+  const { t } = useTranslation('citizen');
+  const { tenant, signedIn } = useCitizen();
+  const paths = citizenPaths(tenant.slug);
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const toast = useToast();
   const setSignedIn = useDemo((state) => state.setSignedIn);
   const me = useMe();
-  const unread = (useNotifications().data ?? []).filter((n) => !n.readAt).length;
 
-  return (
-    <SiteNav
-      label={t('nav.label')}
-      items={[
-        { href: paths.home, label: t('nav.home') },
-        { href: paths.facilities(), label: t('nav.facilities') },
-        ...(signedIn
-          ? [
-              { href: paths.reservations, label: t('nav.reservations') },
-              {
-                href: paths.notifications,
-                label: t('nav.notifications'),
-                badge: unread > 0 ? t('nav.unread', { count: unread }) : undefined,
-              },
-              { href: paths.calendar, label: t('nav.calendar') },
-              { href: paths.profile, label: t('nav.profile') },
-            ]
-          : []),
-      ]}
-      session={
-        signedIn ? (
-          <>
-            <span>{t('session.greeting', { name: me.data?.firstName ?? '' })}</span>
-            <Button
-              variant="quiet"
-              onPress={() => {
-                setSignedIn(false);
-                void queryClient.invalidateQueries();
-                toast(t('session.signedOut'));
-                void navigate(paths.home);
-              }}
-            >
-              {t('session.signOut')}
-            </Button>
-          </>
-        ) : (
-          <Link href={paths.signIn(pathname)} variant="primary">
-            {t('session.signIn')}
-          </Link>
-        )
-      }
-    />
+  return signedIn ? (
+    <>
+      <span>{t('session.greeting', { name: me.data?.firstName ?? '' })}</span>
+      <Button
+        variant="quiet"
+        onPress={() => {
+          setSignedIn(false);
+          void queryClient.invalidateQueries();
+          toast(t('session.signedOut'));
+          void navigate(paths.home);
+        }}
+      >
+        {t('session.signOut')}
+      </Button>
+    </>
+  ) : (
+    <Link href={paths.signIn(pathname)} variant="primary">
+      {t('session.signIn')}
+    </Link>
   );
 }

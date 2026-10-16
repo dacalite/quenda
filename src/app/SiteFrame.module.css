@@ -1,66 +1,142 @@
 /* SPDX-License-Identifier: EUPL-1.2 */
 
+.frame {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
 .inner {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
-  align-items: flex-end;
-  justify-content: space-between;
-  max-width: var(--content-max);
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  width: 100%;
+  max-width: calc(var(--content-max) + 2 * var(--space-3));
   margin-inline: auto;
   padding-inline: var(--space-3);
 }
 
-.header {
-  padding-block: var(--space-3);
-  border-bottom: var(--control-border-width) solid var(--color-primary);
+.utility {
+  font-size: var(--font-size-1);
+  background: var(--color-surface);
+  border-bottom: var(--border-width) solid var(--color-border-subtle);
+}
+
+.utility .inner {
+  justify-content: flex-end;
+}
+
+.language {
+  flex-direction: row;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.language button {
+  width: auto;
+  min-width: 7.5rem;
+  padding-block: 0;
+  border-width: var(--border-width);
+}
+
+.utility .inner {
+  gap: 0 var(--space-2);
+}
+
+.utility .inner > button {
+  padding-inline: var(--space-2);
+}
+
+.bar {
+  position: relative;
+  padding-block: var(--space-2);
+  background: var(--color-background);
+  border-bottom: var(--border-width) solid var(--color-border-subtle);
+}
+
+/* The council's own colour, as a thin rule over its name. */
+.bar::before {
+  position: absolute;
+  inset: 0 0 auto;
+  block-size: 4px;
+  background: var(--color-accent);
+  content: '';
 }
 
 .brand {
   display: inline-flex;
+  flex: 1 1 auto;
   gap: var(--space-2);
   align-items: center;
   min-height: var(--target-min);
   font-size: var(--font-size-4);
   font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: var(--tracking-tight);
   color: var(--color-text);
   text-decoration: none;
 }
 
 .brand[data-hovered] span {
   text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
 }
 
-.tools {
+.session {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
-  align-items: flex-end;
+  gap: var(--space-1) var(--space-2);
+  align-items: center;
+}
+
+[data-surface='staff'] .bar {
+  padding-block: var(--space-2) 0;
+  border-bottom: 0;
+}
+
+[data-surface='staff'] .brand {
+  font-size: var(--font-size-3);
 }
 
 .main {
-  max-width: var(--content-max);
-  min-height: 60vh;
+  flex: 1;
+  padding-block: var(--space-5) var(--space-6);
+}
+
+.main > :not([data-bleed]) {
+  width: 100%;
+  max-width: calc(var(--content-max) + 2 * var(--space-3));
   margin-inline: auto;
-  padding: var(--space-5) var(--space-3);
+  padding-inline: var(--space-3);
+}
+
+.main:has(> [data-bleed]:first-child) {
+  padding-block-start: 0;
 }
 
 .footer {
-  padding-block: var(--space-4);
+  padding-block: var(--space-5);
   font-size: var(--font-size-2);
   color: var(--color-text-muted);
   background: var(--color-surface);
   border-top: var(--border-width) solid var(--color-border-subtle);
 }
 
-.footer p {
+.footer .inner {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.colophon p {
   margin: 0;
 }
 
 .footerLinks {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1) var(--space-4);
+  gap: 0 var(--space-4);
   padding: 0;
   margin: 0;
   list-style: none;
@@ -70,4 +146,12 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--target-min);
+  font-weight: 700;
+}
+
+/* The residents' tab bar sits at the bottom of small screens: the page must end above it. */
+@media (max-width: 55.99rem) and (min-height: 30rem) {
+  [data-tabbar='citizen'] .footer {
+    padding-block-end: calc(var(--space-5) + 4.5rem + env(safe-area-inset-bottom));
+  }
 }

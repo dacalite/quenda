@@ -6,12 +6,13 @@ import { useStaff } from './queries';
 
 export function StaffNav() {
   const { t } = useTranslation(['admin', 'common']);
-  const { tenant, isAdmin, name } = useStaff();
+  const { tenant, isAdmin } = useStaff();
   const paths = adminPaths(tenant.slug);
 
   return (
     <SiteNav
       label={t('nav.label')}
+      variant="menu"
       items={[
         { href: paths.home, label: t('nav.home') },
         { href: paths.agenda(), label: t('nav.agenda') },
@@ -32,11 +33,14 @@ export function StaffNav() {
             ]
           : []),
       ]}
-      session={
-        <span>
-          {t('nav.session', { name, role: t(isAdmin ? 'nav.roleAdmin' : 'nav.roleStaff') })}
-        </span>
-      }
     />
+  );
+}
+
+export function StaffSession() {
+  const { t } = useTranslation('admin');
+  const { isAdmin, name } = useStaff();
+  return (
+    <span>{t('nav.session', { name, role: t(isAdmin ? 'nav.roleAdmin' : 'nav.roleStaff') })}</span>
   );
 }

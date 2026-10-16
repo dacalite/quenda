@@ -11,11 +11,14 @@ import styles from './Page.module.css';
 export function Page({
   title,
   announcement,
+  hero,
   children,
 }: {
   title: string;
   /** What screen readers hear after navigating here, when it should say more than the title. */
   announcement?: string;
+  /** Turns the heading into a full-width navy band holding this content. */
+  hero?: ReactNode;
   children?: ReactNode;
 }) {
   const { t } = useTranslation();
@@ -39,11 +42,25 @@ export function Page({
     if (key !== 'default') onNavigate();
   }, [key]);
 
-  return (
+  const h1 = (
+    <h1 ref={heading} tabIndex={-1} className={styles.title}>
+      {title}
+    </h1>
+  );
+
+  return hero ? (
+    <>
+      <div className={[styles.hero, 'on-navy'].join(' ')} data-bleed>
+        <div className={styles.heroInner}>
+          {h1}
+          {hero}
+        </div>
+      </div>
+      <div className={styles.page}>{children}</div>
+    </>
+  ) : (
     <div className={styles.page}>
-      <h1 ref={heading} tabIndex={-1} className={styles.title}>
-        {title}
-      </h1>
+      {h1}
       {children}
     </div>
   );

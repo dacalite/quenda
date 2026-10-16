@@ -107,7 +107,7 @@ test('book and cancel using only the keyboard, with axe at every step', async ({
   await expectNoAxeViolations(page);
 
   await openMenu();
-  await tabTo(page, menu.getByRole('link', { name: 'As miñas reservas' }));
+  await tabTo(page, menu.getByRole('link', { name: 'Reservas' }));
   await page.keyboard.press('Enter');
   await expect(heading(page)).toHaveText('As miñas reservas');
   await expectNoAxeViolations(page);

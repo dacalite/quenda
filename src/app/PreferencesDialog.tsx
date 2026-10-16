@@ -16,7 +16,7 @@ export function PreferencesDialog() {
 
   return (
     <DialogTrigger>
-      <Button variant="secondary">
+      <Button variant="quiet">
         <Icon name="settings" />
         {t('preferences.open')}
       </Button>

@@ -71,8 +71,7 @@ describe('app shell', () => {
     expect(useDemo.getState().tenantId).toBe('bouzalonga');
     // Nobody is signed in until they go through the simulated Cl@ve or Chave365 gateway.
     expect(sessionUserId()).toBeNull();
-    const menu = within(screen.getByRole('navigation', { name: 'Menú principal' }));
-    expect(menu.getByRole('link', { name: 'Acceder' })).toBeInTheDocument();
+    expect(within(screen.getByRole('banner')).getByRole('link', { name: 'Acceder' })).toBeVisible();
     await expectNoAxeViolations();
   });
 
