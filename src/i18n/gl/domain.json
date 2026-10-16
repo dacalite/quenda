@@ -30,7 +30,7 @@
     "free": "libre",
     "booked": "ocupada",
     "blocked": "pechada por mantemento ou evento",
-    "closed": "pechado",
+    "closed": "pechada",
     "past": "xa pasou"
   },
   "reservationStatus": {

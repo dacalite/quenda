@@ -520,7 +520,7 @@
   "activity": {
     "title": "Rexistro de actividade",
     "intro": "Quen creou, cambiou ou cancelou que, e cando.",
-    "filter": "Mostrar",
+    "filter": "Amosar",
     "all": "Todo",
     "caption_one": "{{count}} rexistro",
     "caption_other": "{{count}} rexistros",
