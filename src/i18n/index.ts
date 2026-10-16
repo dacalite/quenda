@@ -2,11 +2,13 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { APP_NAME, DEFAULT_LANGUAGE, LANGUAGES, type Language } from '../config/app';
+import esAdmin from './es/admin.json';
 import esCitizen from './es/citizen.json';
 import esCommon from './es/common.json';
 import esDemo from './es/demo.json';
 import esDomain from './es/domain.json';
 import esUi from './es/ui.json';
+import glAdmin from './gl/admin.json';
 import glCitizen from './gl/citizen.json';
 import glCommon from './gl/common.json';
 import glDemo from './gl/demo.json';
@@ -16,8 +18,22 @@ import { installGalicianIntl } from './galicianIntl';
 import { setReactAriaLanguage } from './reactAria';
 
 export const resources = {
-  gl: { common: glCommon, ui: glUi, demo: glDemo, domain: glDomain, citizen: glCitizen },
-  es: { common: esCommon, ui: esUi, demo: esDemo, domain: esDomain, citizen: esCitizen },
+  gl: {
+    common: glCommon,
+    ui: glUi,
+    demo: glDemo,
+    domain: glDomain,
+    citizen: glCitizen,
+    admin: glAdmin,
+  },
+  es: {
+    common: esCommon,
+    ui: esUi,
+    demo: esDemo,
+    domain: esDomain,
+    citizen: esCitizen,
+    admin: esAdmin,
+  },
 } as const;
 
 installGalicianIntl();

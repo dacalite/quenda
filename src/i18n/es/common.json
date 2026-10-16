@@ -33,12 +33,6 @@
     "license": "Software libre bajo licencia EUPL-1.2",
     "prototype": "Prototipo con datos simulados: no se guarda nada fuera de este navegador."
   },
-  "admin": {
-    "home": {
-      "title": "Panel de gestión",
-      "intro": "Desde aquí el personal del ayuntamiento gestionará las instalaciones, los horarios, las reservas y los indicadores. Esta sección está en construcción."
-    }
-  },
   "deputacion": {
     "home": {
       "title": "Vista de la diputación",

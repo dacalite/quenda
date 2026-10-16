@@ -6,6 +6,7 @@ import { Navigate, Outlet, useHref, useNavigate, useParams } from 'react-router'
 import { APP_DISPLAY_NAME } from '../../config/app';
 import { NotFoundError } from '../../data/ports/errors';
 import { DEPUTACION } from '../../data/seed/catalog';
+import { StaffNav } from '../../features/admin/StaffNav';
 import { CitizenNav } from '../../features/citizen/CitizenNav';
 import { DemoBar } from '../../features/demo/DemoBar';
 import { currentLanguage } from '../../i18n';
@@ -108,7 +109,15 @@ export function TenantLayout() {
         name={tenant.data?.name ?? APP_DISPLAY_NAME}
         emblem={tenant.data?.emblem}
         homeHref={tenant.data ? `/${tenant.data.slug}` : '/'}
-        nav={tenant.data && role === 'citizen' ? <CitizenNav /> : undefined}
+        nav={
+          tenant.data ? (
+            role === 'citizen' ? (
+              <CitizenNav />
+            ) : role === 'staff' ? (
+              <StaffNav />
+            ) : undefined
+          ) : undefined
+        }
         footerLabel={t('legal.nav')}
         footerLinks={
           tenant.data

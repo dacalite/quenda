@@ -74,3 +74,36 @@ export const citizenPaths = (slug: string) => ({
 /** Only paths inside the app are accepted as a return address, never another site. */
 export const safeReturnPath = (value: string | null, fallback: string) =>
   value?.startsWith('/') && !value.startsWith('//') ? value : fallback;
+
+export const adminPaths = (slug: string) => {
+  const base = `/${slug}/${ADMIN_PATH}`;
+  return {
+    home: base,
+    agenda: (options: { date?: IsoDate; facilityId?: Id; week?: boolean } = {}) =>
+      `${base}/axenda${query({
+        data: options.date,
+        instalacion: options.facilityId,
+        vista: options.week ? 'semana' : undefined,
+      })}`,
+    newBooking: (slot: Partial<Omit<BookingParams, 'replaces'>> = {}) =>
+      `${base}/nova-reserva${query({
+        instalacion: slot.facilityId,
+        espazo: slot.subspaceId,
+        data: slot.date,
+        inicio: slot.start,
+        fin: slot.end,
+      })}`,
+    reservation: (id: Id) => `${base}/reservas/${id}`,
+    access: `${base}/acceso`,
+    facilities: `${base}/instalacions`,
+    newFacility: `${base}/instalacions/nova`,
+    facility: (id: Id) => `${base}/instalacions/${id}`,
+    schedule: (id: Id) => `${base}/instalacions/${id}/horario`,
+    blocks: `${base}/bloqueos`,
+    seasons: `${base}/tempada`,
+    newSeason: `${base}/tempada/nova`,
+    indicators: `${base}/indicadores`,
+    settings: `${base}/configuracion`,
+    activity: `${base}/actividade`,
+  };
+};

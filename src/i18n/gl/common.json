@@ -33,12 +33,6 @@
     "license": "Software libre baixo licenza EUPL-1.2",
     "prototype": "Prototipo con datos simulados: non se garda nada fóra deste navegador."
   },
-  "admin": {
-    "home": {
-      "title": "Panel de xestión",
-      "intro": "Desde aquí o persoal do concello xestionará as instalacións, os horarios, as reservas e os indicadores. Esta sección está en construción."
-    }
-  },
   "deputacion": {
     "home": {
       "title": "Vista da deputación",
