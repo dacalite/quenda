@@ -13,18 +13,23 @@
 
 .paper {
   --notch: 0.75rem;
+  --stub: 5.5rem;
 
   display: grid;
-  grid-template-columns: 5.5rem 1fr;
+  grid-template-columns: var(--stub) 1fr;
   min-block-size: 100%;
   background: var(--color-background);
   border-radius: var(--radius-3);
   /* Two bites at the tear line, as on a paper ticket. */
   mask:
-    radial-gradient(circle at 5.5rem 0, transparent var(--notch), #000 calc(var(--notch) + 0.5px))
+    radial-gradient(
+        circle at var(--stub) 0,
+        transparent var(--notch),
+        #000 calc(var(--notch) + 0.5px)
+      )
       top / 100% 51% no-repeat,
     radial-gradient(
-        circle at 5.5rem 100%,
+        circle at var(--stub) 100%,
         transparent var(--notch),
         #000 calc(var(--notch) + 0.5px)
       )
@@ -88,6 +93,20 @@
   content: '';
 }
 
+.extra {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-start: var(--space-2);
+}
+
+[data-muted] .stub {
+  color: var(--color-text);
+  background: var(--color-surface-strong);
+  border-inline-end-color: var(--color-border);
+}
+
 .link:focus-visible {
   outline: none;
 }
@@ -110,4 +129,14 @@
   color: var(--color-text);
   background: var(--color-background);
   border-inline-end-color: var(--color-border);
+}
+
+@media (max-width: 30rem) {
+  .paper {
+    --stub: 4.25rem;
+  }
+
+  .body {
+    padding-inline: var(--space-3);
+  }
 }

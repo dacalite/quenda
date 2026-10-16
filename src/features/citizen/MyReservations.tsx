@@ -6,15 +6,14 @@ import { useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import { addDays, weekdayOf, zonedNow } from '../../domain/time';
 import type { Facility, IsoDate, Reservation } from '../../domain/types';
-import { useFormat } from '../../i18n/format';
 import { useSubspaceName } from '../../i18n/labels';
-import { Card } from '../../ui/Card';
 import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { Tab, TabList, TabPanel, Tabs } from '../../ui/Tabs';
 import layout from '../../ui/layout.module.css';
 import { useCitizen, useMyReservations } from './queries';
 import { ReservationActions } from './ReservationActions';
+import { Ticket } from './Ticket';
 
 const STATUS_TONE = {
   confirmed: 'success',
@@ -68,6 +67,9 @@ export function MyReservations() {
 
   return (
     <Page title={t('reservations.title')}>
+      <p>
+        <Link href={paths.calendar}>{t('reservations.calendar')}</Link>
+      </p>
       {!reservations.data ? (
         <Pending queries={[reservations]} size="section" />
       ) : (
@@ -96,38 +98,33 @@ function ReservationCard({
   const { t } = useTranslation(['citizen', 'domain']);
   const { tenant } = useCitizen();
   const paths = citizenPaths(tenant.slug);
-  const format = useFormat();
   const subspaceName = useSubspaceName();
   return (
-    <Card
-      as="li"
-      title={`${facility.name}, ${subspaceName(facility, reservation.subspaceId)}`}
-      footer={
-        <>
-          <Link href={paths.reservation(reservation.id)}>{t('reservations.view')}</Link>
-          {repeatDate && (
-            <Link
-              href={paths.availability(facility.id, {
-                date: repeatDate,
-                subspaceId: reservation.subspaceId,
-              })}
-            >
-              {t('reservations.repeat')}
-            </Link>
-          )}
-        </>
-      }
+    <Ticket
+      reservation={reservation}
+      facilityName={`${facility.name}, ${subspaceName(facility, reservation.subspaceId)}`}
+      href={paths.reservation(reservation.id)}
+      headingLevel={2}
+      muted={Boolean(repeatDate)}
     >
-      <p>
-        {format.longDate(reservation.date)}, {format.timeRange(reservation.start, reservation.end)}
-      </p>
       <p className={layout.row}>
         <StatusBadge tone={STATUS_TONE[reservation.status]}>
           {t(`domain:reservationStatus.${reservation.status}`)}
         </StatusBadge>
-        <span className={layout.meta}>{t('reservation.title', { code: reservation.code })}</span>
       </p>
       <ReservationActions reservation={reservation} facility={facility} showQr />
-    </Card>
+      {repeatDate && (
+        <p>
+          <Link
+            href={paths.availability(facility.id, {
+              date: repeatDate,
+              subspaceId: reservation.subspaceId,
+            })}
+          >
+            {t('reservations.repeat')}
+          </Link>
+        </p>
+      )}
+    </Ticket>
   );
 }

@@ -8,9 +8,43 @@
 }
 
 .qr {
-  width: min(16rem, 70vw);
+  display: block;
+  width: min(16rem, 64vw);
   height: auto;
-  border: var(--border-width) solid var(--color-border-subtle);
+}
+
+/* The booking as a boarding pass: code and QR on navy, ready to show at the door. */
+.pass {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-4);
+  text-align: center;
+  border-radius: var(--radius-3);
+  box-shadow: var(--shadow-2);
+}
+
+.pass > h2 {
+  margin: 0;
+  font-size: var(--font-size-3);
+  color: var(--color-text-muted);
+}
+
+.qrTile {
+  padding: var(--space-3);
+  background: #ffffff;
+  border-radius: var(--radius-2);
+}
+
+.passHelp {
+  max-inline-size: 32ch;
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+:root[data-contrast='high'] .pass {
+  border: var(--control-border-width) solid var(--color-border);
 }
 
 .featureList {

@@ -165,8 +165,8 @@
     "noUpcoming": "No tienes reservas próximas.",
     "noHistory": "Todavía no tienes reservas pasadas.",
     "find": "Buscar una instalación",
-    "view": "Ver detalles",
-    "repeat": "Repetir la reserva"
+    "repeat": "Repetir la reserva",
+    "calendar": "Añade tus reservas al calendario de tu móvil"
   },
   "notifications": {
     "title": "Avisos",
