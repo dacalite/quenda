@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: EUPL-1.2
 import type { RouteObject } from 'react-router';
+import { AccessControl } from '../../features/admin/AccessControl';
 import { AdminHome } from '../../features/admin/AdminHome';
+import { Agenda } from '../../features/admin/Agenda';
+import { NewBooking } from '../../features/admin/NewBooking';
 import { RequireStaff } from '../../features/admin/RequireStaff';
+import { ReservationRecord } from '../../features/admin/ReservationRecord';
 import { Availability } from '../../features/citizen/Availability';
 import { BookingReview } from '../../features/citizen/BookingReview';
 import { CalendarPage } from '../../features/citizen/CalendarPage';
@@ -55,7 +59,13 @@ export const routes: RouteObject[] = [
           {
             path: ADMIN_PATH,
             element: <RequireStaff />,
-            children: [{ index: true, element: <AdminHome /> }],
+            children: [
+              { index: true, element: <AdminHome /> },
+              { path: 'axenda', element: <Agenda /> },
+              { path: 'nova-reserva', element: <NewBooking /> },
+              { path: 'reservas/:reservationId', element: <ReservationRecord /> },
+              { path: 'acceso', element: <AccessControl /> },
+            ],
           },
           { path: '*', element: <NotFoundPage /> },
         ],
