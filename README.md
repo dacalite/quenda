@@ -8,7 +8,7 @@ Proposta para o **I Certame GOBTEC de Software Libre**.
 
 **Demostración:** <https://dacalite.github.io/quenda/>
 
-<img src="docs/capturas/mobil/03-franxas.png" width="260" alt="Dispoñibilidade dunha pista de pádel no móbil, coas horas recomendadas e as franxas agrupadas en mañá, tarde e noite">
+<img src="docs/capturas/mobil/03-franxas.png" width="260" alt="Dispoñibilidade dunha pista de pádel no móbil: tira cos próximos días, horas recomendadas e barra de lapelas">
 
 ## Que se pode facer
 
@@ -26,12 +26,18 @@ Proposta para o **I Certame GOBTEC de Software Libre**.
 - Instalacións, horarios, festivos, normas con herdanza e tarifas, sen código.
 - Bloqueos que avisan ás persoas afectadas e reservas de tempada dos clubs con detección de conflitos.
 - Control de acceso por QR, indicadores con táboas e CSV, e rexistro de actividade.
-- Configuración do nome, escudo, cor (con comprobación de contraste), idiomas e textos legais.
+- Configuración do nome, escudo, cor de acento (con comprobación de contraste), idiomas e textos legais.
 
 **Deputación**
 
 - Concellos adheridos e indicadores comparados.
 - Alta dun concello novo en tres pasos, listo para recibir reservas.
+
+## Deseño
+
+Un só sistema de deseño con dúas superficies. A veciñanza ten unha experiencia de aplicación móbil: barra de lapelas, franxas en tarxetas, as reservas como billetes e o código QR nun pase listo para amosar na entrada. O persoal do concello e a deputación traballan nunha interface máis densa, con táboas compactas e unha barra de navegación corporativa.
+
+As cores son as da Xunta e de Galicia: branco, azul celeste e azuis escuros, coa banda diagonal da bandeira como único elemento decorativo. A cor de cada concello vai como acento no escudo e na cabeceira. Os contrastes de todas as parellas de cores compróbanse en tests, tamén no modo de alto contraste.
 
 ## Probalo
 
@@ -48,7 +54,8 @@ A barra amarela da parte superior permite cambiar de rol (cidadanía, persoal do
 Os concellos de Bouzalonga (pequeno e rural) e Ribasmeiras (mediano) e a Deputación de Exemplo son ficticios.
 
 <p>
-  <img src="docs/capturas/mobil/01-inicio.png" width="260" alt="Inicio do Concello de Bouzalonga no móbil">
+  <img src="docs/capturas/mobil/01-inicio.png" width="260" alt="Inicio do Concello de Bouzalonga no móbil, co buscador e a próxima reserva como un billete">
+  <img src="docs/capturas/mobil/04-confirmacion.png" width="260" alt="Reserva confirmada no móbil, co código e a QR nun pase">
   <img src="docs/capturas/escritorio/06-panel.png" width="520" alt="Panel de xestión do Concello de Ribasmeiras no escritorio">
 </p>
 
