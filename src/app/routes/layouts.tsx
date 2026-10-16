@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: EUPL-1.2
-import { useEffect, useEffectEvent } from 'react';
+import { Suspense, useEffect, useEffectEvent } from 'react';
 import { RouterProvider as AriaRouterProvider } from 'react-aria-components';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useHref, useNavigate, useParams } from 'react-router';
@@ -140,7 +140,9 @@ export function TenantLayout() {
             <ErrorPage onRetry={() => void tenant.refetch()} />
           )
         ) : (
-          <Outlet />
+          <Suspense fallback={<Loading />}>
+            <Outlet />
+          </Suspense>
         )}
       </SiteFrame>
     </TenantContext>
@@ -165,7 +167,13 @@ export function DeputacionLayout() {
       homeHref={deputacionPaths.home}
       nav={role === 'deputacion' ? <DeputacionNav /> : undefined}
     >
-      {role === 'deputacion' ? <Outlet /> : <Loading />}
+      {role === 'deputacion' ? (
+        <Suspense fallback={<Loading />}>
+          <Outlet />
+        </Suspense>
+      ) : (
+        <Loading />
+      )}
     </SiteFrame>
   );
 }
