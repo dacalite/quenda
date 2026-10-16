@@ -8,6 +8,7 @@ import {
   ForbiddenError,
   NotFoundError,
   RuleViolationError,
+  ValidationError,
 } from '../../ports/errors';
 import { generateSeed, personaUserId } from '../../seed/generate';
 import { createRandom } from '../../seed/random';
@@ -55,11 +56,12 @@ function setup({
   storage = new MemoryStorage(),
 }: { userId?: string | null; storage?: MemoryStorage } = {}) {
   let session = userId;
+  let clock = NOW;
   const db = createLocalDatabase(storage, 'test.db', () => structuredClone(SEED));
   const repos = createLocalRepositories({
     db,
     session: () => (session ? { userId: session } : null),
-    now: () => NOW,
+    now: () => clock,
     latency: false,
     random: createRandom(7).next,
   });
@@ -68,6 +70,9 @@ function setup({
     db,
     actAs: (id: string | null) => {
       session = id;
+    },
+    travelTo: (instant: Date) => {
+      clock = instant;
     },
   };
 }
@@ -413,8 +418,8 @@ describe('reservations', () => {
     expect(types.sort()).toEqual(['confirmation', 'councilNotice']);
   });
 
-  it('checks in today’s reservations and marks no-shows', async () => {
-    const { repos, db } = setup();
+  it('checks in today’s reservations and marks no-shows once they are over', async () => {
+    const { repos, db, travelTo } = setup();
     const first = freeSlot(db.read(), `${B}-tenis`, TODAY);
     const checkedIn = await repos.reservations.create(B, {
       ...first,
@@ -428,6 +433,10 @@ describe('reservations', () => {
     });
 
     expect((await repos.reservations.checkIn(B, checkedIn.id)).checkedInAt).toBeDefined();
+    await expect(repos.reservations.checkIn(B, checkedIn.id)).rejects.toBeInstanceOf(ConflictError);
+    await expect(repos.reservations.markNoShow(B, absent.id)).rejects.toBeInstanceOf(ConflictError);
+
+    travelTo(new Date('2026-10-15T21:30:00Z'));
     await expect(repos.reservations.markNoShow(B, checkedIn.id)).rejects.toBeInstanceOf(
       ConflictError,
     );
@@ -577,6 +586,35 @@ describe('other repositories', () => {
         'create user',
       ]),
     );
+  });
+
+  it('validates council data as the server would, field by field', async () => {
+    const { repos } = setup();
+    const [facility] = await repos.facilities.list(B);
+    if (!facility) throw new Error('missing fixture');
+    const { id, tenantId: _tenantId, ...input } = facility;
+
+    const created = await repos.facilities.create(B, { ...input, name: 'Pista nova' });
+    expect((await repos.schedules.get(B, created.id)).weekly[1]).not.toHaveLength(0);
+    expect(await repos.facilities.availability(B, created.id, TOMORROW)).not.toHaveLength(0);
+
+    await expect(repos.facilities.create(B, { ...input, name: '' })).rejects.toMatchObject({
+      problems: [{ field: 'name', code: 'required' }],
+    });
+    await expect(repos.facilities.update(B, id, { capacity: 0 })).rejects.toBeInstanceOf(
+      ValidationError,
+    );
+    const schedule = await repos.schedules.get(B, id);
+    await expect(
+      repos.schedules.save(B, {
+        ...schedule,
+        weekly: { ...schedule.weekly, 1: [{ start: '22:00', end: '09:00' }] },
+      }),
+    ).rejects.toBeInstanceOf(ValidationError);
+    await expect(repos.tenants.update(B, { primaryColor: 'vermello' })).rejects.toBeInstanceOf(
+      ValidationError,
+    );
+    expect((await repos.facilities.get(B, id)).capacity).toBe(facility.capacity);
   });
 
   it('adds and removes holidays, one per date', async () => {
