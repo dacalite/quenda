@@ -100,3 +100,34 @@ export const usePreferences = create<PreferencesState>()(
     { name: `${APP_NAME}.preferences` },
   ),
 );
+
+interface TourState {
+  /** Roles whose guided tour has already been offered, so it only opens by itself once. */
+  seen: DemoRole[];
+  active: { role: DemoRole; step: number } | null;
+  start: (role: DemoRole) => void;
+  go: (step: number) => void;
+  stop: () => void;
+}
+
+export const useTour = create<TourState>()(
+  persist(
+    (set) => ({
+      seen: [],
+      active: null,
+      start: (role) => {
+        set(({ seen }) => ({
+          active: { role, step: 0 },
+          seen: seen.includes(role) ? seen : [...seen, role],
+        }));
+      },
+      go: (step) => {
+        set(({ active }) => (active ? { active: { ...active, step } } : {}));
+      },
+      stop: () => {
+        set({ active: null });
+      },
+    }),
+    { name: `${APP_NAME}.tours`, partialize: ({ seen }) => ({ seen }) },
+  ),
+);

@@ -10,7 +10,7 @@ import i18n from '../i18n';
 import { expectNoAxeViolations } from '../test/axe';
 import { AppProviders } from './providers/AppProviders';
 import { routes } from './routes/routes';
-import { sessionUserId, useDemo, usePreferences } from './state';
+import { sessionUserId, useDemo, usePreferences, useTour } from './state';
 
 const SEED = generateSeed('2026-10-15');
 
@@ -47,6 +47,7 @@ beforeEach(() => {
     signedIn: false,
   });
   usePreferences.setState({ textSize: 'normal', highContrast: false, reducedMotion: false });
+  useTour.setState({ seen: ['citizen', 'staff', 'deputacion'], active: null });
 });
 
 afterEach(async () => {

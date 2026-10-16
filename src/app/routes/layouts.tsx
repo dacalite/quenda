@@ -9,6 +9,7 @@ import { DEPUTACION } from '../../data/seed/catalog';
 import { StaffNav } from '../../features/admin/StaffNav';
 import { CitizenNav } from '../../features/citizen/CitizenNav';
 import { DemoBar } from '../../features/demo/DemoBar';
+import { GuidedTour } from '../../features/demo/GuidedTour';
 import { DeputacionNav } from '../../features/deputacion/DeputacionNav';
 import { currentLanguage } from '../../i18n';
 import { accessibleColor } from '../../ui/contrast';
@@ -51,6 +52,7 @@ export function AppShell() {
       <SkipLink targetId="main">{t('skipLink')}</SkipLink>
       <DemoBar />
       <Outlet />
+      <GuidedTour />
     </AriaRouterProvider>
   );
 }
