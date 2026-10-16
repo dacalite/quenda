@@ -10,6 +10,7 @@ import type { FacilityType } from '../../domain/types';
 import type { FieldProblem } from '../../domain/validation';
 import { Button } from '../../ui/Button';
 import { Checkbox } from '../../ui/Checkbox';
+import { Icon } from '../../ui/Icon';
 import { ErrorSummary, type FormError } from '../../ui/ErrorSummary';
 import layout from '../../ui/layout.module.css';
 import { Link } from '../../ui/Link';
@@ -17,6 +18,7 @@ import { TextField } from '../../ui/TextField';
 import { useToast } from '../../ui/toasts';
 import { BrandFields, LanguagesField } from '../admin/BrandFields';
 import { fieldId, useProblemMessages } from '../admin/problems';
+import styles from './deputacion.module.css';
 import { useDeputacionMutation, useDeputacionQuery } from './queries';
 
 const FORM = 'new-council';
@@ -134,9 +136,14 @@ export function NewCouncil() {
   return (
     <Page title={t('wizard.title')}>
       <p>{t('wizard.intro')}</p>
-      <ol className={layout.row}>
+      <ol className={styles.steps}>
         {STEPS.map((name, index) => (
-          <li key={name} aria-current={index === step ? 'step' : undefined}>
+          <li
+            key={name}
+            aria-current={index === step ? 'step' : undefined}
+            data-done={index < step || undefined}
+          >
+            {index < step && <Icon name="check" />}
             {index === step ? (
               <strong>
                 {t('wizard.stepItem', { number: index + 1, name: t(`wizard.steps.${name}`) })}
