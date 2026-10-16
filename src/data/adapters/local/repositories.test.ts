@@ -22,6 +22,7 @@ const A = 'bouzalonga';
 const B = 'ribasmeiras';
 const STAFF_A = personaUserId(A, 'carme');
 const STAFF_B = personaUserId(B, 'carme');
+const CARETAKER_B = personaUserId(B, 'xose');
 
 const uxia: Holder = { kind: 'user', userId: personaUserId(B, 'uxia') };
 const manuel: Holder = { kind: 'user', userId: personaUserId(B, 'manuel') };
@@ -230,6 +231,22 @@ describe('authorization', () => {
     await expect(repos.reservations.checkIn(B, own.id)).rejects.toBeInstanceOf(ForbiddenError);
   });
 
+  it('leaves configuration and the audit log to administrators', async () => {
+    const { repos } = setup({ userId: CARETAKER_B });
+    const [facility] = await repos.facilities.list(B);
+    if (!facility) throw new Error('missing fixture');
+    expect((await repos.users.list(B)).length).toBeGreaterThan(0);
+    expect((await repos.indicators.get(B, { from: TODAY, to: TODAY })).range.from).toBe(TODAY);
+    await expect(repos.tenants.update(B, { name: 'X' })).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(repos.facilities.update(B, facility.id, { name: 'X' })).rejects.toBeInstanceOf(
+      ForbiddenError,
+    );
+    await expect(
+      repos.schedules.createHoliday(B, { date: TOMORROW, name: { gl: 'X', es: 'X' } }),
+    ).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(repos.audit.list(B)).rejects.toBeInstanceOf(ForbiddenError);
+  });
+
   it('gives anonymous visitors public information only', async () => {
     const { repos } = setup({ userId: null });
     const facilities = await repos.facilities.list(B);
@@ -322,6 +339,22 @@ describe('reservations', () => {
     actAs(STAFF_B);
     const audit = await repos.audit.list(B);
     expect(audit.find((e) => e.subjectId === reservation.id)?.action).toBe('create');
+  });
+
+  it('sends the confirmation of a phone booking by the chosen channel', async () => {
+    const { repos, db } = setup();
+    const slot = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
+    const booking = await repos.reservations.create(B, {
+      ...slot,
+      holder: manuel,
+      channel: 'phone',
+      confirmBy: 'sms',
+    });
+    expect(booking).toMatchObject({ channel: 'phone', createdBy: STAFF_B });
+    const notice = (await repos.notifications.list(B, manuel.userId)).find(
+      (n) => n.reservationId === booking.id,
+    );
+    expect(notice).toMatchObject({ type: 'confirmation', channel: 'sms' });
   });
 
   it('rejects a taken slot with a conflict and broken rules with their reasons', async () => {
@@ -418,6 +451,39 @@ describe('reservations', () => {
   });
 });
 
+describe('blocks', () => {
+  it('cancels the bookings in the way, telling each person why', async () => {
+    const { repos, db, actAs } = setup({ userId: uxia.userId });
+    const slot = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
+    const booking = await repos.reservations.create(B, { ...slot, holder: uxia, channel: 'web' });
+
+    actAs(STAFF_B);
+    const input = {
+      facilityId: slot.facilityId,
+      subspaceId: null,
+      dates: { from: TOMORROW, to: TOMORROW },
+      times: { start: slot.start, end: slot.end },
+      reason: 'maintenance' as const,
+      note: 'Pintura das liñas',
+    };
+    expect((await repos.schedules.previewBlock(B, input)).map((r) => r.id)).toEqual([booking.id]);
+    expect((await repos.reservations.get(B, booking.id)).status).toBe('confirmed');
+
+    await repos.schedules.createBlock(B, input);
+    const cancelled = await repos.reservations.get(B, booking.id);
+    expect(cancelled.status).toBe('cancelled');
+    expect(cancelled.history.at(-1)).toMatchObject({ type: 'cancelled', detail: input.note });
+    expect(await repos.schedules.previewBlock(B, input)).toEqual([]);
+
+    const notice = (await repos.notifications.list(B, uxia.userId)).find(
+      (n) => n.reservationId === booking.id && n.type === 'councilNotice',
+    );
+    expect(notice).toBeDefined();
+    const audit = await repos.audit.list(B);
+    expect(audit.some((e) => e.action === 'cancel' && e.subjectId === booking.id)).toBe(true);
+  });
+});
+
 describe('recurring bookings', () => {
   const pattern = (subspaceId: string, start: string, end: string) => ({
     entityId: `${B}-patinaxe`,
@@ -511,6 +577,30 @@ describe('other repositories', () => {
         'create user',
       ]),
     );
+  });
+
+  it('adds and removes holidays, one per date', async () => {
+    const { repos } = setup();
+    const name = { gl: 'Festa local', es: 'Fiesta local' };
+    const holiday = await repos.schedules.createHoliday(B, { date: TOMORROW, name });
+    expect(await repos.schedules.listHolidays(B)).toContainEqual(holiday);
+    await expect(repos.schedules.createHoliday(B, { date: TOMORROW, name })).rejects.toBeInstanceOf(
+      ConflictError,
+    );
+    await repos.schedules.deleteHoliday(B, holiday.id);
+    expect(await repos.schedules.listHolidays(B)).not.toContainEqual(holiday);
+  });
+
+  it('computes indicators for staff only', async () => {
+    const { repos, actAs } = setup();
+    const range = { from: addDays(TODAY, -56), to: TODAY };
+    const indicators = await repos.indicators.get(B, range);
+    expect(indicators.bookings).toBeGreaterThan(0);
+    expect(indicators.occupancy).toBeGreaterThan(0);
+    expect(indicators.occupancy).toBeLessThan(1);
+    expect(indicators.facilities).toHaveLength((await repos.facilities.list(B)).length);
+    actAs(uxia.userId);
+    await expect(repos.indicators.get(B, range)).rejects.toBeInstanceOf(ForbiddenError);
   });
 
   it('marks notifications as read only once', async () => {
