@@ -9,12 +9,13 @@ import type {
   LocalizedText,
   Role,
   SlotMinutes,
-  Subspace,
   Tenant,
   TextSize,
   TimeRange,
   Weekday,
 } from '../../domain/types';
+
+import { HALL_SPACES, legalTexts, PITCH_SPACES, subspace } from '../../domain/councils';
 
 // Fictional councils, facilities, clubs and people. Any resemblance to real ones is unintended.
 
@@ -60,25 +61,6 @@ const GYM_HOURS = week(
   [range('09:00', '14:00'), range('16:00', '20:00')],
   [range('10:00', '14:00')],
 );
-
-const subspace = (id: string, gl: string, es: string, extra: Partial<Subspace> = {}): Subspace => ({
-  id,
-  name: text(gl, es),
-  capacity: 1,
-  contains: [],
-  ...extra,
-});
-
-const HALL_SPACES = [
-  subspace('court-1', 'Pista 1', 'Pista 1'),
-  subspace('court-2', 'Pista 2', 'Pista 2'),
-  subspace('full', 'Pista completa', 'Pista completa', { contains: ['court-1', 'court-2'] }),
-];
-const PITCH_SPACES = [
-  subspace('half-a', 'Medio campo A', 'Medio campo A'),
-  subspace('half-b', 'Medio campo B', 'Medio campo B'),
-  subspace('full', 'Campo completo', 'Campo completo', { contains: ['half-a', 'half-b'] }),
-];
 
 export interface FacilitySeed {
   key: string;
@@ -157,21 +139,6 @@ export interface TenantSeed {
   block: { facilityKey: string; weekday: Weekday; times: TimeRange; note: string };
 }
 
-const legal = (council: string) => ({
-  legalNotice: text(
-    `Texto de exemplo. Este sitio web é titularidade do ${council}. O seu uso implica a aceptación destas condicións.`,
-    `Texto de ejemplo. Este sitio web es titularidad del ${council}. Su uso implica la aceptación de estas condiciones.`,
-  ),
-  privacy: text(
-    `Texto de exemplo. O ${council} trata os teus datos para xestionar as reservas, con base no exercicio de poderes públicos. Podes exercer os teus dereitos de acceso, rectificación e supresión.`,
-    `Texto de ejemplo. El ${council} trata tus datos para gestionar las reservas, con base en el ejercicio de poderes públicos. Puedes ejercer tus derechos de acceso, rectificación y supresión.`,
-  ),
-  accessibility: text(
-    `Texto de exemplo. O ${council} comprométese a facer accesible este sitio web conforme ao Real decreto 1112/2018.`,
-    `Texto de ejemplo. El ${council} se compromete a hacer accesible este sitio web conforme al Real Decreto 1112/2018.`,
-  ),
-});
-
 export const DEPUTACION: Deputacion = { id: 'deputacion-exemplo', name: 'Deputación de Exemplo' };
 
 export const TENANTS: TenantSeed[] = [
@@ -184,7 +151,7 @@ export const TENANTS: TenantSeed[] = [
       emblem: 'oak',
       languages: ['gl', 'es'],
       timeZone: 'Europe/Madrid',
-      legal: legal('Concello de Bouzalonga'),
+      legal: legalTexts('Concello de Bouzalonga'),
       defaultRules: {
         minAdvanceHours: 1,
         maxAdvanceDays: 7,
@@ -379,7 +346,7 @@ export const TENANTS: TenantSeed[] = [
       emblem: 'bridge',
       languages: ['gl', 'es'],
       timeZone: 'Europe/Madrid',
-      legal: legal('Concello de Ribasmeiras'),
+      legal: legalTexts('Concello de Ribasmeiras'),
       defaultRules: {
         minAdvanceHours: 2,
         maxAdvanceDays: 14,

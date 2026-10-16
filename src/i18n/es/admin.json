@@ -37,7 +37,8 @@
     "range": "«{{field}}» tiene un valor fuera de lo permitido.",
     "order": "«{{field}}»: el final tiene que ser posterior al inicio y el máximo no puede ser menor que el mínimo.",
     "overlap": "Los tramos de «{{field}}» se solapan.",
-    "format": "«{{field}}» tiene que ser un color en formato #RRGGBB, por ejemplo #1A5E9A."
+    "format": "«{{field}}» tiene que ser un color en formato #RRGGBB, por ejemplo #1A5E9A.",
+    "taken": "Ya hay otro concello con ese valor en «{{field}}». Elige otro."
   },
   "rules": {
     "minAdvanceHours": "Antelación mínima (horas)",
