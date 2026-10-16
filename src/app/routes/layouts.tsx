@@ -27,6 +27,12 @@ function useApplyPreferences() {
   }, [textSize, highContrast, reducedMotion]);
 }
 
+// React Router resolves every href against the current route, external URLs included.
+function useAppHref(href: string) {
+  const internal = useHref(href);
+  return /^[a-z][a-z\d+.-]*:/i.test(href) ? href : internal;
+}
+
 export function AppShell() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -37,7 +43,7 @@ export function AppShell() {
       navigate={(href) => {
         void navigate(href);
       }}
-      useHref={useHref}
+      useHref={useAppHref}
     >
       <SkipLink targetId="main">{t('skipLink')}</SkipLink>
       <DemoBar />

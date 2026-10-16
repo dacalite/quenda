@@ -157,6 +157,18 @@ test.describe('citizen screens pass axe', () => {
     await expect(heading(page)).toHaveText(/^Reservar:/);
   });
 
+  test('the map link leaves the app for OpenStreetMap', async ({ page }) => {
+    await page.route('https://www.openstreetmap.org/**', (route) =>
+      route.fulfill({ contentType: 'text/html', body: '<title>OSM</title>' }),
+    );
+    await page.goto('./bouzalonga/instalacions');
+    await page
+      .getByRole('link', { name: /^Ver no mapa:/ })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/^https:\/\/www\.openstreetmap\.org\/\?mlat=/);
+  });
+
   test('profile errors are summarised and linked to each field', async ({ page }) => {
     await page.goto('./bouzalonga/perfil');
     await page.getByRole('textbox', { name: 'Correo electrónico' }).fill('non-e-un-correo');
