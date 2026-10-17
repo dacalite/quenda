@@ -72,6 +72,9 @@ test.use({ timezoneId: 'Europe/Madrid', locale: 'gl-ES' });
 test('citizen screens', async ({ page }) => {
   await prepare(page, 'citizen');
 
+  await page.goto('./');
+  await capture(page, '00-perfil');
+
   await page.goto('./bouzalonga');
   await capture(page, '01-inicio');
 
