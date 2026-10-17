@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { defineConfig } from 'vitest/config';
+import optimizeLocales from '@react-aria/optimize-locales-plugin';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { APP_DISPLAY_NAME } from './src/config/app';
@@ -8,6 +9,8 @@ export default defineConfig({
   base: process.env.BASE_PATH ?? '/', // /<repo>/ on GitHub Pages
   plugins: [
     react(),
+    // React Aria ships 34 languages; Galician is built on its Spanish strings (src/i18n/reactAria.ts).
+    { ...optimizeLocales.vite({ locales: ['es-ES'] }), enforce: 'pre' },
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon.svg'],
