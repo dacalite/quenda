@@ -786,6 +786,16 @@ describe('adapter behaviour', () => {
     expect(db.read().generatedFor).toBe(TODAY);
   });
 
+  it('keeps uploaded photos in the browser and lets only administration upload them', async () => {
+    const { repos, actAs } = setup({ userId: STAFF_B });
+    const image = new Blob(['jpeg'], { type: 'image/jpeg' });
+    await expect(repos.facilities.uploadPhoto(B, image)).resolves.toEqual({
+      url: 'data:image/jpeg;base64,anBlZw==',
+    });
+    actAs(personaUserId(B, 'xose'));
+    await expect(repos.facilities.uploadPhoto(B, image)).rejects.toBeInstanceOf(ForbiddenError);
+  });
+
   it('starts again from the seed when stored data is corrupt or outdated', async () => {
     const storage = new MemoryStorage();
     storage.setItem('test.db', '{not json');

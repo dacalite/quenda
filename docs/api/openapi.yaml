@@ -142,6 +142,40 @@ paths:
               schema: { $ref: '#/components/schemas/Facility' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '403': { $ref: '#/components/responses/Forbidden' }
+  /tenants/{tenantId}/photos:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    post:
+      tags: [Instalacións]
+      operationId: uploadPhoto
+      summary: Subir unha foto dunha instalación
+      description: >-
+        Só para a administración. Garda a imaxe no almacenamento de obxectos e devolve o seu enderezo,
+        que despois se inclúe nas fotos da instalación co seu texto alternativo.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Imaxe JPEG, PNG ou WebP de ata 5 MB.
+      responses:
+        '201':
+          description: Imaxe gardada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url]
+                properties:
+                  url: { type: string, format: uri-reference }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
   /tenants/{tenantId}/facilities/{facilityId}:
     parameters:
       - $ref: '#/components/parameters/TenantId'
@@ -1229,10 +1263,16 @@ components:
           type: array
           items:
             type: object
-            required: [id, alt]
+            required: [id, url, alt]
             properties:
               id: { $ref: '#/components/schemas/Id' }
-              alt: { $ref: '#/components/schemas/LocalizedText' }
+              url:
+                type: string
+                format: uri-reference
+                description: Enderezo da imaxe, tal como o devolve `uploadPhoto`.
+              alt:
+                description: Texto alternativo en cada idioma; obrigatorio.
+                allOf: [{ $ref: '#/components/schemas/LocalizedText' }]
         usageRules: { $ref: '#/components/schemas/LocalizedText' }
         status: { type: string, enum: [active, inactive] }
         rules:

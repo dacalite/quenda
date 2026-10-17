@@ -374,6 +374,23 @@ export function createLocalRepositories({
           db.commit();
           return facility;
         }),
+      // No server in the demo: the image stays in the browser as a data URL.
+      uploadPhoto: async (tenantId, image) => {
+        const url = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            resolve(reader.result as string);
+          };
+          reader.onerror = () => {
+            reject(reader.error ?? new Error('The image could not be read'));
+          };
+          reader.readAsDataURL(image);
+        });
+        return respond(() => {
+          requireAdmin(tenantId);
+          return { url };
+        });
+      },
       availability: (tenantId, facilityId, date) =>
         respond(() => {
           const facility = findIn(data().facilities, tenantId, facilityId, 'facility');

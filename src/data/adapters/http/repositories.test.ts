@@ -14,6 +14,7 @@ interface Call {
   method: string;
   headers: Headers;
   body: unknown;
+  raw: unknown;
 }
 
 function setup(respond: (call: Call) => Response = () => Response.json({})) {
@@ -27,6 +28,7 @@ function setup(respond: (call: Call) => Response = () => Response.json({})) {
         method: init?.method ?? 'GET',
         headers: new Headers(init?.headers),
         body: typeof init?.body === 'string' ? (JSON.parse(init.body) as unknown) : undefined,
+        raw: init?.body,
       };
       calls.push(call);
       return Promise.resolve(respond(call));
@@ -48,6 +50,20 @@ describe('createHttpRepositories', () => {
     expect(calls[0]?.url).toBe('https://reservas.example.org/api/v1/tenants');
     expect(calls[0]?.headers.get('authorization')).toBe('Bearer token-123');
     expect(calls[0]?.headers.get('accept')).toBe('application/json');
+  });
+
+  it('uploads photos as multipart form data', async () => {
+    const { repos, calls } = setup(() =>
+      Response.json({ url: 'https://ficheiros.example.org/foto.jpg' }, { status: 201 }),
+    );
+    const image = new Blob(['jpeg'], { type: 'image/jpeg' });
+    await expect(repos.facilities.uploadPhoto('t1', image)).resolves.toEqual({
+      url: 'https://ficheiros.example.org/foto.jpg',
+    });
+    expect(calls[0]?.method).toBe('POST');
+    expect(calls[0]?.url).toBe('https://reservas.example.org/api/v1/tenants/t1/photos');
+    expect(calls[0]?.headers.get('content-type')).toBeNull();
+    expect((calls[0]?.raw as FormData).get('file')).toBeInstanceOf(Blob);
   });
 
   it('maps every port call to its resource, scoped by tenant', async () => {

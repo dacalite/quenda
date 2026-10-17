@@ -73,6 +73,8 @@ export interface FacilitySeed {
 
 type FacilityTemplate = Omit<FacilitySeed['facility'], 'status' | 'rules' | 'photos'> & {
   photoAlt: LocalizedText;
+  /** An image in `public/photos`, credited in `public/photos/CREDITS.md`; without one, a drawing. */
+  photoFile?: string;
   rules?: Partial<BookingRules>;
 };
 
@@ -81,13 +83,18 @@ const facility = (
   slotMinutes: SlotMinutes,
   weekly: Record<Weekday, TimeRange[]>,
   demand: number,
-  { photoAlt, rules = {}, ...data }: FacilityTemplate,
+  { photoAlt, photoFile, rules = {}, ...data }: FacilityTemplate,
 ): FacilitySeed => ({
   key,
   slotMinutes,
   weekly,
   demand,
-  facility: { ...data, status: 'active', rules, photos: [{ id: `${key}-photo`, alt: photoAlt }] },
+  facility: {
+    ...data,
+    status: 'active',
+    rules,
+    photos: photoFile ? [{ id: `${key}-photo`, url: `photos/${photoFile}`, alt: photoAlt }] : [],
+  },
 });
 
 const ALL_FEATURES: AccessibilityFeature[] = [
