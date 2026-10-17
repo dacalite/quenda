@@ -68,12 +68,14 @@ export function createHttpRepositories({
     const headers = new Headers({ accept: 'application/json' });
     const bearer = token();
     if (bearer) headers.set('authorization', `Bearer ${bearer}`);
-    if (body !== undefined) headers.set('content-type', 'application/json');
+    // Files go as multipart: the browser sets that content type with its boundary.
+    const form = body instanceof FormData;
+    if (body !== undefined && !form) headers.set('content-type', 'application/json');
 
     const response = await send(`${root}${path}${search.size > 0 ? `?${search}` : ''}`, {
       method,
       headers,
-      ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+      ...(body !== undefined ? { body: form ? body : JSON.stringify(body) } : {}),
     });
     if (!response.ok) {
       const problem = (await response.json().catch(() => ({}))) as Problem;
@@ -106,6 +108,11 @@ export function createHttpRepositories({
       get: (tenantId, id) => get(facility(tenantId, id)),
       create: (tenantId, input) => post(`${tenant(tenantId)}/facilities`, input),
       update: (tenantId, id, changes) => patch(facility(tenantId, id), changes),
+      uploadPhoto: (tenantId, image) => {
+        const body = new FormData();
+        body.set('file', image);
+        return post(`${tenant(tenantId)}/photos`, body);
+      },
       availability: (tenantId, id, date) => get(`${facility(tenantId, id)}/availability`, { date }),
       recommendations: (tenantId, id, date) =>
         get(`${facility(tenantId, id)}/recommendations`, { date }),

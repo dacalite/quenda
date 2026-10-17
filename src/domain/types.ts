@@ -106,6 +106,8 @@ export interface Subspace {
 
 export interface Photo {
   id: Id;
+  /** Where the image is served from: object storage in the real system, the browser in the demo. */
+  url: string;
   alt: LocalizedText;
 }
 

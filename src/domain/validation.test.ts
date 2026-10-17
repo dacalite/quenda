@@ -48,6 +48,17 @@ describe('validateFacility', () => {
     ]);
   });
 
+  it('asks for the alternative text of every photo in each language', () => {
+    const {
+      id: _id,
+      tenantId: _tenantId,
+      ...facility
+    } = makeFacility({
+      photos: [{ id: 'p', url: 'photos/pista.jpg', alt: { gl: 'Pista de pádel', es: ' ' } }],
+    });
+    expect(fields(validateFacility(facility))).toEqual(['photos.0.alt.es required']);
+  });
+
   it('requires at least one bookable space', () => {
     const { id: _id, tenantId: _tenantId, ...facility } = makeFacility({ subspaces: [] });
     expect(fields(validateFacility(facility))).toEqual(['subspaces required']);

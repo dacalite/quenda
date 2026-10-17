@@ -57,6 +57,10 @@ export function validateFacility(facility: Omit<Facility, 'id' | 'tenantId'>): F
   if (Math.abs(facility.coordinates.lat) > 90) add('coordinates.lat', 'range');
   if (Math.abs(facility.coordinates.lng) > 180) add('coordinates.lng', 'range');
   if (facility.subspaces.length === 0) add('subspaces', 'required');
+  facility.photos.forEach((photo, i) => {
+    if (blank(photo.alt.gl)) add(`photos.${String(i)}.alt.gl`, 'required');
+    if (blank(photo.alt.es)) add(`photos.${String(i)}.alt.es`, 'required');
+  });
   facility.subspaces.forEach((subspace, i) => {
     if (blank(subspace.name.gl)) add(`subspaces.${String(i)}.name.gl`, 'required');
     if (blank(subspace.name.es)) add(`subspaces.${String(i)}.name.es`, 'required');

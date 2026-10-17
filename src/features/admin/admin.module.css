@@ -58,3 +58,20 @@
   border: var(--control-border-width) solid var(--color-border);
   border-radius: var(--radius-1);
 }
+
+.photo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.photoPreview {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  background: var(--color-surface-strong);
+  border-radius: var(--radius-2);
+}

@@ -74,7 +74,7 @@ export function FacilityDetail() {
   return (
     <Page title={f.name}>
       <div className={layout.split}>
-        <FacilityImage type={f.type} alt={f.photos[0] ? localized(f.photos[0].alt) : ''} />
+        <FacilityImage type={f.type} photo={f.photos[0]} />
         <div className={layout.section}>
           <p>{localized(f.description)}</p>
           <dl className={layout.details}>
@@ -102,6 +102,19 @@ export function FacilityDetail() {
           </p>
         </div>
       </div>
+
+      {f.photos.length > 1 && (
+        <section className={layout.section} aria-labelledby="facility-photos">
+          <h2 id="facility-photos">{t('facility.morePhotos')}</h2>
+          <ul className={styles.gallery}>
+            {f.photos.slice(1).map((photo) => (
+              <li key={photo.id}>
+                <FacilityImage type={f.type} photo={photo} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className={layout.panel} aria-labelledby="facility-accessibility">
         <h2 id="facility-accessibility">{t('facility.accessibilityTitle')}</h2>

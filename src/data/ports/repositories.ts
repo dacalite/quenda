@@ -48,6 +48,8 @@ export interface FacilityRepository {
   get(tenantId: Id, id: Id): Promise<Facility>;
   create(tenantId: Id, input: FacilityInput): Promise<Facility>;
   update(tenantId: Id, id: Id, patch: Partial<FacilityInput>): Promise<Facility>;
+  /** Stores an image for a facility photo and returns where it is served from. */
+  uploadPhoto(tenantId: Id, image: Blob): Promise<{ url: string }>;
   /** Public: the status of every slot, without revealing who booked what. */
   availability(tenantId: Id, facilityId: Id, date: IsoDate): Promise<AvailabilitySlot[]>;
   /** Public: free slots that are usually quiet on that weekday. */

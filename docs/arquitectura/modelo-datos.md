@@ -13,6 +13,7 @@ erDiagram
   TENANT ||--o{ ENTITY : ten
   TENANT ||--o{ AUDIT_ENTRY : rexistra
   FACILITY ||--|{ SUBSPACE : "divídese en"
+  FACILITY ||--o{ PHOTO : "ten fotos"
   FACILITY ||--|| SCHEDULE : abre
   SCHEDULE ||--o{ SCHEDULE_EXCEPTION : "ten excepcións"
   FACILITY ||--o{ BLOCK : "pode bloquearse"
@@ -57,6 +58,13 @@ erDiagram
     text status "active ou inactive"
     jsonb rules "sobrescribe as normas xerais"
     jsonb pricing
+  }
+  PHOTO {
+    uuid id PK
+    uuid facility_id FK
+    text url "no almacenamento de obxectos"
+    jsonb alt "texto alternativo en cada idioma"
+    int position
   }
   SUBSPACE {
     text id PK
@@ -189,6 +197,7 @@ erDiagram
 - **Normas con herdanza.** `TENANT.default_rules` son as normas xerais e `FACILITY.rules` só garda as que cambian; `resolveRules` combínaas.
 - **Datas e horas locais.** As datas e horas de reservas, horarios e bloqueos son do calendario do concello (`time_zone`); os instantes (`created_at`, `checked_in_at`) gárdanse en UTC.
 - **Importes en céntimos** (`int`), para evitar erros de redondeo.
+- **Fotos fóra da base de datos.** A imaxe sobe ao almacenamento de obxectos (`POST /tenants/{tenantId}/photos`) e `PHOTO` só garda o seu enderezo e o texto alternativo, obrigatorio en cada idioma. No prototipo a imaxe redúcese no navegador e gárdase nel.
 - **Textos en varios idiomas** en `jsonb` co código de idioma como clave (`{"gl": "…", "es": "…"}`).
 - **Instalacións que non se borran.** Desactívanse (`status = 'inactive'`) para conservar o historial e os indicadores.
 - **Historial e rexistro de actividade.** `RESERVATION_EVENT` garda o que lle pasou a cada reserva; `AUDIT_ENTRY`, quen cambiou que no concello. Ningún dos dous se edita.

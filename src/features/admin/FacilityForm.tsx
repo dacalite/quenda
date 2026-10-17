@@ -27,6 +27,7 @@ import { RadioGroup } from '../../ui/RadioGroup';
 import { Select } from '../../ui/Select';
 import { TextField } from '../../ui/TextField';
 import { useToast } from '../../ui/toasts';
+import { PhotoFields } from './PhotoFields';
 import { fieldId, useProblemMessages } from './problems';
 import { useStaff, useStaffMutation } from './queries';
 import { RulesFields } from './RulesFields';
@@ -111,6 +112,13 @@ function FacilityForm({ id, initial }: { id?: string; initial: FacilityInput }) 
     ),
   };
   const label = (path: string) => {
+    const photo = /^photos\.(\d+)\.alt\.(gl|es)$/.exec(path);
+    if (photo) {
+      return t('facilityForm.photoAlt', {
+        n: Number(photo[1]) + 1,
+        language: t(`facilityForm.language.${photo[2] as 'gl' | 'es'}`),
+      });
+    }
     const space = /^subspaces\.(\d+)\.(?:name\.(gl|es)|capacity)$/.exec(path);
     if (!space) return labels[path] ?? path;
     const n = Number(space[1]) + 1;
@@ -330,6 +338,17 @@ function FacilityForm({ id, initial }: { id?: string; initial: FacilityInput }) 
               {t(`domain:accessibility.${feature}`)}
             </Checkbox>
           ))}
+        </fieldset>
+
+        <fieldset className={layout.section}>
+          <legend>{t('facilityForm.photos')}</legend>
+          <PhotoFields
+            photos={draft.photos}
+            onChange={(photos) => {
+              update({ photos });
+            }}
+            field={field}
+          />
         </fieldset>
 
         <fieldset className={layout.section}>

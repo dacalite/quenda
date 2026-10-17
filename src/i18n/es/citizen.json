@@ -2,7 +2,7 @@
   "nav": {
     "label": "Menú principal",
     "home": "Inicio",
-    "facilities": "Instalaciones",
+    "facilities": "Instala\u00adciones",
     "reservations": "Reservas",
     "notifications": "Avisos",
     "unread_one": "{{count}} sin leer",
@@ -77,7 +77,9 @@
     "closed": "Cerrado",
     "nextFree": "Próxima hora libre: {{date}}, {{time}}.",
     "noNextFree": "No hay horas libres en los próximos 7 días.",
-    "book": "Ver disponibilidad y reservar"
+    "book": "Ver disponibilidad y reservar",
+    "drawingAlt": "Dibujo: {{type}}",
+    "morePhotos": "Más fotos"
   },
   "availability": {
     "title": "Reservar: {{name}}",
