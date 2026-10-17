@@ -263,12 +263,22 @@ a.slot .slotStatus {
   margin: 0;
 }
 
+.noticeTitle {
+  margin: 0;
+  font-size: var(--font-size-3);
+}
+
 .notification[data-unread] {
   background: var(--color-primary-surface);
   border-color: transparent;
 }
 
-:root[data-contrast='high'] .notification[data-unread] {
+:root[data-contrast='high'] .noticeTitle {
+  margin: 0;
+  font-size: var(--font-size-3);
+}
+
+.notification[data-unread] {
   border: var(--control-border-width) solid var(--color-border);
 }
 

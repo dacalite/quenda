@@ -157,6 +157,16 @@ test.describe('citizen screens pass axe', () => {
     await expect(heading(page)).toHaveText(/^Reservar:/);
   });
 
+  test('a single notice can be marked as read, keeping the focus on it', async ({ page }) => {
+    await page.goto('./bouzalonga/avisos');
+    const notice = page.getByRole('listitem').filter({ hasText: 'Reserva confirmada' });
+    await expect(notice).toContainText('Sen ler');
+    await notice.getByRole('button', { name: 'Marcar como lido' }).click();
+    await expect(notice).not.toContainText('Sen ler');
+    await expect(notice.getByRole('heading', { name: 'Reserva confirmada' })).toBeFocused();
+    await expect(page.getByRole('button', { name: 'Marcar todos como lidos' })).toBeVisible();
+  });
+
   test('the map link opens Google Maps at the facility', async ({ page }) => {
     await page.route('https://www.google.com/maps/**', (route) =>
       route.fulfill({ contentType: 'text/html', body: '<title>Maps</title>' }),

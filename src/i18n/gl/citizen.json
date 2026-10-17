@@ -173,6 +173,7 @@
   "notifications": {
     "title": "Avisos",
     "markAll": "Marcar todos como lidos",
+    "markOne": "Marcar como lido",
     "unread": "Sen ler",
     "empty": "Non tes avisos.",
     "message": {
