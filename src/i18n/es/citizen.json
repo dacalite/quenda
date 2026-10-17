@@ -155,8 +155,6 @@
       "noShow": "No presentada"
     },
     "byCouncil": "{{event}} por el ayuntamiento: {{reason}}",
-    "showQr": "Ver el QR",
-    "qrTitle": "Código QR de la reserva",
     "notFound": "No encontramos esta reserva."
   },
   "reservations": {

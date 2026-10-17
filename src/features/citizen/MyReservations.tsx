@@ -12,7 +12,6 @@ import { StatusBadge } from '../../ui/StatusBadge';
 import { Tab, TabList, TabPanel, Tabs } from '../../ui/Tabs';
 import layout from '../../ui/layout.module.css';
 import { useCitizen, useMyReservations } from './queries';
-import { ReservationActions } from './ReservationActions';
 import { Ticket } from './Ticket';
 
 const STATUS_TONE = {
@@ -112,7 +111,6 @@ function ReservationCard({
           {t(`domain:reservationStatus.${reservation.status}`)}
         </StatusBadge>
       </p>
-      <ReservationActions reservation={reservation} facility={facility} showQr />
       {repeatDate && (
         <p>
           <Link

@@ -59,7 +59,7 @@
       },
       "mine": {
         "title": "Mis reservas",
-        "body": "Próximas e historial. Desde aquí cambias la hora de una reserva, repites una pasada o abres los avisos del ayuntamiento."
+        "body": "Próximas e historial. Abre una reserva para ver su QR, cambiar la hora o cancelarla; de las pasadas puedes repetir la reserva."
       },
       "cancel": {
         "title": "Cambiar o cancelar",

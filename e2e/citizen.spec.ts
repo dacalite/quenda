@@ -112,8 +112,10 @@ test('book and cancel using only the keyboard, with axe at every step', async ({
   await expect(heading(page)).toHaveText('As miñas reservas');
   await expectNoAxeViolations(page);
 
-  const card = page.getByRole('listitem').filter({ hasText: code });
-  await tabTo(page, card.getByRole('button', { name: 'Cancelar a reserva' }));
+  await tabTo(page, page.getByRole('link', { name: `Reserva ${code}` }));
+  await page.keyboard.press('Enter');
+  await expect(heading(page)).toHaveText(`Reserva ${code}`);
+  await tabTo(page, page.getByRole('button', { name: 'Cancelar a reserva' }));
   await page.keyboard.press('Enter');
   await expect(page.getByRole('alertdialog', { name: 'Cancelar a reserva?' })).toBeVisible();
   await expectNoAxeViolations(page);
