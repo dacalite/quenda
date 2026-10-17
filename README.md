@@ -41,7 +41,7 @@ As cores son as da Xunta e de Galicia: branco, azul celeste e azuis escuros, coa
 
 ## Probalo
 
-A barra amarela da parte superior permite cambiar de rol (cidadanía, persoal do concello ou deputación), de persoa e de concello, iniciar unha **visita guiada** e reiniciar os datos.
+Ao entrar escóllese como ver a demostración: cidadanía, persoal do concello ou deputación. Despois, o botón «Cambiar de perfil» da franxa superior permite cambiar de perfil, de persoa e de concello, iniciar unha **visita guiada** e reiniciar os datos.
 
 | Persoa | Perfil                                                              |
 | ------ | ------------------------------------------------------------------- |
@@ -89,7 +89,7 @@ src/
   domain/     regras de reserva, prezos, dispoñibilidade, recomendacións e indicadores
   data/       portos (contrato da API), adaptadores local e HTTP, datos de demostración
   app/        estrutura da aplicación, rutas, foco e anuncios
-  features/   pantallas de cidadanía, concello, deputación e barra de demostración
+  features/   pantallas de cidadanía, concello, deputación e controis da demostración
   ui/         sistema de deseño accesible
   i18n/       textos en galego e castelán
 e2e/          tests no navegador con axe
