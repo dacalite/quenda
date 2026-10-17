@@ -95,7 +95,7 @@ src/
   domain/     regras de reserva, prezos, dispoñibilidade, recomendacións e indicadores (funcións puras)
   data/       portos (contrato da API), adaptadores local e HTTP, e semente de demostración
   app/        estrutura da aplicación, rutas, foco e anuncios
-  features/   pantallas de cidadanía, concello, deputación e barra de demostración
+  features/   pantallas de cidadanía, concello, deputación e controis da demostración
   ui/         sistema de deseño accesible sobre React Aria
   i18n/       textos en galego e castelán
 ```

@@ -22,7 +22,6 @@ async function signedInAs(page: Page, citizen = 'uxia') {
           role: 'citizen',
           citizen: persona,
           staff: 'carme',
-          collapsed: true,
           signedIn: true,
         },
         version: 0,
@@ -107,13 +106,15 @@ test('book and cancel using only the keyboard, with axe at every step', async ({
   await expectNoAxeViolations(page);
 
   await openMenu();
-  await tabTo(page, menu.getByRole('link', { name: 'As miñas reservas' }));
+  await tabTo(page, menu.getByRole('link', { name: 'Reservas' }));
   await page.keyboard.press('Enter');
   await expect(heading(page)).toHaveText('As miñas reservas');
   await expectNoAxeViolations(page);
 
-  const card = page.getByRole('listitem').filter({ hasText: code });
-  await tabTo(page, card.getByRole('button', { name: 'Cancelar a reserva' }));
+  await tabTo(page, page.getByRole('link', { name: `Reserva ${code}` }));
+  await page.keyboard.press('Enter');
+  await expect(heading(page)).toHaveText(`Reserva ${code}`);
+  await tabTo(page, page.getByRole('button', { name: 'Cancelar a reserva' }));
   await page.keyboard.press('Enter');
   await expect(page.getByRole('alertdialog', { name: 'Cancelar a reserva?' })).toBeVisible();
   await expectNoAxeViolations(page);
@@ -155,6 +156,16 @@ test.describe('citizen screens pass axe', () => {
     await expect(notice).toContainText('Reparación do valado da pista');
     await notice.getByRole('link', { name: 'Escoller outra hora' }).click();
     await expect(heading(page)).toHaveText(/^Reservar:/);
+  });
+
+  test('a single notice can be marked as read, keeping the focus on it', async ({ page }) => {
+    await page.goto('./bouzalonga/avisos');
+    const notice = page.getByRole('listitem').filter({ hasText: 'Reserva confirmada' });
+    await expect(notice).toContainText('Sen ler');
+    await notice.getByRole('button', { name: 'Marcar como lido' }).click();
+    await expect(notice).not.toContainText('Sen ler');
+    await expect(notice.getByRole('heading', { name: 'Reserva confirmada' })).toBeFocused();
+    await expect(page.getByRole('button', { name: 'Marcar todos como lidos' })).toBeVisible();
   });
 
   test('the map link opens Google Maps at the facility', async ({ page }) => {

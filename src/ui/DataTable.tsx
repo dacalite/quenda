@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useId, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './DataTable.module.css';
 
 export interface Column<T> {
@@ -17,6 +18,8 @@ export interface DataTableProps<T> {
   rows: T[];
   rowKey: (row: T) => string;
   hideCaption?: boolean;
+  /** Shown in place of the rows when there are none. */
+  empty?: string;
 }
 
 export function DataTable<T>({
@@ -25,7 +28,9 @@ export function DataTable<T>({
   rows,
   rowKey,
   hideCaption = false,
+  empty,
 }: DataTableProps<T>) {
+  const { t } = useTranslation('ui');
   const captionId = useId();
   return (
     // Focusable so keyboard users can scroll a wide table on small screens. A group, not a
@@ -46,6 +51,13 @@ export function DataTable<T>({
           </tr>
         </thead>
         <tbody>
+          {rows.length === 0 && (
+            <tr>
+              <td colSpan={columns.length} className={styles.empty}>
+                {empty ?? t('table.empty')}
+              </td>
+            </tr>
+          )}
           {rows.map((row) => (
             <tr key={rowKey(row)}>
               {columns.map((column) =>

@@ -3,6 +3,7 @@
 .scroller {
   max-width: 100%;
   overflow-x: auto;
+  background: var(--color-background);
   border: var(--border-width) solid var(--color-border-subtle);
   border-radius: var(--radius-2);
 }
@@ -20,6 +21,8 @@
 
 .table th,
 .table td {
+  /* Narrow screens scroll the table sideways instead of folding every cell. */
+  min-inline-size: 7rem;
   padding: var(--space-2) var(--space-3);
   text-align: start;
   vertical-align: top;
@@ -27,11 +30,25 @@
 }
 
 .table thead th {
-  font-size: var(--font-size-2);
+  font-size: var(--font-size-1);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  background: var(--color-surface);
+  border-top: 0;
+}
+
+.table tbody tr:hover > * {
   background: var(--color-surface);
 }
 
 .table [data-align='end'] {
   text-align: end;
   font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  padding-block: var(--space-4);
+  color: var(--color-text-muted);
+  text-align: center;
 }

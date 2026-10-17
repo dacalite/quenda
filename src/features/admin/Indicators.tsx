@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Pending } from '../../app/Pending';
 import { downloadFile } from '../../app/download';
 import { Page } from '../../app/Page';
 import { useFacilities } from '../../app/queries';
@@ -71,7 +72,7 @@ export function Indicators() {
       {indicators.data && facilities.data ? (
         <Report figures={indicators.data} facilities={facilities.data} />
       ) : (
-        <p aria-busy="true">{t('common:loading')}</p>
+        <Pending queries={[indicators, facilities]} size="section" />
       )}
     </Page>
   );

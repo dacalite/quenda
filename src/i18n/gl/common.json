@@ -22,7 +22,8 @@
   "error": {
     "title": "Non se puido cargar esta páxina",
     "body": "Volve tentalo dentro duns intres.",
-    "retry": "Tentar de novo"
+    "retry": "Tentar de novo",
+    "inline": "Non se puido cargar esta información."
   },
   "notFound": {
     "title": "Non atopamos esta páxina",

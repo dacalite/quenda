@@ -33,6 +33,7 @@ export interface SelectProps {
   name?: string;
   /** Goes on the button that opens the list, so an error summary can move focus to it. */
   id?: string;
+  className?: string;
 }
 
 export function Select({
@@ -45,6 +46,7 @@ export function Select({
   placeholder,
   isRequired = false,
   id,
+  className,
   ...props
 }: SelectProps) {
   const { t } = useTranslation('ui');
@@ -59,7 +61,7 @@ export function Select({
       isRequired={isRequired}
       isInvalid={Boolean(errorMessage)}
       validationBehavior="aria"
-      className={fieldStyles.field}
+      className={[fieldStyles.field, className].filter(Boolean).join(' ')}
     >
       <FieldLabel isRequired={isRequired}>{label}</FieldLabel>
       <AriaButton id={id} className={styles.trigger}>

@@ -18,5 +18,8 @@
   },
   "select": {
     "placeholder": "Elige una opción"
+  },
+  "table": {
+    "empty": "No hay nada que mostrar."
   }
 }

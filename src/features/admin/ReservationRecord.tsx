@@ -123,7 +123,7 @@ function Record({ reservation, facility }: { reservation: Reservation; facility:
         )}
         {cancellable && (
           <DialogTrigger>
-            <Button variant="danger">{t('record.cancel')}</Button>
+            <Button variant="dangerSecondary">{t('record.cancel')}</Button>
             <ConfirmDialog
               title={t('record.cancelTitle', { code: reservation.code })}
               confirmLabel={t('record.cancelConfirm')}

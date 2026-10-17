@@ -3,7 +3,7 @@
     "label": "Menú principal",
     "home": "Inicio",
     "facilities": "Instalaciones",
-    "reservations": "Mis reservas",
+    "reservations": "Reservas",
     "notifications": "Avisos",
     "unread_one": "{{count}} sin leer",
     "unread_other": "{{count}} sin leer",
@@ -36,6 +36,8 @@
   "list": {
     "title": "Instalaciones",
     "filters": "Filtros",
+    "showFilters": "Mostrar los filtros",
+    "hideFilters": "Ocultar los filtros",
     "search": "Nombre o tipo",
     "type": "Tipo de instalación",
     "anyType": "Todos los tipos",
@@ -82,6 +84,7 @@
     "previousDay": "Día anterior",
     "nextDay": "Día siguiente",
     "date": "Día",
+    "days": "Elige el día",
     "subspace": "Espacio",
     "views": "Vista de la disponibilidad",
     "dayView": "Día",
@@ -152,8 +155,6 @@
       "noShow": "No presentada"
     },
     "byCouncil": "{{event}} por el ayuntamiento: {{reason}}",
-    "showQr": "Ver el QR",
-    "qrTitle": "Código QR de la reserva",
     "notFound": "No encontramos esta reserva."
   },
   "reservations": {
@@ -164,12 +165,13 @@
     "noUpcoming": "No tienes reservas próximas.",
     "noHistory": "Todavía no tienes reservas pasadas.",
     "find": "Buscar una instalación",
-    "view": "Ver detalles",
-    "repeat": "Repetir la reserva"
+    "repeat": "Repetir la reserva",
+    "calendar": "Añade tus reservas al calendario de tu móvil"
   },
   "notifications": {
     "title": "Avisos",
     "markAll": "Marcar todos como leídos",
+    "markOne": "Marcar como leído",
     "unread": "Sin leer",
     "empty": "No tienes avisos.",
     "message": {
@@ -244,7 +246,7 @@
     "howItWorks": "Cómo funcionaría en el servicio real",
     "howItWorksBody": "El ayuntamiento se conectaría con Cl@ve, del Gobierno de España, y con Chave365, de la Xunta de Galicia, mediante SAML 2.0 u OpenID Connect. La aplicación nunca vería tu contraseña: solo recibiría tu nombre y tu DNI ya verificados.",
     "providerTitle": "{{provider}}: pasarela simulada",
-    "providerIntro": "Esta pantalla imita la pasarela de identificación. En la demostración entras como la persona elegida en la barra de demostración.",
+    "providerIntro": "Esta pantalla imita la pasarela de identificación. En la demostración entras como la persona elegida en «Cambiar de perfil».",
     "continueAs": "Continuar como {{name}}",
     "cancel": "Cancelar",
     "signedIn": "Has accedido como {{name}}."

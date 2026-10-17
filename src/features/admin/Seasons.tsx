@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useTranslation } from 'react-i18next';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import { useFacilities } from '../../app/queries';
 import { adminPaths } from '../../app/routes/paths';
@@ -87,7 +88,7 @@ export function Seasons() {
             ]}
           />
         ) : (
-          <p aria-busy="true">{t('common:loading')}</p>
+          <Pending queries={[bookings, entities, facilities]} />
         )}
       </section>
 

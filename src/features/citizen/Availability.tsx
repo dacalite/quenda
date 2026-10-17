@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useQueries } from '@tanstack/react-query';
+import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
+import { Pending } from '../../app/Pending';
 import { NotFoundPage } from '../../app/pages';
 import { Page } from '../../app/Page';
 import { useAvailability, useAvailabilityQuery, useFacility, useSchedule } from '../../app/queries';
@@ -18,7 +20,6 @@ import { DatePicker } from '../../ui/DatePicker';
 import { Icon } from '../../ui/Icon';
 import { Link } from '../../ui/Link';
 import { Select } from '../../ui/Select';
-import { StatusBadge } from '../../ui/StatusBadge';
 import { Tab, TabList, TabPanel, Tabs } from '../../ui/Tabs';
 import layout from '../../ui/layout.module.css';
 import styles from './citizen.module.css';
@@ -92,6 +93,13 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
       replaces,
     });
 
+  // Folded at first: on a phone the slots, not the suggestions, are what most people came for.
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const suggestionsId = useId();
+
+  const stripStart = addDays(date, -3) < today ? today : addDays(date, -3);
+  const stripDays = Array.from({ length: 7 }, (_, i) => addDays(stripStart, i));
+
   const slots = (availability.data ?? []).filter((slot) => slot.subspaceId === subspaceId);
 
   const recommended = (recommendations.data ?? []).flatMap((r) => {
@@ -110,16 +118,30 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
         </p>
       )}
 
-      <div className={layout.row}>
-        <Button
-          isDisabled={date <= today}
-          onPress={() => {
-            go({ date: addDays(date, -1) });
-          }}
-        >
-          <Icon name="chevronLeft" />
-          {t('availability.previousDay')}
-        </Button>
+      <ul className={styles.dayStrip} aria-label={t('availability.days')}>
+        {stripDays.map((day) => (
+          <li key={day}>
+            <Link
+              href={paths.availability(facility.id, {
+                date: day,
+                subspaceId,
+                week,
+                ...(replaces ? { replaces } : {}),
+              })}
+              className={styles.day}
+              aria-current={day === date ? 'date' : undefined}
+            >
+              <span aria-hidden="true">{format.weekdayShort(day)}</span>
+              <span aria-hidden="true" className={styles.dayNumber}>
+                {format.dayOfMonth(day)}
+              </span>
+              <span className="visually-hidden">{format.longDate(day)}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      <div className={styles.dayControls}>
         <DatePicker
           label={t('availability.date')}
           value={date}
@@ -128,14 +150,27 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
             if (value) go({ date: value });
           }}
         />
-        <Button
-          onPress={() => {
-            go({ date: addDays(date, 1) });
-          }}
-        >
-          {t('availability.nextDay')}
-          <Icon name="chevronRight" />
-        </Button>
+        <div className={styles.dayButtons}>
+          <Button
+            variant="quiet"
+            isDisabled={date <= today}
+            onPress={() => {
+              go({ date: addDays(date, -1) });
+            }}
+          >
+            <Icon name="chevronLeft" />
+            {t('availability.previousDay')}
+          </Button>
+          <Button
+            variant="quiet"
+            onPress={() => {
+              go({ date: addDays(date, 1) });
+            }}
+          >
+            {t('availability.nextDay')}
+            <Icon name="chevronRight" />
+          </Button>
+        </div>
         {facility.subspaces.length > 1 && (
           <Select
             label={t('availability.subspace')}
@@ -150,16 +185,29 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
 
       {recommended.length > 0 && (
         <section className={layout.panel} aria-labelledby="recommendations-title">
-          <h2 id="recommendations-title">{t('availability.recommendationsTitle')}</h2>
+          <h2 id="recommendations-title" className={styles.disclosureTitle}>
+            <Button
+              variant="quiet"
+              aria-expanded={suggestionsOpen}
+              aria-controls={suggestionsId}
+              onPress={() => {
+                setSuggestionsOpen(!suggestionsOpen);
+              }}
+            >
+              <Icon name={suggestionsOpen ? 'chevronDown' : 'chevronRight'} />
+              {t('availability.recommendationsTitle')}
+            </Button>
+          </h2>
           <p>
             {t('availability.recommendationsIntro', {
               times: format.list(recommended.map((r) => r.start).sort()),
             })}
           </p>
-          <ul className={layout.stack}>
+          <ul id={suggestionsId} className={styles.suggestions} hidden={!suggestionsOpen}>
             {recommended.map((r) => (
               <li key={r.start}>
-                <Link href={bookingHref(r.slot)}>
+                <Link href={bookingHref(r.slot)} className={styles.suggestion}>
+                  <Icon name="clock" />
                   {t('availability.recommendation', {
                     time: r.start,
                     percent: format.percent(r.expectedOccupancy),
@@ -182,8 +230,8 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
           <Tab id="week">{t('availability.weekView')}</Tab>
         </TabList>
         <TabPanel id="day">
-          {availability.isPending ? (
-            <p aria-busy="true">{t('common:loading')}</p>
+          {!availability.data ? (
+            <Pending queries={[availability]} size="section" />
           ) : slots.length === 0 ? (
             <p>{t('availability.noSlots')}</p>
           ) : (
@@ -208,19 +256,23 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
                               <span className={styles.slotTime}>
                                 {format.timeRange(slot.start, slot.end)}
                               </span>
-                              <StatusBadge tone="success">
-                                {t('domain:slotStatus.free')}
-                              </StatusBadge>
-                              <span>{format.price(price)}</span>
+                              <span className={styles.slotMeta}>
+                                <span className={styles.slotStatus}>
+                                  <Icon name="success" />
+                                  {t('domain:slotStatus.free')}
+                                </span>
+                                <span className={styles.slotPrice}>{format.price(price)}</span>
+                              </span>
                             </Link>
                           ) : (
                             <span className={styles.slot} data-status={slot.status}>
                               <span className={styles.slotTime}>
                                 {format.timeRange(slot.start, slot.end)}
                               </span>
-                              <StatusBadge tone={slot.status === 'booked' ? 'neutral' : 'warning'}>
+                              <span className={styles.slotStatus}>
+                                <Icon name={slot.status === 'booked' ? 'neutral' : 'lock'} />
                                 {t(`domain:slotStatus.${slot.status}`)}
-                              </StatusBadge>
+                              </span>
                             </span>
                           )}
                         </li>

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import { useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
@@ -8,6 +9,7 @@ import type { NotificationChannel } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
 import { Button } from '../../ui/Button';
 import { Checkbox } from '../../ui/Checkbox';
+import { Icon } from '../../ui/Icon';
 import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { useToast } from '../../ui/toasts';
@@ -48,30 +50,31 @@ export function Notifications() {
           </Button>
         </p>
       )}
-      {notifications.isPending ? (
-        <p aria-busy="true">{t('common:loading')}</p>
-      ) : (notifications.data ?? []).length === 0 ? (
+      {!notifications.data ? (
+        <Pending queries={[notifications]} size="section" />
+      ) : notifications.data.length === 0 ? (
         <p>{t('notifications.empty')}</p>
       ) : (
         <ul className={layout.stack}>
-          {(notifications.data ?? []).map((notification) => {
+          {notifications.data.map((notification) => {
             const reservation = reservations.data?.find((r) => r.id === notification.reservationId);
             const facility = facilities.data?.find((f) => f.id === reservation?.facilityId);
             const reason = reservation?.history.findLast((e) => e.type === 'cancelled')?.detail;
             return (
               <li
                 key={notification.id}
-                className={[layout.panel, notification.readAt ? null : styles.unread]
-                  .filter(Boolean)
-                  .join(' ')}
+                className={styles.notification}
+                data-unread={notification.readAt ? undefined : true}
               >
-                <p className={layout.row}>
-                  <strong>{t(`domain:notificationType.${notification.type}`)}</strong>
+                <div className={layout.row}>
+                  <h2 id={`notice-${notification.id}`} tabIndex={-1} className={styles.noticeTitle}>
+                    {t(`domain:notificationType.${notification.type}`)}
+                  </h2>
                   {!notification.readAt && (
                     <StatusBadge tone="info">{t('notifications.unread')}</StatusBadge>
                   )}
                   <span className={layout.meta}>{format.dateTime(notification.createdAt)}</span>
-                </p>
+                </div>
                 {reservation && facility && (
                   <>
                     <p>
@@ -82,7 +85,7 @@ export function Notifications() {
                         reason: reason ?? t('notifications.noReason'),
                       })}
                     </p>
-                    <p>
+                    <p className={layout.row}>
                       {notification.type === 'councilNotice' ? (
                         <Link
                           variant="primary"
@@ -98,6 +101,9 @@ export function Notifications() {
                           {t('notifications.view')}
                         </Link>
                       )}
+                      {!notification.readAt && (
+                        <MarkOneRead id={notification.id} titleId={`notice-${notification.id}`} />
+                      )}
                     </p>
                   </>
                 )}
@@ -108,6 +114,29 @@ export function Notifications() {
       )}
       <ChannelSettings />
     </Page>
+  );
+}
+
+/** Once read, the button goes away: focus moves to the notice so it is not lost. */
+function MarkOneRead({ id, titleId }: { id: string; titleId: string }) {
+  const { t } = useTranslation('citizen');
+  const markRead = useMarkRead();
+  return (
+    <Button
+      variant="quiet"
+      aria-describedby={titleId}
+      isDisabled={markRead.isPending}
+      onPress={() => {
+        markRead.mutate([id], {
+          onSuccess: () => {
+            document.getElementById(titleId)?.focus();
+          },
+        });
+      }}
+    >
+      <Icon name="check" />
+      {t('notifications.markOne')}
+    </Button>
   );
 }
 

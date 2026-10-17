@@ -2,6 +2,7 @@
 import { useQueries } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import { useAvailability, useAvailabilityQuery, useFacilities } from '../../app/queries';
 import { adminPaths } from '../../app/routes/paths';
@@ -33,7 +34,7 @@ export function Agenda() {
   if (!facility || !facilities.data) {
     return (
       <Page title={t('agenda.title')}>
-        <p aria-busy="true">{t('common:loading')}</p>
+        <Pending queries={[facilities]} size="section" />
       </Page>
     );
   }
@@ -167,7 +168,7 @@ function DayGrid({
   const slots = availability.data ?? [];
   const times = [...new Set(slots.map((s) => s.start))].sort();
 
-  if (availability.isPending) return <p aria-busy="true">{t('common:loading')}</p>;
+  if (!availability.data) return <Pending queries={[availability]} size="section" />;
   if (times.length === 0) return <p>{t('agenda.closed')}</p>;
 
   return (

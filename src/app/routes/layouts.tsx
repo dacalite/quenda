@@ -1,25 +1,26 @@
 // SPDX-License-Identifier: EUPL-1.2
-import { useEffect, useEffectEvent } from 'react';
+import { Suspense, useEffect, useEffectEvent } from 'react';
 import { RouterProvider as AriaRouterProvider } from 'react-aria-components';
 import { useTranslation } from 'react-i18next';
-import { Navigate, Outlet, useHref, useNavigate, useParams } from 'react-router';
+import { Outlet, useHref, useNavigate, useParams } from 'react-router';
 import { APP_DISPLAY_NAME } from '../../config/app';
 import { NotFoundError } from '../../data/ports/errors';
 import { DEPUTACION } from '../../data/seed/catalog';
-import { StaffNav } from '../../features/admin/StaffNav';
-import { CitizenNav } from '../../features/citizen/CitizenNav';
-import { DemoBar } from '../../features/demo/DemoBar';
+import { StaffNav, StaffSession } from '../../features/admin/StaffNav';
+import { CitizenNav, CitizenSession } from '../../features/citizen/CitizenNav';
 import { GuidedTour } from '../../features/demo/GuidedTour';
-import { DeputacionNav } from '../../features/deputacion/DeputacionNav';
+import { ProfileSwitcher } from '../../features/demo/ProfileSwitcher';
+import { DeputacionNav, DeputacionSession } from '../../features/deputacion/DeputacionNav';
 import { currentLanguage } from '../../i18n';
 import { accessibleColor } from '../../ui/contrast';
 import { SkipLink } from '../../ui/SkipLink';
 import { TenantContext } from '../contexts';
 import { ErrorPage, NotFoundPage } from '../pages';
-import { useTenantBySlug, useTenants } from '../queries';
+import { Pending } from '../Pending';
+import { useTenantBySlug } from '../queries';
 import { SiteFrame } from '../SiteFrame';
 import { useDemo, usePreferences } from '../state';
-import { citizenPaths, deputacionPaths, LEGAL_PAGES, roleHome } from './paths';
+import { citizenPaths, deputacionPaths, LEGAL_PAGES } from './paths';
 
 function useApplyPreferences() {
   const { textSize, highContrast, reducedMotion } = usePreferences();
@@ -50,32 +51,14 @@ export function AppShell() {
       useHref={useAppHref}
     >
       <SkipLink targetId="main">{t('skipLink')}</SkipLink>
-      <DemoBar />
       <Outlet />
       <GuidedTour />
     </AriaRouterProvider>
   );
 }
 
-export function RedirectToDemoStart() {
-  const tenants = useTenants();
-  const role = useDemo((state) => state.role);
-  const first = tenants.data?.[0];
-  if (first) return <Navigate to={roleHome(role, first.slug)} replace />;
-  return <LoadingFrame />;
-}
-
 function Loading() {
-  const { t } = useTranslation();
-  return <p aria-busy="true">{t('loading')}</p>;
-}
-
-function LoadingFrame() {
-  return (
-    <SiteFrame name={APP_DISPLAY_NAME} homeHref="/">
-      <Loading />
-    </SiteFrame>
-  );
+  return <Pending size="section" />;
 }
 
 export function TenantLayout() {
@@ -112,12 +95,23 @@ export function TenantLayout() {
         name={tenant.data?.name ?? APP_DISPLAY_NAME}
         emblem={tenant.data?.emblem}
         homeHref={tenant.data ? `/${tenant.data.slug}` : '/'}
+        surface={role === 'citizen' ? 'citizen' : 'staff'}
+        tools={<ProfileSwitcher />}
         nav={
           tenant.data ? (
             role === 'citizen' ? (
               <CitizenNav />
             ) : role === 'staff' ? (
               <StaffNav />
+            ) : undefined
+          ) : undefined
+        }
+        session={
+          tenant.data ? (
+            role === 'citizen' ? (
+              <CitizenSession />
+            ) : role === 'staff' ? (
+              <StaffSession />
             ) : undefined
           ) : undefined
         }
@@ -140,7 +134,9 @@ export function TenantLayout() {
             <ErrorPage onRetry={() => void tenant.refetch()} />
           )
         ) : (
-          <Outlet />
+          <Suspense fallback={<Loading />}>
+            <Outlet />
+          </Suspense>
         )}
       </SiteFrame>
     </TenantContext>
@@ -163,9 +159,18 @@ export function DeputacionLayout() {
     <SiteFrame
       name={DEPUTACION.name}
       homeHref={deputacionPaths.home}
+      surface="staff"
+      tools={<ProfileSwitcher />}
       nav={role === 'deputacion' ? <DeputacionNav /> : undefined}
+      session={role === 'deputacion' ? <DeputacionSession /> : undefined}
     >
-      {role === 'deputacion' ? <Outlet /> : <Loading />}
+      {role === 'deputacion' ? (
+        <Suspense fallback={<Loading />}>
+          <Outlet />
+        </Suspense>
+      ) : (
+        <Loading />
+      )}
     </SiteFrame>
   );
 }

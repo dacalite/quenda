@@ -7,8 +7,8 @@
   z-index: 200;
   padding: var(--space-2) var(--space-3);
   font-weight: 700;
-  color: var(--color-background);
-  background: var(--color-text);
+  color: #ffffff;
+  background: var(--color-navy);
   border-radius: var(--radius-1);
   transform: translateY(-300%);
 }

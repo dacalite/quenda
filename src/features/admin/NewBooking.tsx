@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import { useAvailability, useFacilities } from '../../app/queries';
 import { adminPaths } from '../../app/routes/paths';
@@ -32,7 +33,7 @@ export function NewBooking() {
   if (!facilities.data) {
     return (
       <Page title={t('newBooking.title')}>
-        <p aria-busy="true">{t('common:loading')}</p>
+        <Pending queries={[facilities]} size="section" />
       </Page>
     );
   }
@@ -190,8 +191,8 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
               }}
             />
           </div>
-          {availability.isPending ? (
-            <p aria-busy="true">{t('common:loading')}</p>
+          {!availability.data ? (
+            <Pending queries={[availability]} />
           ) : free.length === 0 ? (
             <p id={SLOT_FIELD_ID} tabIndex={-1}>
               {t('newBooking.noFree')}

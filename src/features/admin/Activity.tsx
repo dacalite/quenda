@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import type { AuditSubject } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
@@ -43,8 +44,8 @@ export function Activity() {
           ...SUBJECTS.map((s) => ({ id: s, label: t(`domain:auditSubject.${s}`) })),
         ]}
       />
-      {entries.isPending ? (
-        <p aria-busy="true">{t('common:loading')}</p>
+      {!entries.data ? (
+        <Pending queries={[entries]} size="section" />
       ) : rows.length === 0 ? (
         <p>{t('activity.empty')}</p>
       ) : (

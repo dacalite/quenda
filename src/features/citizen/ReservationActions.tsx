@@ -6,24 +6,20 @@ import { canCancel } from '../../domain/rules/cancellation';
 import { zonedNow } from '../../domain/time';
 import type { Facility, Reservation } from '../../domain/types';
 import { Button } from '../../ui/Button';
-import { ConfirmDialog, DialogTrigger, Modal } from '../../ui/Dialog';
+import { ConfirmDialog, DialogTrigger } from '../../ui/Dialog';
 import { Icon } from '../../ui/Icon';
 import { Link } from '../../ui/Link';
 import { useToast } from '../../ui/toasts';
 import layout from '../../ui/layout.module.css';
-import styles from './citizen.module.css';
 import { useCancel, useCitizen } from './queries';
-import { ReservationQr } from './ReservationQr';
 
-/** Change, cancel and show the QR of a booking, with the cancellation policy stated first. */
+/** Change and cancel a booking, with the cancellation policy stated first. */
 export function ReservationActions({
   reservation,
   facility,
-  showQr = false,
 }: {
   reservation: Reservation;
   facility: Facility;
-  showQr?: boolean;
 }) {
   const { t } = useTranslation(['citizen', 'common']);
   const { tenant } = useCitizen();
@@ -37,19 +33,6 @@ export function ReservationActions({
 
   return (
     <div className={layout.row}>
-      {showQr && (
-        <DialogTrigger>
-          <Button>{t('reservation.showQr')}</Button>
-          <Modal title={t('reservation.qrTitle')}>
-            <p className={styles.code}>{reservation.code}</p>
-            <ReservationQr
-              code={reservation.code}
-              alt={t('reservation.qrAlt', { code: reservation.code })}
-            />
-            <p>{t('reservation.qrHelp', { code: reservation.code })}</p>
-          </Modal>
-        </DialogTrigger>
-      )}
       <Link
         variant="secondary"
         href={paths.availability(reservation.facilityId, {
@@ -61,7 +44,7 @@ export function ReservationActions({
         {t('reservation.change')}
       </Link>
       <DialogTrigger>
-        <Button variant="danger">
+        <Button variant="dangerSecondary">
           <Icon name="close" />
           {t('reservation.cancel')}
         </Button>

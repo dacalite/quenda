@@ -2,7 +2,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useEffectEvent, useId, useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { useTenants } from '../../app/queries';
 import { useRepositories } from '../../app/repositories';
 import { sessionUserId, useDemo, useTour } from '../../app/state';
@@ -69,15 +69,17 @@ export function GuidedTour() {
   const stepKey = active ? `${active.role}:${String(active.step)}` : null;
 
   // The first time a role is shown, its tour opens by itself.
+  // Not on the profile chooser: the tour starts once a profile has been picked.
+  const choosing = useLocation().pathname === '/';
   const offer = useEffectEvent(() => {
-    if (active || seen.includes(role) || !tenant) return;
+    if (active || seen.includes(role) || !tenant || choosing) return;
     startTour(role);
   });
   useEffect(() => {
     offer();
-  }, [role, tenant?.id]);
+  }, [role, tenant?.id, choosing]);
 
-  // Switching role from the demo bar leaves the tour of the previous one.
+  // Switching profile leaves the tour of the previous one.
   const leaveOtherRole = useEffectEvent(() => {
     if (active && active.role !== role) {
       clearHighlight();
@@ -127,10 +129,12 @@ export function GuidedTour() {
     request.current++;
     clearHighlight();
     stop();
+    const requested = active.returnTo ? document.getElementById(active.returnTo) : null;
     const back =
-      opener.current instanceof HTMLElement && opener.current.isConnected
+      requested ??
+      (opener.current instanceof HTMLElement && opener.current.isConnected
         ? opener.current
-        : document.querySelector<HTMLElement>('main h1');
+        : document.querySelector<HTMLElement>('main h1'));
     back?.focus();
   };
   const move = (delta: number) => {

@@ -1,8 +1,15 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { expect, test, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from './axe';
+import { freezeDate } from './clock';
 
 const heading = (page: Page) => page.getByRole('heading', { level: 1 });
+
+// A new council must always have free slots left today.
+test.use({ timezoneId: 'Europe/Madrid' });
+test.beforeEach(async ({ page }) => {
+  await freezeDate(page);
+});
 
 async function open(page: Page, path: string) {
   await page.goto(`./deputacion${path}`);
@@ -49,7 +56,11 @@ test('opening the deputación area acts as the deputación', async ({ page }) =>
   await expect(heading(page)).toBeVisible();
   await page.goto('./deputacion');
   await expect(heading(page)).toHaveText('Concellos adheridos');
-  await expect(page.getByRole('button', { name: /Ver como$/ })).toContainText('Deputación');
+  await page.getByRole('button', { name: 'Cambiar de perfil' }).click();
+  await expect(page.getByRole('dialog').getByRole('link', { name: 'Deputación' })).toHaveAttribute(
+    'aria-current',
+    'true',
+  );
 });
 
 test('a council signed up with the keyboard takes bookings straight away', async ({ page }) => {

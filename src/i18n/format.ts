@@ -22,6 +22,10 @@ export function useFormat() {
     /** «20 de outubro de 2026» */
     fullDate: day({ day: 'numeric', month: 'long', year: 'numeric' }),
     weekday: day({ weekday: 'long' }),
+    /** The parts of a date drawn as a calendar sheet: «ven.», «30», «out.» */
+    weekdayShort: day({ weekday: 'short' }),
+    dayOfMonth: day({ day: 'numeric' }),
+    monthShort: day({ month: 'short' }),
     timeRange: (start: Time, end: Time) => t('timeRange', { start, end }),
     dateTime: (instant: Instant) =>
       new Intl.DateTimeFormat(locale, {

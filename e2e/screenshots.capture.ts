@@ -24,7 +24,7 @@ async function prepare(page: Page, role: Role) {
       localStorage.setItem(
         'quenda.demo',
         JSON.stringify({
-          state: { role, citizen: 'uxia', staff: 'carme', collapsed: true, signedIn: true },
+          state: { role, citizen: 'uxia', staff: 'carme', signedIn: true },
           version: 0,
         }),
       );
@@ -51,6 +51,8 @@ async function capture(page: Page, name: string) {
     path: `docs/capturas/${test.info().project.name}/${name}.png`,
     fullPage: true,
     animations: 'disabled',
+    // A transformed ancestor holds the residents' fixed tab bar, so it lands at the end of the page.
+    style: '[data-tabbar] { transform: translateZ(0); }',
   });
 }
 
@@ -69,6 +71,9 @@ test.use({ timezoneId: 'Europe/Madrid', locale: 'gl-ES' });
 
 test('citizen screens', async ({ page }) => {
   await prepare(page, 'citizen');
+
+  await page.goto('./');
+  await capture(page, '00-perfil');
 
   await page.goto('./bouzalonga');
   await capture(page, '01-inicio');

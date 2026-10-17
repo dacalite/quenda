@@ -107,6 +107,7 @@ export function createLocalRepositories({
 
   // Every call resolves asynchronously with a copy, like a response body would.
   const respond = async <T>(produce: () => T): Promise<T> => {
+    await db.ready();
     if (latency) {
       const ms = latency.min + random() * (latency.max - latency.min);
       await new Promise((resolve) => setTimeout(resolve, ms));

@@ -16,9 +16,9 @@ export function PreferencesDialog() {
 
   return (
     <DialogTrigger>
-      <Button variant="secondary">
-        <Icon name="settings" />
-        {t('preferences.open')}
+      <Button variant="quiet">
+        <Icon name="accessibility" />
+        <span className="hide-narrow">{t('preferences.open')}</span>
       </Button>
       <Modal title={t('preferences.title')}>
         <p>{t('preferences.intro')}</p>

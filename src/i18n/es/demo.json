@@ -1,10 +1,21 @@
 {
-  "region": "Controles de la demostración",
   "notice": "Prototipo con datos simulados",
-  "show": "Mostrar los controles de la demostración",
-  "hide": "Ocultar los controles de la demostración",
+  "chooser": {
+    "title": "¿Cómo quieres probar Quenda?",
+    "intro": "Es un prototipo con datos simulados: lo que hagas queda solo en este navegador. Elige un perfil para empezar; puedes cambiarlo cuando quieras con el botón «Cambiar de perfil» de la parte superior."
+  },
+  "roleCard": {
+    "citizen": "Busca una instalación, reserva una hora libre desde el móvil y gestiona tus reservas y avisos.",
+    "staff": "El día a día del ayuntamiento: agenda, reservas por teléfono, control de acceso, instalaciones e indicadores.",
+    "deputacion": "Los ayuntamientos adheridos, sus indicadores comparados y el alta de un ayuntamiento nuevo.",
+    "current": "Perfil actual"
+  },
+  "switcher": {
+    "open": "Cambiar de perfil",
+    "short": "Perfil",
+    "details": "Persona y ayuntamiento"
+  },
   "role": {
-    "label": "Ver como",
     "citizen": "Ciudadanía",
     "staff": "Personal del ayuntamiento",
     "deputacion": "Diputación"
@@ -47,7 +58,7 @@
       },
       "availability": {
         "title": "Ver la disponibilidad",
-        "body": "Las horas se agrupan en mañana, tarde y noche, y cada una dice su estado y el precio. Arriba, las horas con poca gente según las últimas ocho semanas."
+        "body": "Las horas se agrupan en mañana, tarde y noche, y cada una dice su estado y el precio. Arriba puedes desplegar las horas con poca gente según las últimas ocho semanas."
       },
       "review": {
         "title": "Revisar y confirmar",
@@ -59,7 +70,7 @@
       },
       "mine": {
         "title": "Mis reservas",
-        "body": "Próximas e historial. Desde aquí cambias la hora de una reserva, repites una pasada o abres los avisos del ayuntamiento."
+        "body": "Próximas e historial. Abre una reserva para ver su QR, cambiar la hora o cancelarla; de las pasadas puedes repetir la reserva."
       },
       "cancel": {
         "title": "Cambiar o cancelar",

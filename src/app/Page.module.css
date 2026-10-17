@@ -15,3 +15,50 @@
   max-width: 65ch;
   margin: 0;
 }
+
+/* The flag's diagonal band, light enough that any text crossing it keeps its contrast. */
+.hero {
+  background-color: var(--color-background);
+  background-image: linear-gradient(
+    to top right,
+    transparent 55%,
+    rgb(79 179 232 / 70%) 55%,
+    rgb(79 179 232 / 70%) 55.4%,
+    rgb(79 179 232 / 22%) 55.4%,
+    rgb(79 179 232 / 22%) 67.6%,
+    rgb(79 179 232 / 70%) 67.6%,
+    rgb(79 179 232 / 70%) 68%,
+    transparent 68%
+  );
+}
+
+.heroInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: calc(var(--content-max) + 2 * var(--space-3));
+  margin-inline: auto;
+  padding: var(--space-5) var(--space-3) var(--space-6);
+}
+
+.heroInner > .title {
+  max-width: 18ch;
+  font-size: var(--font-size-7);
+  line-height: 1.05;
+}
+
+.heroInner > p {
+  max-width: 52ch;
+  margin: 0;
+  font-size: var(--font-size-3);
+  color: var(--color-text-muted);
+}
+
+.hero + .page {
+  padding-block-start: var(--space-5);
+}
+
+:root[data-contrast='high'] .hero {
+  background-image: none;
+  border-block-end: var(--control-border-width) solid var(--color-border);
+}

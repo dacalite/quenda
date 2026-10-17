@@ -1,37 +1,42 @@
 // SPDX-License-Identifier: EUPL-1.2
 import type { RouteObject } from 'react-router';
-import { AccessControl } from '../../features/admin/AccessControl';
-import { Activity } from '../../features/admin/Activity';
-import { AdminHome } from '../../features/admin/AdminHome';
-import { Agenda } from '../../features/admin/Agenda';
-import { Blocks } from '../../features/admin/Blocks';
-import { Facilities } from '../../features/admin/Facilities';
-import { EditFacility, NewFacility } from '../../features/admin/FacilityForm';
-import { Indicators } from '../../features/admin/Indicators';
-import { NewBooking } from '../../features/admin/NewBooking';
 import { RequireAdmin, RequireStaff } from '../../features/admin/RequireStaff';
-import { ReservationRecord } from '../../features/admin/ReservationRecord';
-import { ScheduleEditor } from '../../features/admin/ScheduleEditor';
-import { SeasonWizard } from '../../features/admin/SeasonWizard';
-import { Seasons } from '../../features/admin/Seasons';
-import { Settings } from '../../features/admin/Settings';
-import { Availability } from '../../features/citizen/Availability';
-import { BookingReview } from '../../features/citizen/BookingReview';
-import { CalendarPage } from '../../features/citizen/CalendarPage';
-import { CitizenHome } from '../../features/citizen/CitizenHome';
-import { FacilityDetail } from '../../features/citizen/FacilityDetail';
-import { FacilityList } from '../../features/citizen/FacilityList';
-import { LegalPage } from '../../features/citizen/LegalPage';
-import { MyReservations } from '../../features/citizen/MyReservations';
-import { Notifications } from '../../features/citizen/Notifications';
-import { Profile } from '../../features/citizen/Profile';
 import { RequireCitizen } from '../../features/citizen/RequireCitizen';
-import { ReservationDetail } from '../../features/citizen/ReservationDetail';
-import { IdentityProvider, SignIn } from '../../features/citizen/SignIn';
-import { DeputacionHome } from '../../features/deputacion/DeputacionHome';
-import { NewCouncil } from '../../features/deputacion/NewCouncil';
 import { NotFoundPage } from '../pages';
-import { AppShell, DeputacionLayout, RedirectToDemoStart, TenantLayout } from './layouts';
+import {
+  AccessControl,
+  Activity,
+  AdminHome,
+  Agenda,
+  Availability,
+  Blocks,
+  BookingReview,
+  CalendarPage,
+  CitizenHome,
+  DeputacionHome,
+  EditFacility,
+  Facilities,
+  FacilityDetail,
+  FacilityList,
+  IdentityProvider,
+  Indicators,
+  LegalPage,
+  MyReservations,
+  NewBooking,
+  NewCouncil,
+  NewFacility,
+  Notifications,
+  Profile,
+  ReservationDetail,
+  ReservationRecord,
+  ScheduleEditor,
+  SeasonWizard,
+  Seasons,
+  Settings,
+  SignIn,
+} from './screens';
+import { ProfileChooser } from '../../features/demo/ProfileChooser';
+import { AppShell, DeputacionLayout, TenantLayout } from './layouts';
 import { ADMIN_PATH, DEPUTACION_PATH, LEGAL_PAGES } from './paths';
 
 const personal = (element: React.ReactNode) => <RequireCitizen>{element}</RequireCitizen>;
@@ -41,7 +46,7 @@ export const routes: RouteObject[] = [
   {
     element: <AppShell />,
     children: [
-      { index: true, element: <RedirectToDemoStart /> },
+      { index: true, element: <ProfileChooser /> },
       {
         path: DEPUTACION_PATH,
         element: <DeputacionLayout />,

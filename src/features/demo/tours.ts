@@ -118,13 +118,13 @@ const deputacion: TourStep[] = [
 
 export const TOURS: Record<DemoRole, TourStep[]> = { citizen, staff, deputacion };
 
-/** Opens the tour of the current role; the demo bar uses it to reopen a tour. */
+/** Opens the tour of a role; the profile switcher uses it to reopen a tour. */
 export function useStartTour() {
   const start = useTour((state) => state.start);
   const setStaff = useDemo((state) => state.setStaff);
-  return (role: DemoRole) => {
+  return (role: DemoRole, returnTo?: string) => {
     // Several stops of the council tour are for administrators.
     if (role === 'staff') setStaff('carme');
-    start(role);
+    start(role, returnTo);
   };
 }

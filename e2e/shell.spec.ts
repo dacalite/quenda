@@ -40,14 +40,18 @@ test.describe('every view passes axe', () => {
   test('with the reset confirmation open, in Spanish', async ({ page }) => {
     await page.goto('./ribasmeiras');
     await choose(page, /Idioma/, 'Castellano');
+    await page.getByRole('button', { name: 'Cambiar de perfil' }).click();
     await page.getByRole('button', { name: 'Reiniciar la demostración' }).click();
     await expect(page.getByRole('alertdialog')).toBeVisible();
     await expectNoAxeViolations(page);
   });
 });
 
-test('the root opens the first council', async ({ page }) => {
+test('the root offers the three profiles and opens the first council', async ({ page }) => {
   await page.goto('./');
+  await expect(heading(page)).toHaveText('Como queres probar Quenda?');
+  await expectNoAxeViolations(page);
+  await page.getByRole('link', { name: 'Cidadanía' }).click();
   await expect(page).toHaveURL(/\/bouzalonga$/);
   await expect(page).toHaveTitle('Reserva de instalacións deportivas · Concello de Bouzalonga');
 });
@@ -64,7 +68,8 @@ test('the skip link is the first tab stop and moves focus to main', async ({ pag
 test('navigating moves focus to the new heading and updates the title', async ({ page }) => {
   await page.goto('./bouzalonga');
   await expect(heading(page)).toBeVisible();
-  await choose(page, /Ver como/, 'Persoal do concello');
+  await page.getByRole('button', { name: 'Cambiar de perfil' }).click();
+  await page.getByRole('link', { name: 'Persoal do concello' }).click();
   await expect(heading(page)).toHaveText('Panel de xestión');
   await expect(heading(page)).toBeFocused();
   await expect(page).toHaveTitle('Panel de xestión · Concello de Bouzalonga');
@@ -74,14 +79,15 @@ test('navigating moves focus to the new heading and updates the title', async ({
 test('switching council changes the brand colour', async ({ page }) => {
   await page.goto('./bouzalonga');
   await expect(heading(page)).toBeVisible();
-  const primary = () =>
+  const accent = () =>
     page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue('--color-primary'),
+      getComputedStyle(document.documentElement).getPropertyValue('--color-accent'),
     );
-  const before = await primary();
+  const before = await accent();
+  await page.getByRole('button', { name: 'Cambiar de perfil' }).click();
   await choose(page, /Concello/, 'Concello de Ribasmeiras');
   await expect(page).toHaveTitle(/Concello de Ribasmeiras/);
-  expect(await primary()).not.toBe(before);
+  expect(await accent()).not.toBe(before);
 });
 
 test('the chosen language survives a reload', async ({ page }) => {
@@ -96,6 +102,7 @@ test('the chosen language survives a reload', async ({ page }) => {
 test('the demo can be reset and says so', async ({ page }) => {
   await page.goto('./bouzalonga');
   await expect(heading(page)).toBeVisible();
+  await page.getByRole('button', { name: 'Cambiar de perfil' }).click();
   await page.getByRole('button', { name: 'Reiniciar a demostración' }).click();
   await page.getByRole('button', { name: 'Reiniciar', exact: true }).click();
   await expect(page.getByRole('region', { name: 'Avisos' })).toContainText(

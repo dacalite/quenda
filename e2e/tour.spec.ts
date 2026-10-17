@@ -1,9 +1,16 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { expect, test, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from './axe';
+import { freezeDate } from './clock';
 
 const heading = (page: Page) => page.getByRole('heading', { level: 1 });
 const step = (page: Page) => page.getByRole('dialog');
+
+// The tour shows the quiet hours of today, so there must be some left.
+test.use({ timezoneId: 'Europe/Madrid' });
+test.beforeEach(async ({ page }) => {
+  await freezeDate(page);
+});
 
 async function expectStep(page: Page, progress: string, title: string) {
   await expect(step(page)).toBeFocused();
@@ -28,6 +35,17 @@ test.describe('first visit', () => {
     await page.reload();
     await expect(heading(page)).toBeVisible();
     await expect(step(page)).toHaveCount(0);
+  });
+
+  test('keeps the step clear of the tab bar on a phone', async ({ page }) => {
+    await page.goto('./bouzalonga');
+    await expectStep(page, 'Paso 1 de 7', 'Visita guiada: reservar como veciña');
+    const tabs = page.getByRole('navigation', { name: 'Menú principal' });
+    const bar = await tabs.boundingBox();
+    const dialog = await step(page).boundingBox();
+    const fixed = await tabs.evaluate((nav) => getComputedStyle(nav).position === 'fixed');
+    test.skip(!fixed, 'Only small screens have the tab bar at the bottom');
+    expect((dialog?.y ?? 0) + (dialog?.height ?? 0)).toBeLessThanOrEqual(bar?.y ?? 0);
   });
 
   test('walks the resident through booking, keyboard only', async ({ page }) => {
@@ -93,12 +111,13 @@ test.describe('first visit', () => {
   });
 });
 
-test('reopens from the demo bar and gives the focus back to it', async ({ page }) => {
+test('reopens from the profile dialog and gives the focus back to its button', async ({ page }) => {
   await page.goto('./ribasmeiras');
   await expect(heading(page)).toBeVisible();
-  const open = page.getByRole('button', { name: 'Visita guiada' });
-  await open.click();
+  const switcher = page.getByRole('button', { name: 'Cambiar de perfil' });
+  await switcher.click();
+  await page.getByRole('button', { name: 'Visita guiada' }).click();
   await expectStep(page, 'Paso 1 de 7', 'Visita guiada: reservar como veciña');
   await page.keyboard.press('Escape');
-  await expect(open).toBeFocused();
+  await expect(switcher).toBeFocused();
 });

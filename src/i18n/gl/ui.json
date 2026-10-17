@@ -18,5 +18,8 @@
   },
   "select": {
     "placeholder": "Escolle unha opción"
+  },
+  "table": {
+    "empty": "Non hai nada que amosar."
   }
 }

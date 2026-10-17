@@ -70,16 +70,20 @@ function Detail({ reservation, facility }: { reservation: Reservation; facility:
         : {})}
     >
       <div className={layout.split}>
-        <section className={layout.section} aria-labelledby="reservation-code">
+        <section className={[styles.pass, 'on-navy'].join(' ')} aria-labelledby="reservation-code">
           <h2 id="reservation-code">{t('reservation.code')}</h2>
           <p className={styles.code}>{reservation.code}</p>
           {active && (
             <>
-              <ReservationQr
-                code={reservation.code}
-                alt={t('reservation.qrAlt', { code: reservation.code })}
-              />
-              <p>{t('reservation.qrHelp', { code: reservation.code })}</p>
+              <div className={styles.qrTile}>
+                <ReservationQr
+                  code={reservation.code}
+                  alt={t('reservation.qrAlt', { code: reservation.code })}
+                />
+              </div>
+              <p className={styles.passHelp}>
+                {t('reservation.qrHelp', { code: reservation.code })}
+              </p>
             </>
           )}
         </section>

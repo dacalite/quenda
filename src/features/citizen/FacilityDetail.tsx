@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
+import { Pending } from '../../app/Pending';
 import { Page } from '../../app/Page';
 import { useFacility, useSchedule } from '../../app/queries';
 import { useRepositories } from '../../app/repositories';
@@ -17,6 +18,7 @@ import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { NotFoundPage } from '../../app/pages';
 import layout from '../../ui/layout.module.css';
+import styles from './citizen.module.css';
 import { FacilityImage } from './FacilityImage';
 import { useCitizen, useMe } from './queries';
 
@@ -54,7 +56,7 @@ export function FacilityDetail() {
   });
 
   if (facility.isError) return <NotFoundPage />;
-  if (!facility.data) return <p aria-busy="true">{t('common:loading')}</p>;
+  if (!facility.data) return <Pending queries={[facility]} size="section" />;
 
   const f = facility.data;
   const slotMinutes = schedule.data?.slotMinutes ?? 60;
@@ -82,14 +84,17 @@ export function FacilityDetail() {
             <dd>{f.address}</dd>
           </dl>
           <p className={layout.meta}>{t('facility.capacity', { count: f.capacity })}</p>
-          <p>
-            {nextFree.data
-              ? t('facility.nextFree', {
-                  date: format.longDate(nextFree.data.date),
-                  time: format.timeRange(nextFree.data.start, nextFree.data.end),
-                })
-              : nextFree.isSuccess && t('facility.noNextFree')}
-          </p>
+          {(nextFree.data || nextFree.isSuccess) && (
+            <p className={styles.nextFree}>
+              <Icon name="clock" />
+              {nextFree.data
+                ? t('facility.nextFree', {
+                    date: format.longDate(nextFree.data.date),
+                    time: format.timeRange(nextFree.data.start, nextFree.data.end),
+                  })
+                : t('facility.noNextFree')}
+            </p>
+          )}
           <p>
             <Link href={paths.availability(f.id)} variant="primary">
               {t('facility.book')}

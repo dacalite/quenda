@@ -9,7 +9,7 @@ export interface Stat {
   detail?: ReactNode;
 }
 
-/** Key figures as cards; a description list, so each value is read with its label. */
+/** Key figures in one strip; a description list, so each value is read with its label. */
 export function StatList({ stats }: { stats: Stat[] }) {
   return (
     <dl className={styles.list}>

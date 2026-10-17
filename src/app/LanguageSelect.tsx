@@ -13,7 +13,7 @@ const OPTIONS = LANGUAGES.map((language) => ({
 }));
 
 /** The languages the council offers; all of them outside a council. */
-export function LanguageSelect() {
+export function LanguageSelect({ className }: { className?: string }) {
   const { t, i18n } = useTranslation();
   const tenant = use(TenantContext);
   return (
@@ -22,6 +22,7 @@ export function LanguageSelect() {
       options={tenant ? OPTIONS.filter((o) => tenant.languages.includes(o.id)) : OPTIONS}
       value={currentLanguage()}
       onChange={(language) => void i18n.changeLanguage(language)}
+      className={className}
     />
   );
 }

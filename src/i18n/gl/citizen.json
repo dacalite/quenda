@@ -3,7 +3,7 @@
     "label": "Menú principal",
     "home": "Inicio",
     "facilities": "Instalacións",
-    "reservations": "As miñas reservas",
+    "reservations": "Reservas",
     "notifications": "Avisos",
     "unread_one": "{{count}} sen ler",
     "unread_other": "{{count}} sen ler",
@@ -36,6 +36,8 @@
   "list": {
     "title": "Instalacións",
     "filters": "Filtros",
+    "showFilters": "Amosar os filtros",
+    "hideFilters": "Agochar os filtros",
     "search": "Nome ou tipo",
     "type": "Tipo de instalación",
     "anyType": "Todos os tipos",
@@ -82,6 +84,7 @@
     "previousDay": "Día anterior",
     "nextDay": "Día seguinte",
     "date": "Día",
+    "days": "Escolle o día",
     "subspace": "Espazo",
     "views": "Vista da dispoñibilidade",
     "dayView": "Día",
@@ -133,7 +136,7 @@
     "details": "Detalles",
     "status": "Estado",
     "payment": "Pagamento",
-    "channel": "Canal",
+    "channel": "Canle",
     "addToCalendar": "Engadir ao calendario (.ics)",
     "change": "Cambiar a hora",
     "cancel": "Cancelar a reserva",
@@ -152,8 +155,6 @@
       "noShow": "Non presentada"
     },
     "byCouncil": "{{event}} polo concello: {{reason}}",
-    "showQr": "Ver o QR",
-    "qrTitle": "Código QR da reserva",
     "notFound": "Non atopamos esta reserva."
   },
   "reservations": {
@@ -164,12 +165,13 @@
     "noUpcoming": "Non tes reservas próximas.",
     "noHistory": "Aínda non tes reservas pasadas.",
     "find": "Buscar unha instalación",
-    "view": "Ver detalles",
-    "repeat": "Repetir a reserva"
+    "repeat": "Repetir a reserva",
+    "calendar": "Engade as túas reservas ao calendario do teu móbil"
   },
   "notifications": {
     "title": "Avisos",
     "markAll": "Marcar todos como lidos",
+    "markOne": "Marcar como lido",
     "unread": "Sen ler",
     "empty": "Non tes avisos.",
     "message": {
@@ -244,7 +246,7 @@
     "howItWorks": "Como funcionaría no servizo real",
     "howItWorksBody": "O concello conectaríase con Cl@ve, do Goberno de España, e con Chave365, da Xunta de Galicia, mediante SAML 2.0 ou OpenID Connect. A aplicación nunca vería o teu contrasinal: só recibiría o teu nome e o teu DNI xa verificados.",
     "providerTitle": "{{provider}}: pasarela simulada",
-    "providerIntro": "Esta pantalla imita a pasarela de identificación. Na demostración entras como a persoa escollida na barra de demostración.",
+    "providerIntro": "Esta pantalla imita a pasarela de identificación. Na demostración entras como a persoa escollida en «Cambiar de perfil».",
     "continueAs": "Continuar como {{name}}",
     "cancel": "Cancelar",
     "signedIn": "Accediches como {{name}}."
