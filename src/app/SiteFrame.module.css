@@ -152,6 +152,6 @@
 /* The residents' tab bar sits at the bottom of small screens: the page must end above it. */
 @media (max-width: 55.99rem) and (min-height: 30rem) {
   [data-tabbar='citizen'] .footer {
-    padding-block-end: calc(var(--space-5) + 4.5rem + env(safe-area-inset-bottom));
+    padding-block-end: calc(var(--space-5) + var(--tabbar-space, 0px));
   }
 }

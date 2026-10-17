@@ -37,6 +37,17 @@ test.describe('first visit', () => {
     await expect(step(page)).toHaveCount(0);
   });
 
+  test('keeps the step clear of the tab bar on a phone', async ({ page }) => {
+    await page.goto('./bouzalonga');
+    await expectStep(page, 'Paso 1 de 7', 'Visita guiada: reservar como veciña');
+    const tabs = page.getByRole('navigation', { name: 'Menú principal' });
+    const bar = await tabs.boundingBox();
+    const dialog = await step(page).boundingBox();
+    const fixed = await tabs.evaluate((nav) => getComputedStyle(nav).position === 'fixed');
+    test.skip(!fixed, 'Only small screens have the tab bar at the bottom');
+    expect((dialog?.y ?? 0) + (dialog?.height ?? 0)).toBeLessThanOrEqual(bar?.y ?? 0);
+  });
+
   test('walks the resident through booking, keyboard only', async ({ page }) => {
     await page.goto('./bouzalonga');
     await expectStep(page, 'Paso 1 de 7', 'Visita guiada: reservar como veciña');

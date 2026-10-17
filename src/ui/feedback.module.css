@@ -72,7 +72,7 @@
 
 .toasts {
   position: fixed;
-  inset-block-end: var(--space-3);
+  inset-block-end: calc(var(--space-3) + var(--tabbar-space, 0px));
   inset-inline: var(--space-3);
   z-index: 90;
   display: flex;
