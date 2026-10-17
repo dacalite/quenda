@@ -11,7 +11,7 @@ O prototipo ten que funcionar de verdade para quen o proba (reservar, cancelar, 
 
 - O prototipo é só a parte do navegador. Todo o acceso a datos pasa por **portos** asíncronos (`src/data/ports`) coa mesma forma que a API REST: acoutados por concello e con erros tipados equivalentes aos códigos HTTP (400, 403, 404, 409 e 422).
 - Un **adaptador local** (`src/data/adapters/local`) implementa os portos sobre `localStorage` e simula o servidor: latencia de 150 a 400 ms, permisos por rol, validación, rexistro de actividade e avisos.
-- Os datos de demostración xéranse cunha semente determinista, idénticos tras cada reinicio, e renóvanse se teñen máis de sete días.
+- Os datos de demostración xéranse cunha semente determinista, idénticos tras cada reinicio, e renóvanse se teñen máis de sete días. A xeración faise nun _worker_ para que a primeira visita non bloquee a páxina nun móbil lento.
 - Un **adaptador HTTP** (`src/data/adapters/http`) implementa os mesmos portos sobre a API descrita en `docs/api/openapi.yaml`.
 - As regras de negocio (`src/domain`) son funcións puras que pode executar tamén o servidor.
 
