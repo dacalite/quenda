@@ -23,7 +23,7 @@ Proposta para o **I Certame GOBTEC de Software Libre**.
 **Concello**
 
 - Panel do día, axenda e reservas por teléfono ou no mostrador.
-- Instalacións, horarios, festivos, normas con herdanza e tarifas, sen código.
+- Instalacións con fotos (co seu texto alternativo), horarios, festivos, normas con herdanza e tarifas, sen código.
 - Bloqueos que avisan ás persoas afectadas e reservas de tempada dos clubs con detección de conflitos.
 - Control de acceso por QR, indicadores con táboas e CSV, e rexistro de actividade.
 - Configuración do nome, escudo, cor de acento (con comprobación de contraste), idiomas e textos legais.
