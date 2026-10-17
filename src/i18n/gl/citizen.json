@@ -77,7 +77,9 @@
     "closed": "Pechado",
     "nextFree": "Próxima hora libre: {{date}}, {{time}}.",
     "noNextFree": "Non hai horas libres nos próximos 7 días.",
-    "book": "Ver dispoñibilidade e reservar"
+    "book": "Ver dispoñibilidade e reservar",
+    "drawingAlt": "Debuxo: {{type}}",
+    "morePhotos": "Máis fotos"
   },
   "availability": {
     "title": "Reservar: {{name}}",

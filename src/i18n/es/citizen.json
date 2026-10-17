@@ -77,7 +77,9 @@
     "closed": "Cerrado",
     "nextFree": "Próxima hora libre: {{date}}, {{time}}.",
     "noNextFree": "No hay horas libres en los próximos 7 días.",
-    "book": "Ver disponibilidad y reservar"
+    "book": "Ver disponibilidad y reservar",
+    "drawingAlt": "Dibujo: {{type}}",
+    "morePhotos": "Más fotos"
   },
   "availability": {
     "title": "Reservar: {{name}}",

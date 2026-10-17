@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: EUPL-1.2
-import type { FacilityType } from '../../domain/types';
+import { useTranslation } from 'react-i18next';
+import { assetUrl } from '../../app/assetUrl';
+import type { FacilityType, Photo } from '../../domain/types';
+import { useLocalized } from '../../i18n/labels';
 import styles from './citizen.module.css';
 
-// Placeholder drawings: each council would upload real photos with the same alternative text.
+// Drawings for facilities without photos yet.
 const DRAWINGS: Record<FacilityType, string> = {
   sportsHall: 'M20 70h120M20 70V30h120v40M80 30v40M60 50a20 20 0 0 0 40 0',
   paddleCourt: 'M30 25h100v50H30zM80 25v50M30 50h100',
@@ -14,9 +17,30 @@ const DRAWINGS: Record<FacilityType, string> = {
   gym: 'M40 50h80M40 38v24M120 38v24M30 42v16M130 42v16',
 };
 
-export function FacilityImage({ type, alt }: { type: FacilityType; alt: string }) {
+/** The facility's photo or, when it has none, a drawing of its type. */
+export function FacilityImage({ type, photo }: { type: FacilityType; photo?: Photo | undefined }) {
+  const { t } = useTranslation(['citizen', 'domain']);
+  const localized = useLocalized();
+  if (photo) {
+    return (
+      <img
+        src={assetUrl(photo.url)}
+        alt={localized(photo.alt)}
+        className={styles.image}
+        width={800}
+        height={400}
+        loading="lazy"
+        decoding="async"
+      />
+    );
+  }
   return (
-    <svg role="img" aria-label={alt} viewBox="0 0 160 100" className={styles.image}>
+    <svg
+      role="img"
+      aria-label={t('facility.drawingAlt', { type: t(`domain:facilityType.${type}`) })}
+      viewBox="0 0 160 100"
+      className={styles.image}
+    >
       <rect width="160" height="100" fill="var(--color-primary-surface)" />
       <path
         d={DRAWINGS[type]}

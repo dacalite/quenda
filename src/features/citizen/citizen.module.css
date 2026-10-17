@@ -5,6 +5,7 @@
   width: 100%;
   height: auto;
   aspect-ratio: 2 / 1;
+  object-fit: cover;
   background: var(--color-primary-surface);
   border-radius: var(--radius-2);
 }
@@ -465,4 +466,13 @@ a.slot .slotStatus {
   .filtersToggle {
     display: none;
   }
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-3);
+  padding: 0;
+  margin: 0;
+  list-style: none;
 }

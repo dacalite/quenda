@@ -10,7 +10,6 @@ import { citizenPaths } from '../../app/routes/paths';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
 import { daypart, minutesBetween, zonedNow, type Daypart } from '../../domain/time';
 import type { AccessibilityFeature, FacilityType } from '../../domain/types';
-import { useLocalized } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { Checkbox } from '../../ui/Checkbox';
@@ -39,7 +38,6 @@ export function FacilityList() {
   const { t } = useTranslation(['citizen', 'domain', 'common']);
   const { tenant } = useCitizen();
   const paths = citizenPaths(tenant.slug);
-  const localized = useLocalized();
   const [params, setParams] = useSearchParams();
   const facilities = useFacilities();
   const availabilityQuery = useAvailabilityQuery();
@@ -239,10 +237,7 @@ export function FacilityList() {
               </>
             }
           >
-            <FacilityImage
-              type={facility.type}
-              alt={facility.photos[0] ? localized(facility.photos[0].alt) : ''}
-            />
+            <FacilityImage type={facility.type} photo={facility.photos[0]} />
             <p className={layout.meta}>
               {t(`domain:facilityType.${facility.type}`)} · {facility.address}
             </p>
