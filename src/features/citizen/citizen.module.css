@@ -134,13 +134,20 @@ a.slot .slotStatus {
 }
 
 .dayStrip {
-  display: flex;
+  display: none;
   gap: var(--space-2);
   padding: var(--space-1);
   margin: 0;
   overflow-x: auto;
   list-style: none;
   scroll-snap-type: x proximity;
+}
+
+/* On a phone the date field below is enough: the strip would only crowd the screen. */
+@media (min-width: 56rem) {
+  .dayStrip {
+    display: flex;
+  }
 }
 
 .dayStrip > li {
@@ -204,6 +211,23 @@ a.slot .slotStatus {
   flex-wrap: wrap;
   gap: var(--space-2);
   align-items: flex-end;
+}
+
+.disclosureTitle {
+  margin: 0;
+  font-size: var(--font-size-4);
+}
+
+/* The heading's own button: full size and colour of the heading, not a link-blue control. */
+.disclosureTitle > button {
+  padding-inline: 0;
+  font-size: inherit;
+  color: var(--color-text);
+  text-align: start;
+}
+
+.suggestions[hidden] {
+  display: none;
 }
 
 .suggestions {

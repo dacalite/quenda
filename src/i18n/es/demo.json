@@ -47,7 +47,7 @@
       },
       "availability": {
         "title": "Ver la disponibilidad",
-        "body": "Las horas se agrupan en mañana, tarde y noche, y cada una dice su estado y el precio. Arriba, las horas con poca gente según las últimas ocho semanas."
+        "body": "Las horas se agrupan en mañana, tarde y noche, y cada una dice su estado y el precio. Arriba puedes desplegar las horas con poca gente según las últimas ocho semanas."
       },
       "review": {
         "title": "Revisar y confirmar",

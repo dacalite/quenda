@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useQueries } from '@tanstack/react-query';
+import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { Pending } from '../../app/Pending';
@@ -92,6 +93,10 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
       replaces,
     });
 
+  // Folded at first: on a phone the slots, not the suggestions, are what most people came for.
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const suggestionsId = useId();
+
   const stripStart = addDays(date, -3) < today ? today : addDays(date, -3);
   const stripDays = Array.from({ length: 7 }, (_, i) => addDays(stripStart, i));
 
@@ -180,13 +185,25 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
 
       {recommended.length > 0 && (
         <section className={layout.panel} aria-labelledby="recommendations-title">
-          <h2 id="recommendations-title">{t('availability.recommendationsTitle')}</h2>
+          <h2 id="recommendations-title" className={styles.disclosureTitle}>
+            <Button
+              variant="quiet"
+              aria-expanded={suggestionsOpen}
+              aria-controls={suggestionsId}
+              onPress={() => {
+                setSuggestionsOpen(!suggestionsOpen);
+              }}
+            >
+              <Icon name={suggestionsOpen ? 'chevronDown' : 'chevronRight'} />
+              {t('availability.recommendationsTitle')}
+            </Button>
+          </h2>
           <p>
             {t('availability.recommendationsIntro', {
               times: format.list(recommended.map((r) => r.start).sort()),
             })}
           </p>
-          <ul className={styles.suggestions}>
+          <ul id={suggestionsId} className={styles.suggestions} hidden={!suggestionsOpen}>
             {recommended.map((r) => (
               <li key={r.start}>
                 <Link href={bookingHref(r.slot)} className={styles.suggestion}>
