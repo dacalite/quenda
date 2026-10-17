@@ -36,31 +36,33 @@ export interface Database {
 }
 
 export interface LocalDatabase {
+  /** Settles once the data has been read from storage or, on a first visit, generated. */
+  ready(): Promise<void>;
+  /** The data itself: only after `ready`, unless the seed is synchronous. */
   read(): Database;
   commit(): void;
-  reset(): void;
+  reset(): Promise<void>;
 }
 
 export function createLocalDatabase(
   storage: Storage | null,
   key: string,
-  seed: () => Database,
+  seed: () => Database | Promise<Database>,
   /** Stored data that should be replaced by a fresh seed, e.g. a demo opened weeks later. */
   isStale: (db: Database) => boolean = () => false,
 ): LocalDatabase {
   let data: Database | null = null;
+  let pending: Promise<void> | null = null;
 
-  const load = (): { data: Database; fresh: boolean } => {
+  const stored = (): Database | null => {
     try {
-      const stored = storage?.getItem(key);
-      const parsed = stored ? (JSON.parse(stored) as Database) : null;
-      if (parsed?.version === SCHEMA_VERSION && !isStale(parsed)) {
-        return { data: parsed, fresh: false };
-      }
+      const text = storage?.getItem(key);
+      const parsed = text ? (JSON.parse(text) as Database) : null;
+      if (parsed?.version === SCHEMA_VERSION && !isStale(parsed)) return parsed;
     } catch {
       // Corrupt or unreadable data: start again from the seed.
     }
-    return { data: seed(), fresh: true };
+    return null;
   };
 
   const commit = () => {
@@ -71,20 +73,42 @@ export function createLocalDatabase(
     }
   };
 
+  // Saving a fresh seed takes a while; doing it later keeps the first screen responsive.
+  const settle = (fresh: Database) => {
+    data = fresh;
+    setTimeout(commit, 0);
+  };
+
+  /** Loads in place when it can, so a synchronous seed is readable straight away. */
+  const load = (): Promise<void> => {
+    const found = stored();
+    if (found) {
+      data = found;
+      return Promise.resolve();
+    }
+    const fresh = seed();
+    if (fresh instanceof Promise) return fresh.then(settle);
+    settle(fresh);
+    return Promise.resolve();
+  };
+
+  const ready = () => (pending ??= load());
+
   return {
+    ready,
     read: () => {
-      if (!data) {
-        const loaded = load();
-        data = loaded.data;
-        // Saving a fresh seed takes a while; doing it later keeps the first screen responsive.
-        if (loaded.fresh) setTimeout(commit, 0);
-      }
+      if (!data) void ready();
+      if (!data) throw new Error('The demo data is still being generated');
       return data;
     },
     commit,
     reset: () => {
-      data = seed();
-      commit();
+      data = null;
+      pending = Promise.resolve(seed()).then((fresh) => {
+        data = fresh;
+        commit();
+      });
+      return pending;
     },
   };
 }

@@ -761,10 +761,29 @@ describe('adapter behaviour', () => {
     const second = setup({ storage, userId: uxia.userId });
     expect((await second.repos.reservations.get(B, reservation.id)).code).toBe(reservation.code);
 
-    second.db.reset();
+    // Calls made while the reset runs wait for it.
+    void second.db.reset();
     await expect(second.repos.reservations.get(B, reservation.id)).rejects.toBeInstanceOf(
       NotFoundError,
     );
+  });
+
+  it('waits for a seed generated asynchronously, e.g. in a worker', async () => {
+    let finish: (db: Database) => void = () => undefined;
+    const db = createLocalDatabase(
+      null,
+      'async',
+      () =>
+        new Promise<Database>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const repos = createLocalRepositories({ db, session: () => null, latency: false });
+    const tenants = repos.tenants.list();
+    expect(() => db.read()).toThrow();
+    finish(structuredClone(SEED));
+    expect(await tenants).toHaveLength(2);
+    expect(db.read().generatedFor).toBe(TODAY);
   });
 
   it('starts again from the seed when stored data is corrupt or outdated', async () => {

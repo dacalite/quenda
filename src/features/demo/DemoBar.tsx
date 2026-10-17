@@ -128,9 +128,10 @@ export function DemoBar() {
               confirmLabel={t('reset.confirm')}
               tone="danger"
               onConfirm={() => {
-                resetDemoData();
-                void queryClient.resetQueries();
-                toast(t('reset.done'));
+                void resetDemoData().then(() => {
+                  void queryClient.resetQueries();
+                  toast(t('reset.done'));
+                });
               }}
             >
               {t('reset.body')}

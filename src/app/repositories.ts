@@ -4,7 +4,8 @@ import { APP_NAME } from '../config/app';
 import { createLocalDatabase } from '../data/adapters/local/database';
 import { createLocalRepositories } from '../data/adapters/local/repositories';
 import type { Repositories } from '../data/ports/repositories';
-import { generateSeed, personaUsers } from '../data/seed/generate';
+import { personaUsers } from '../data/seed/generate';
+import { generateSeedInWorker } from '../data/seed/inWorker';
 import { daysBetween, zonedNow } from '../domain/time';
 import { currentSession } from './state';
 
@@ -24,7 +25,7 @@ const storage = (() => {
 const db = createLocalDatabase(
   storage,
   `${APP_NAME}.db`,
-  () => generateSeed(today()),
+  () => generateSeedInWorker(today()),
   (stored) => daysBetween(stored.generatedFor, today()) > STALE_AFTER_DAYS,
 );
 
@@ -34,9 +35,7 @@ export const localRepositories = createLocalRepositories({
   initialUsers: personaUsers,
 });
 
-export const resetDemoData = () => {
-  db.reset();
-};
+export const resetDemoData = () => db.reset();
 
 export const RepositoriesContext = createContext<Repositories>(localRepositories);
 
