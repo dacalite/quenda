@@ -19,6 +19,8 @@ export interface SiteFrameProps {
   surface?: Surface;
   nav?: ReactNode;
   session?: ReactNode;
+  /** Extra controls at the start of the top strip, e.g. the demo's profile switcher. */
+  tools?: ReactNode;
   footerLinks?: { href: string; label: string }[];
   footerLabel?: string;
   children: ReactNode;
@@ -31,6 +33,7 @@ export function SiteFrame({
   surface = 'citizen',
   nav,
   session,
+  tools,
   footerLinks = [],
   footerLabel,
   children,
@@ -42,6 +45,7 @@ export function SiteFrame({
         <header className={styles.header}>
           <div className={styles.utility}>
             <div className={styles.inner}>
+              {tools}
               <LanguageSelect className={styles.language} />
               <PreferencesDialog />
             </div>

@@ -22,7 +22,6 @@ async function signedInAs(page: Page, citizen = 'uxia') {
           role: 'citizen',
           citizen: persona,
           staff: 'carme',
-          collapsed: true,
           signedIn: true,
         },
         version: 0,

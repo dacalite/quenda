@@ -56,7 +56,11 @@ test('opening the deputación area acts as the deputación', async ({ page }) =>
   await expect(heading(page)).toBeVisible();
   await page.goto('./deputacion');
   await expect(heading(page)).toHaveText('Concellos adheridos');
-  await expect(page.getByRole('button', { name: /Ver como$/ })).toContainText('Deputación');
+  await page.getByRole('button', { name: 'Cambiar de perfil' }).click();
+  await expect(page.getByRole('dialog').getByRole('link', { name: 'Deputación' })).toHaveAttribute(
+    'aria-current',
+    'true',
+  );
 });
 
 test('a council signed up with the keyboard takes bookings straight away', async ({ page }) => {

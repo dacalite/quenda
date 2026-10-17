@@ -16,14 +16,12 @@ interface DemoState {
   staff: StaffPersona;
   /** Council being shown, set from the URL. */
   tenantId: Id | null;
-  collapsed: boolean;
   /** Residents sign in through the simulated Cl@ve or Chave365 screen. */
   signedIn: boolean;
   setRole: (role: DemoRole) => void;
   setCitizen: (persona: CitizenPersona) => void;
   setStaff: (persona: StaffPersona) => void;
   setTenantId: (tenantId: Id | null) => void;
-  setCollapsed: (collapsed: boolean) => void;
   setSignedIn: (signedIn: boolean) => void;
 }
 
@@ -34,7 +32,6 @@ export const useDemo = create<DemoState>()(
       citizen: 'uxia',
       staff: 'carme',
       tenantId: null,
-      collapsed: false,
       signedIn: false,
       setRole: (role) => {
         set({ role });
@@ -48,20 +45,16 @@ export const useDemo = create<DemoState>()(
       setTenantId: (tenantId) => {
         set({ tenantId });
       },
-      setCollapsed: (collapsed) => {
-        set({ collapsed });
-      },
       setSignedIn: (signedIn) => {
         set({ signedIn });
       },
     }),
     {
       name: `${APP_NAME}.demo`,
-      partialize: ({ role, citizen, staff, collapsed, signedIn }) => ({
+      partialize: ({ role, citizen, staff, signedIn }) => ({
         role,
         citizen,
         staff,
-        collapsed,
         signedIn,
       }),
     },
@@ -104,8 +97,9 @@ export const usePreferences = create<PreferencesState>()(
 interface TourState {
   /** Roles whose guided tour has already been offered, so it only opens by itself once. */
   seen: DemoRole[];
-  active: { role: DemoRole; step: number } | null;
-  start: (role: DemoRole) => void;
+  /** `returnTo`: id of the control that gets the focus back when the tour ends. */
+  active: { role: DemoRole; step: number; returnTo?: string | undefined } | null;
+  start: (role: DemoRole, returnTo?: string) => void;
   go: (step: number) => void;
   stop: () => void;
 }
@@ -115,9 +109,9 @@ export const useTour = create<TourState>()(
     (set) => ({
       seen: [],
       active: null,
-      start: (role) => {
+      start: (role, returnTo) => {
         set(({ seen }) => ({
-          active: { role, step: 0 },
+          active: { role, step: 0, returnTo },
           seen: seen.includes(role) ? seen : [...seen, role],
         }));
       },

@@ -1,0 +1,27 @@
+/* SPDX-License-Identifier: EUPL-1.2 */
+
+.notice {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-warning);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.details > h3 {
+  margin: 0;
+  font-size: var(--font-size-3);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

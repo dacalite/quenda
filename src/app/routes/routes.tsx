@@ -35,7 +35,8 @@ import {
   Settings,
   SignIn,
 } from './screens';
-import { AppShell, DeputacionLayout, RedirectToDemoStart, TenantLayout } from './layouts';
+import { ProfileChooser } from '../../features/demo/ProfileChooser';
+import { AppShell, DeputacionLayout, TenantLayout } from './layouts';
 import { ADMIN_PATH, DEPUTACION_PATH, LEGAL_PAGES } from './paths';
 
 const personal = (element: React.ReactNode) => <RequireCitizen>{element}</RequireCitizen>;
@@ -45,7 +46,7 @@ export const routes: RouteObject[] = [
   {
     element: <AppShell />,
     children: [
-      { index: true, element: <RedirectToDemoStart /> },
+      { index: true, element: <ProfileChooser /> },
       {
         path: DEPUTACION_PATH,
         element: <DeputacionLayout />,

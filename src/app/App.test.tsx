@@ -34,7 +34,10 @@ async function choose(label: string | RegExp, option: string) {
   await userEvent.click(await screen.findByRole('option', { name: option }));
 }
 
-const demoBar = () => within(screen.getByRole('region', { name: 'Controis da demostración' }));
+async function openSwitcher() {
+  await userEvent.click(screen.getByRole('button', { name: 'Cambiar de perfil' }));
+  return within(await screen.findByRole('dialog', { name: 'Cambiar de perfil' }));
+}
 
 beforeEach(() => {
   localStorage.clear();
@@ -43,7 +46,6 @@ beforeEach(() => {
     citizen: 'uxia',
     staff: 'carme',
     tenantId: null,
-    collapsed: false,
     signedIn: false,
   });
   usePreferences.setState({ textSize: 'normal', highContrast: false, reducedMotion: false });
@@ -55,8 +57,19 @@ afterEach(async () => {
 });
 
 describe('app shell', () => {
-  it('opens the first council as a citizen, with a complete, accessible page', async () => {
+  it('starts on the profile chooser, which opens the first council as a citizen', async () => {
     renderApp();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Como queres probar Quenda?' }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual([
+      'Cidadanía',
+      'Persoal do concello',
+      'Deputación',
+    ]);
+    await expectNoAxeViolations();
+
+    await userEvent.click(screen.getByRole('link', { name: 'Cidadanía' }));
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Reserva de instalacións deportivas' }),
     ).toBeInTheDocument();
@@ -75,9 +88,11 @@ describe('app shell', () => {
     await expectNoAxeViolations();
   });
 
-  it('switches council from the demo bar, moving focus to the new heading', async () => {
+  it('switches council from the profile dialog, moving focus to the new heading', async () => {
     renderApp('/bouzalonga');
     await screen.findByRole('heading', { level: 1 });
+    await openSwitcher();
+    await expectNoAxeViolations();
     await choose(/Concello/, 'Concello de Ribasmeiras');
 
     await waitFor(() => {
@@ -92,24 +107,32 @@ describe('app shell', () => {
     renderApp('/ribasmeiras');
     await screen.findByRole('heading', { level: 1 });
 
-    await choose(/Ver como/, 'Persoal do concello');
+    await userEvent.click(
+      (await openSwitcher()).getByRole('link', { name: 'Persoal do concello' }),
+    );
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Panel de xestión' }),
     ).toHaveFocus();
     expect(sessionUserId()).toBe('ribasmeiras-carme');
 
-    await choose(/Ver como/, 'Deputación');
+    await userEvent.click((await openSwitcher()).getByRole('link', { name: 'Deputación' }));
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Concellos adheridos' }),
     ).toBeInTheDocument();
     expect(document.title).toBe('Concellos adheridos · Deputación de Exemplo');
-    expect(demoBar().queryByRole('button', { name: /Concello/ })).not.toBeInTheDocument();
+    const dialog = await openSwitcher();
+    expect(dialog.getByRole('link', { name: 'Deputación' })).toHaveAttribute(
+      'aria-current',
+      'true',
+    );
+    expect(dialog.queryByRole('button', { name: /Concello/ })).not.toBeInTheDocument();
   });
 
   it('gives Manuel large text when he becomes the demo persona', async () => {
     useDemo.setState({ signedIn: true });
     renderApp('/bouzalonga');
     await screen.findByRole('heading', { level: 1 });
+    await openSwitcher();
     await choose(/Persoa/, 'Manuel, 72 anos, empadroado, usa lector de pantalla');
     await waitFor(() => {
       expect(document.documentElement.dataset.textSize).toBe('large');
@@ -130,9 +153,9 @@ describe('app shell', () => {
     ).toBeInTheDocument();
     expect(document.documentElement.lang).toBe('es');
     expect(screen.getByRole('link', { name: 'Saltar al contenido' })).toBeInTheDocument();
-    expect(
-      screen.getByRole('region', { name: 'Controles de la demostración' }),
-    ).toBeInTheDocument();
+    await openSwitcher();
+    expect(screen.getByText('Prototipo con datos simulados')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Personal del ayuntamiento' })).toBeInTheDocument();
   });
 
   it('applies display preferences to the whole document', async () => {
@@ -150,21 +173,12 @@ describe('app shell', () => {
     expect([root.textSize, root.contrast, root.motion]).toEqual(['xlarge', 'high', 'reduced']);
   });
 
-  it('collapses the demo controls but keeps the prototype notice visible', async () => {
-    renderApp('/bouzalonga');
-    await screen.findByRole('heading', { level: 1 });
-    const toggle = demoBar().getByRole('button', { name: 'Ocultar os controis da demostración' });
-    expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    await userEvent.click(toggle);
-    expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    expect(demoBar().queryByRole('button', { name: /Ver como/ })).not.toBeInTheDocument();
-    expect(demoBar().getByText('Prototipo con datos simulados')).toBeVisible();
-  });
-
   it('asks before resetting the demo and confirms it afterwards', async () => {
     renderApp('/bouzalonga');
     await screen.findByRole('heading', { level: 1 });
-    await userEvent.click(demoBar().getByRole('button', { name: 'Reiniciar a demostración' }));
+    await userEvent.click(
+      (await openSwitcher()).getByRole('button', { name: 'Reiniciar a demostración' }),
+    );
     await screen.findByRole('alertdialog', { name: 'Reiniciar a demostración?' });
     await userEvent.click(screen.getByRole('button', { name: 'Reiniciar' }));
     expect(

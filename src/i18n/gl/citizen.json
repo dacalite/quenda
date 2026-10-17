@@ -246,7 +246,7 @@
     "howItWorks": "Como funcionaría no servizo real",
     "howItWorksBody": "O concello conectaríase con Cl@ve, do Goberno de España, e con Chave365, da Xunta de Galicia, mediante SAML 2.0 ou OpenID Connect. A aplicación nunca vería o teu contrasinal: só recibiría o teu nome e o teu DNI xa verificados.",
     "providerTitle": "{{provider}}: pasarela simulada",
-    "providerIntro": "Esta pantalla imita a pasarela de identificación. Na demostración entras como a persoa escollida na barra de demostración.",
+    "providerIntro": "Esta pantalla imita a pasarela de identificación. Na demostración entras como a persoa escollida en «Cambiar de perfil».",
     "continueAs": "Continuar como {{name}}",
     "cancel": "Cancelar",
     "signedIn": "Accediches como {{name}}."

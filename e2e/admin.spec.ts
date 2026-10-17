@@ -29,7 +29,7 @@ async function asStaff(page: Page, staff: 'carme' | 'xose' = 'carme') {
     localStorage.setItem(
       'quenda.demo',
       JSON.stringify({
-        state: { role: 'staff', citizen: 'uxia', staff: persona, collapsed: true, signedIn: false },
+        state: { role: 'staff', citizen: 'uxia', staff: persona, signedIn: false },
         version: 0,
       }),
     );

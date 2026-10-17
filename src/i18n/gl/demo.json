@@ -1,10 +1,21 @@
 {
-  "region": "Controis da demostración",
   "notice": "Prototipo con datos simulados",
-  "show": "Amosar os controis da demostración",
-  "hide": "Ocultar os controis da demostración",
+  "chooser": {
+    "title": "Como queres probar Quenda?",
+    "intro": "É un prototipo con datos simulados: o que fagas queda só neste navegador. Escolle un perfil para empezar; podes cambialo cando queiras co botón «Cambiar de perfil» da parte superior."
+  },
+  "roleCard": {
+    "citizen": "Busca unha instalación, reserva unha hora libre desde o móbil e xestiona as túas reservas e avisos.",
+    "staff": "O día a día do concello: axenda, reservas por teléfono, control de acceso, instalacións e indicadores.",
+    "deputacion": "Os concellos adheridos, os seus indicadores comparados e o alta dun concello novo.",
+    "current": "Perfil actual"
+  },
+  "switcher": {
+    "open": "Cambiar de perfil",
+    "short": "Perfil",
+    "details": "Persoa e concello"
+  },
   "role": {
-    "label": "Ver como",
     "citizen": "Cidadanía",
     "staff": "Persoal do concello",
     "deputacion": "Deputación"

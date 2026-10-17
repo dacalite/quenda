@@ -2,14 +2,14 @@
 import { Suspense, useEffect, useEffectEvent } from 'react';
 import { RouterProvider as AriaRouterProvider } from 'react-aria-components';
 import { useTranslation } from 'react-i18next';
-import { Navigate, Outlet, useHref, useNavigate, useParams } from 'react-router';
+import { Outlet, useHref, useNavigate, useParams } from 'react-router';
 import { APP_DISPLAY_NAME } from '../../config/app';
 import { NotFoundError } from '../../data/ports/errors';
 import { DEPUTACION } from '../../data/seed/catalog';
 import { StaffNav, StaffSession } from '../../features/admin/StaffNav';
 import { CitizenNav, CitizenSession } from '../../features/citizen/CitizenNav';
-import { DemoBar } from '../../features/demo/DemoBar';
 import { GuidedTour } from '../../features/demo/GuidedTour';
+import { ProfileSwitcher } from '../../features/demo/ProfileSwitcher';
 import { DeputacionNav, DeputacionSession } from '../../features/deputacion/DeputacionNav';
 import { currentLanguage } from '../../i18n';
 import { accessibleColor } from '../../ui/contrast';
@@ -17,10 +17,10 @@ import { SkipLink } from '../../ui/SkipLink';
 import { TenantContext } from '../contexts';
 import { ErrorPage, NotFoundPage } from '../pages';
 import { Pending } from '../Pending';
-import { useTenantBySlug, useTenants } from '../queries';
+import { useTenantBySlug } from '../queries';
 import { SiteFrame } from '../SiteFrame';
 import { useDemo, usePreferences } from '../state';
-import { citizenPaths, deputacionPaths, LEGAL_PAGES, roleHome } from './paths';
+import { citizenPaths, deputacionPaths, LEGAL_PAGES } from './paths';
 
 function useApplyPreferences() {
   const { textSize, highContrast, reducedMotion } = usePreferences();
@@ -51,31 +51,14 @@ export function AppShell() {
       useHref={useAppHref}
     >
       <SkipLink targetId="main">{t('skipLink')}</SkipLink>
-      <DemoBar />
       <Outlet />
       <GuidedTour />
     </AriaRouterProvider>
   );
 }
 
-export function RedirectToDemoStart() {
-  const tenants = useTenants();
-  const role = useDemo((state) => state.role);
-  const first = tenants.data?.[0];
-  if (first) return <Navigate to={roleHome(role, first.slug)} replace />;
-  return <LoadingFrame />;
-}
-
 function Loading() {
   return <Pending size="section" />;
-}
-
-function LoadingFrame() {
-  return (
-    <SiteFrame name={APP_DISPLAY_NAME} homeHref="/">
-      <Loading />
-    </SiteFrame>
-  );
 }
 
 export function TenantLayout() {
@@ -113,6 +96,7 @@ export function TenantLayout() {
         emblem={tenant.data?.emblem}
         homeHref={tenant.data ? `/${tenant.data.slug}` : '/'}
         surface={role === 'citizen' ? 'citizen' : 'staff'}
+        tools={<ProfileSwitcher />}
         nav={
           tenant.data ? (
             role === 'citizen' ? (
@@ -176,6 +160,7 @@ export function DeputacionLayout() {
       name={DEPUTACION.name}
       homeHref={deputacionPaths.home}
       surface="staff"
+      tools={<ProfileSwitcher />}
       nav={role === 'deputacion' ? <DeputacionNav /> : undefined}
       session={role === 'deputacion' ? <DeputacionSession /> : undefined}
     >

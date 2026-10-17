@@ -111,12 +111,13 @@ test.describe('first visit', () => {
   });
 });
 
-test('reopens from the demo bar and gives the focus back to it', async ({ page }) => {
+test('reopens from the profile dialog and gives the focus back to its button', async ({ page }) => {
   await page.goto('./ribasmeiras');
   await expect(heading(page)).toBeVisible();
-  const open = page.getByRole('button', { name: 'Visita guiada' });
-  await open.click();
+  const switcher = page.getByRole('button', { name: 'Cambiar de perfil' });
+  await switcher.click();
+  await page.getByRole('button', { name: 'Visita guiada' }).click();
   await expectStep(page, 'Paso 1 de 7', 'Visita guiada: reservar como veciña');
   await page.keyboard.press('Escape');
-  await expect(open).toBeFocused();
+  await expect(switcher).toBeFocused();
 });

@@ -35,7 +35,7 @@
 
 .language button {
   width: auto;
-  min-width: 7.5rem;
+  min-width: 0;
   padding-block: 0;
   border-width: var(--border-width);
 }

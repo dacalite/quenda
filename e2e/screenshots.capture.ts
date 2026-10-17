@@ -24,7 +24,7 @@ async function prepare(page: Page, role: Role) {
       localStorage.setItem(
         'quenda.demo',
         JSON.stringify({
-          state: { role, citizen: 'uxia', staff: 'carme', collapsed: true, signedIn: true },
+          state: { role, citizen: 'uxia', staff: 'carme', signedIn: true },
           version: 0,
         }),
       );
