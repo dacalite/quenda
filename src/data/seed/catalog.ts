@@ -198,16 +198,17 @@ export const TENANTS: TenantSeed[] = [
           entitiesFree: true,
         },
         photoAlt: text(
-          'Pista interior do pavillón con liñas de baloncesto e fútbol sala e gradas ao fondo.',
-          'Pista interior del pabellón con líneas de baloncesto y fútbol sala y gradas al fondo.',
+          'Pista interior baleira, gris azulada, con liñas de varios deportes e canastras na parede do fondo.',
+          'Pista interior vacía, gris azulada, con líneas de varios deportes y canastas en la pared del fondo.',
         ),
+        photoFile: 'pavillon-bouzalonga.webp',
       }),
       facility('padel', 60, HALL_HOURS, 1, {
         name: 'Pista de pádel do Campo da Feira',
         type: 'paddleCourt',
         description: text(
-          'Pista de pádel exterior cuberta, con céspede artificial e iluminación.',
-          'Pista de pádel exterior cubierta, con césped artificial e iluminación.',
+          'Pista de pádel exterior con paredes de vidro, céspede artificial e iluminación.',
+          'Pista de pádel exterior con paredes de cristal, césped artificial e iluminación.',
         ),
         address: 'Rúa do Campo da Feira, 6, Bouzalonga',
         coordinates: { lat: 42.7615, lng: -8.1929 },
@@ -222,9 +223,10 @@ export const TENANTS: TenantSeed[] = [
           entitiesFree: true,
         },
         photoAlt: text(
-          'Pista de pádel con paredes de vidro baixo unha cuberta metálica.',
-          'Pista de pádel con paredes de cristal bajo una cubierta metálica.',
+          'Pista de pádel ao aire libre con paredes de vidro e céspede artificial verde, rodeada de árbores.',
+          'Pista de pádel al aire libre con paredes de cristal y césped artificial verde, rodeada de árboles.',
         ),
+        photoFile: 'padel-bouzalonga.webp',
       }),
       facility('tenis', 60, HALL_HOURS, 0.5, {
         name: 'Pista de tenis do Souto',
@@ -249,6 +251,7 @@ export const TENANTS: TenantSeed[] = [
           'Pista de tenis verde con rede central e árbores arredor.',
           'Pista de tenis verde con red central y árboles alrededor.',
         ),
+        photoFile: 'tenis-bouzalonga.webp',
       }),
       facility('campo', 90, PITCH_HOURS, 0.5, {
         name: 'Campo de fútbol municipal',
@@ -270,9 +273,10 @@ export const TENANTS: TenantSeed[] = [
           entitiesFree: true,
         },
         photoAlt: text(
-          'Campo de herba artificial visto desde a bancada, coas porterías nos extremos.',
-          'Campo de césped artificial visto desde la grada, con las porterías en los extremos.',
+          'Campo de herba artificial visto a través do valado, con xente xogando ao lonxe.',
+          'Campo de césped artificial visto a través de la valla, con gente jugando a lo lejos.',
         ),
+        photoFile: 'campo-bouzalonga.webp',
       }),
       facility('sala', 60, ROOM_HOURS, 0.35, {
         name: 'Sala multiusos da Casa da Cultura',
@@ -415,9 +419,10 @@ export const TENANTS: TenantSeed[] = [
           entitiesFree: true,
         },
         photoAlt: text(
-          'Dúas pistas de pádel contiguas con céspede azul baixo unha cuberta.',
-          'Dos pistas de pádel contiguas con césped azul bajo una cubierta.',
+          'Pista de pádel azul con paredes de vidro baixo unha cuberta de lona; dúas persoas xogan ao fondo.',
+          'Pista de pádel azul con paredes de cristal bajo una cubierta de lona; dos personas juegan al fondo.',
         ),
+        photoFile: 'padel-ribeira.webp',
       }),
       facility('tenis', 60, HALL_HOURS, 0.6, {
         name: 'Pista de tenis do Malecón',
@@ -498,9 +503,10 @@ export const TENANTS: TenantSeed[] = [
           entitiesFree: true,
         },
         photoAlt: text(
-          'Piscina cuberta de seis rúas separadas por cordas, con grandes ventás.',
-          'Piscina cubierta de seis calles separadas por corcheras, con grandes ventanales.',
+          'Piscina cuberta con rúas separadas por cordas, bancadas azuis nun lateral e grandes ventás.',
+          'Piscina cubierta con calles separadas por corcheras, gradas azules en un lateral y grandes ventanales.',
         ),
+        photoFile: 'piscina-ribeira.webp',
       }),
       facility('sala', 60, ROOM_HOURS, 0.3, {
         name: 'Sala multiusos do Centro Social',
@@ -553,9 +559,10 @@ export const TENANTS: TenantSeed[] = [
           entitiesFree: true,
         },
         photoAlt: text(
-          'Ximnasio con cintas de correr diante dunha cristaleira e zona de pesos.',
-          'Gimnasio con cintas de correr delante de una cristalera y zona de pesas.',
+          'Fila de cintas de correr sobre chan vermello diante dunha cristaleira.',
+          'Fila de cintas de correr sobre suelo rojo delante de una cristalera.',
         ),
+        photoFile: 'ximnasio-ribeira.webp',
       }),
     ],
     entities: [

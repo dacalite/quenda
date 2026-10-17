@@ -214,10 +214,10 @@ test('a facility photo needs its alternative text and then shows to residents', 
   page,
 }) => {
   await asStaff(page);
-  await open(page, '/instalacions/ribasmeiras-padel');
+  await open(page, '/instalacions/ribasmeiras-sala');
   await page
     .locator('input[type="file"]')
-    .setInputFiles({ name: 'pista.png', mimeType: 'image/png', buffer: PHOTO });
+    .setInputFiles({ name: 'sala.png', mimeType: 'image/png', buffer: PHOTO });
   await expect(page.getByRole('group', { name: 'Foto 1' })).toBeVisible();
   await expect(toasts(page)).toContainText('Foto engadida');
   await expectNoAxeViolations(page);
@@ -227,16 +227,14 @@ test('a facility photo needs its alternative text and then shows to residents', 
   await expect(page.getByRole('heading', { name: 'Hai 2 erros no formulario' })).toBeVisible();
   await page.getByRole('link', { name: /Texto alternativo da foto 1 en galego/ }).click();
   await expect(page.getByLabel('Texto alternativo en galego')).toBeFocused();
-  await page.keyboard.type('Pistas de pádel cubertas co valado novo');
-  await page
-    .getByLabel('Texto alternativo en castelán')
-    .fill('Pistas de pádel cubiertas con la valla nueva');
+  await page.keyboard.type('Sala multiusos con cadeiras apiladas');
+  await page.getByLabel('Texto alternativo en castelán').fill('Sala multiusos con sillas apiladas');
   await save.click();
   await expect(toasts(page)).toContainText('Cambios gardados.');
 
-  await page.goto('./ribasmeiras/instalacions/ribasmeiras-padel');
+  await page.goto('./ribasmeiras/instalacions/ribasmeiras-sala');
   await expect(
-    page.getByRole('img', { name: 'Pistas de pádel cubertas co valado novo' }),
+    page.getByRole('img', { name: 'Sala multiusos con cadeiras apiladas' }),
   ).toBeVisible();
 });
 

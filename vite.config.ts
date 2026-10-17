@@ -38,7 +38,7 @@ export default defineConfig({
       },
       // The whole interface and the local data work offline once loaded.
       workbox: {
-        globPatterns: ['**/*.{js,css,html,woff2,svg,png}'],
+        globPatterns: ['**/*.{js,css,html,woff2,svg,png,webp}'],
         navigateFallback: 'index.html',
       },
     }),

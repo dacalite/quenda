@@ -119,3 +119,5 @@ As achegas son benvidas. Le a [guía para contribuír](CONTRIBUTING.md) e o [có
 ## Licenza
 
 [EUPL-1.2](LICENSE). Software libre: podes usalo, estudalo, modificalo e redistribuílo, e as melloras que publiques seguen sendo libres.
+
+As fotos de exemplo das instalacións teñen as súas propias licenzas Creative Commons, indicadas en [public/photos/CREDITS.md](public/photos/CREDITS.md).
