@@ -1,42 +1,103 @@
+<div align="center">
+
+<img src="public/icons/icon.svg" width="88" height="88" alt="">
+
 # Quenda
 
+**Reserva de instalacións deportivas municipais, libre e accesible.**
+
+Proposta para o I Certame GOBTEC de Software Libre
+
+[![Licenza EUPL-1.2](https://img.shields.io/badge/licenza-EUPL--1.2-0b5cad)](LICENSE)
+[![WCAG 2.1 AA](https://img.shields.io/badge/WCAG_2.1-AA-0b5cad)](docs/accesibilidade/criterios.md)
+[![Galego e castelán](https://img.shields.io/badge/idiomas-galego_·_castelán-0b5cad)](src/i18n)
+[![CI](https://github.com/dacalite/quenda/actions/workflows/ci.yml/badge.svg)](https://github.com/dacalite/quenda/actions/workflows/ci.yml)
+
+**[Probar a demostración](https://dacalite.github.io/quenda/)** · [Ver o vídeo](https://drive.google.com/file/d/17YjD5p25-TKYCOU9gqyLJfKe3WNKlxGY/view) · [Documentación](docs)
+
+<a href="https://drive.google.com/file/d/17YjD5p25-TKYCOU9gqyLJfKe3WNKlxGY/view"><img src="docs/capturas/readme/video.jpg" width="640" alt="Ver o vídeo de presentación de Quenda (35 segundos)"></a>
+
+</div>
+
+> [!NOTE]
 > **Prototipo con datos simulados.** Non hai servidor: os datos gárdanse no teu navegador e volven ao estado inicial ao reiniciar a demostración.
 
 Quenda (en galego, «turno») é unha plataforma libre para reservar as instalacións deportivas municipais, pensada para concellos e deputacións. A veciñanza consulta e reserva desde o móbil; o concello xestiona instalacións, horarios, normas e reservas por teléfono; e a deputación ofrece o servizo a varios concellos desde unha soa instalación. Está deseñada para cumprir as WCAG 2.1 AA desde o primeiro compoñente.
 
-Proposta para o **I Certame GOBTEC de Software Libre**.
+## Capturas
 
-**Demostración:** <https://dacalite.github.io/quenda/>
+<table>
+  <tr>
+    <td align="center" width="25%"><img src="docs/capturas/readme/mobil-01-inicio.png" width="190" alt="Inicio do Concello de Bouzalonga no móbil, co buscador e os tipos de instalación"><br><sub>Inicio</sub></td>
+    <td align="center" width="25%"><img src="docs/capturas/readme/mobil-03-franxas.png" width="190" alt="Reserva dunha pista de pádel no móbil: día, horas con pouca xente e franxas"><br><sub>Horas libres</sub></td>
+    <td align="center" width="25%"><img src="docs/capturas/readme/mobil-04-confirmacion.png" width="190" alt="Reserva confirmada no móbil, co código e o QR nun pase"><br><sub>Pase con QR</sub></td>
+    <td align="center" width="25%"><img src="docs/capturas/readme/mobil-14-calendario.png" width="190" alt="Calendario persoal no móbil, cos días con reservas marcados"><br><sub>Calendario persoal</sub></td>
+  </tr>
+</table>
 
-<img src="docs/capturas/mobil/03-franxas.png" width="260" alt="Dispoñibilidade dunha pista de pádel no móbil: tira cos próximos días, horas recomendadas e barra de lapelas">
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="docs/capturas/readme/escritorio-06-panel.png" alt="Panel de xestión do Concello de Ribasmeiras: cifras clave, accesos rápidos e reservas de hoxe"><br><sub>Panel do concello</sub></td>
+    <td align="center" width="50%"><img src="docs/capturas/readme/escritorio-09-indicadores.png" alt="Indicadores do concello: resumo do período e ocupación por instalación"><br><sub>Indicadores</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/capturas/readme/escritorio-10-configuracion.png" alt="Configuración do concello: nome, escudo e cor corporativa con comprobación de contraste"><br><sub>Configuración sen código</sub></td>
+    <td align="center"><img src="docs/capturas/readme/escritorio-11-deputacion.png" alt="Vista da deputación cos concellos adheridos"><br><sub>Deputación</sub></td>
+  </tr>
+</table>
+
+Todas as pantallas completas, en móbil e escritorio, están en [`docs/capturas`](docs/capturas) e xéranse con `npm run screenshots`.
 
 ## Que se pode facer
 
-**Cidadanía**
+<table>
+  <tr>
+    <th width="34%">Cidadanía</th>
+    <th width="33%">Concello</th>
+    <th width="33%">Deputación</th>
+  </tr>
+  <tr valign="top">
+    <td>
+      <ul>
+        <li>Buscar por tipo, día, franxa, accesibilidade física ou dispoñibilidade inmediata.</li>
+        <li>Ver as franxas libres, coas horas de menos xente recomendadas.</li>
+        <li>Reservar, cambiar e cancelar coas normas e o prezo visibles, e recibir un QR.</li>
+        <li>Calendario mensual coas propias reservas e envío a Google Calendar, Outlook ou .ics.</li>
+        <li>Historial, avisos do concello e descarga dos propios datos.</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>Panel do día, axenda e reservas por teléfono ou no mostrador.</li>
+        <li>Instalacións con fotos, horarios, festivos, normas e tarifas, sen código.</li>
+        <li>Bloqueos que avisan ás persoas afectadas e reservas de tempada dos clubs.</li>
+        <li>Control de acceso por QR, indicadores con CSV e rexistro de actividade.</li>
+        <li>Nome, escudo, cor, idiomas e textos legais configurables.</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>Concellos adheridos nunha instancia compartida.</li>
+        <li>Indicadores comparados entre concellos.</li>
+        <li>Alta dun concello novo en tres pasos, listo para recibir reservas.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
 
-- Buscar instalacións por tipo, día, franxa, accesibilidade física ou dispoñibilidade inmediata.
-- Ver a dispoñibilidade como lista de franxas, con recomendación das horas con menos xente.
-- Reservar, cambiar e cancelar coas normas e o prezo visibles, e recibir un código QR e o evento para o calendario.
-- Ver as propias reservas nun calendario mensual e levalas a Google Calendar, Outlook ou calquera aplicación de calendario.
-- Consultar o historial e os avisos do concello, como un peche por mantemento que obriga a escoller outra hora.
-- Descargar os propios datos e axustar o tamaño do texto, o contraste e o movemento.
+## Accesibilidade
 
-**Concello**
+- **WCAG 2.1 AA**, a referencia da EN 301 549 e do Real decreto 1112/2018.
+- **axe en cada pantalla** dos tests de extremo a extremo, en escritorio e móbil: calquera infracción fai fallar o cambio.
+- **Todo co teclado e co lector de pantalla**, con foco sempre visible, anuncios dos cambios e visitas guiadas.
+- **Axustes para cada persoa**: tamaño do texto, alto contraste e menos movemento.
+- **Gráficas con táboa e resumo en texto**, e a cor nunca como único medio.
 
-- Panel do día, axenda e reservas por teléfono ou no mostrador.
-- Instalacións con fotos (co seu texto alternativo), horarios, festivos, normas con herdanza e tarifas, sen código.
-- Bloqueos que avisan ás persoas afectadas e reservas de tempada dos clubs con detección de conflitos.
-- Control de acceso por QR, indicadores con táboas e CSV, e rexistro de actividade.
-- Configuración do nome, escudo, cor de acento (con comprobación de contraste), idiomas e textos legais.
-
-**Deputación**
-
-- Concellos adheridos e indicadores comparados.
-- Alta dun concello novo en tres pasos, listo para recibir reservas.
+Os detalles están nos [criterios e como se cumpre cada un](docs/accesibilidade/criterios.md), no [informe de probas](docs/accesibilidade/informe-probas.md) e na [declaración de accesibilidade](docs/accesibilidade/declaracion-accesibilidade.md).
 
 ## Deseño
 
-Un só sistema de deseño con dúas superficies. A veciñanza ten unha experiencia de aplicación móbil: barra de lapelas, franxas en tarxetas, as reservas como billetes e o código QR nun pase listo para amosar na entrada. O persoal do concello e a deputación traballan nunha interface máis densa, con táboas compactas e unha barra de navegación corporativa.
+Un só sistema de deseño con dúas superficies. A veciñanza ten unha experiencia de aplicación móbil: barra de lapelas, franxas en tarxetas, as reservas como billetes e o QR nun pase listo para amosar na entrada. O persoal do concello e a deputación traballan nunha interface máis densa, con táboas compactas e unha barra de navegación corporativa.
 
 As cores son as da Xunta e de Galicia: branco, azul celeste e azuis escuros, coa banda diagonal da bandeira como único elemento decorativo. A cor de cada concello vai como acento no escudo e na cabeceira. Os contrastes de todas as parellas de cores compróbanse en tests, tamén no modo de alto contraste.
 
@@ -54,14 +115,6 @@ Ao entrar escóllese como ver a demostración: cidadanía, persoal do concello o
 
 Os concellos de Bouzalonga (pequeno e rural) e Ribasmeiras (mediano) e a Deputación de Exemplo son ficticios.
 
-<p>
-  <img src="docs/capturas/mobil/01-inicio.png" width="260" alt="Inicio do Concello de Bouzalonga no móbil, co buscador e a próxima reserva como un billete">
-  <img src="docs/capturas/mobil/04-confirmacion.png" width="260" alt="Reserva confirmada no móbil, co código e a QR nun pase">
-  <img src="docs/capturas/escritorio/06-panel.png" width="520" alt="Panel de xestión do Concello de Ribasmeiras no escritorio">
-</p>
-
-Todas as capturas están en [`docs/capturas`](docs/capturas) e xéranse con `npm run screenshots`.
-
 ## Executalo
 
 Precisa Node.js 22 ou superior.
@@ -70,6 +123,9 @@ Precisa Node.js 22 ou superior.
 npm ci
 npm run dev
 ```
+
+<details>
+<summary><strong>Todos os comandos</strong></summary>
 
 | Comando               | Que fai                                                              |
 | --------------------- | -------------------------------------------------------------------- |
@@ -83,7 +139,10 @@ npm run dev
 | `npm run api:lint`    | Valida a especificación OpenAPI                                      |
 | `npm run screenshots` | Xera as capturas de `docs/capturas`                                  |
 
-## Estrutura
+</details>
+
+<details>
+<summary><strong>Estrutura do código</strong></summary>
 
 ```
 src/
@@ -97,14 +156,18 @@ e2e/          tests no navegador con axe
 docs/         documentación técnica
 ```
 
+</details>
+
 ## Documentación
 
-- [Visión xeral da arquitectura](docs/arquitectura/vision-xeral.md) e [modelo de datos](docs/arquitectura/modelo-datos.md)
-- [Especificación da API (OpenAPI 3.1)](docs/api/openapi.yaml)
-- [Interoperabilidade](docs/interoperabilidade.md) e [seguridade e protección de datos](docs/seguridade-rxpd.md)
-- [Accesibilidade](docs/accesibilidade/criterios.md): criterios, [informe de probas](docs/accesibilidade/informe-probas.md) e [declaración](docs/accesibilidade/declaracion-accesibilidade.md)
-- [Despregamento](docs/despregamento.md)
-- [Decisións de arquitectura (ADR)](docs/adr)
+| Tema                     | Documentos                                                                                                                                                                    |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Arquitectura             | [Visión xeral](docs/arquitectura/vision-xeral.md) · [Modelo de datos](docs/arquitectura/modelo-datos.md) · [ADR](docs/adr)                                                    |
+| API                      | [Especificación OpenAPI 3.1](docs/api/openapi.yaml)                                                                                                                           |
+| Interoperabilidade       | [Estándares e formatos](docs/interoperabilidade.md)                                                                                                                           |
+| Seguridade e privacidade | [Seguridade e protección de datos](docs/seguridade-rxpd.md)                                                                                                                   |
+| Accesibilidade           | [Criterios](docs/accesibilidade/criterios.md) · [Informe de probas](docs/accesibilidade/informe-probas.md) · [Declaración](docs/accesibilidade/declaracion-accesibilidade.md) |
+| Despregamento            | [Guía de despregamento](docs/despregamento.md)                                                                                                                                |
 
 ## Adaptalo a outro concello
 
