@@ -2,7 +2,7 @@
   "nav": {
     "label": "Menú principal",
     "home": "Inicio",
-    "facilities": "Instala\u00adciones",
+    "facilities": "Instala­ciones",
     "reservations": "Reservas",
     "notifications": "Avisos",
     "unread_one": "{{count}} sin leer",
@@ -139,7 +139,6 @@
     "status": "Estado",
     "payment": "Pago",
     "channel": "Canal",
-    "addToCalendar": "Añadir al calendario (.ics)",
     "change": "Cambiar la hora",
     "cancel": "Cancelar la reserva",
     "cancelTitle": "¿Cancelar la reserva?",
@@ -258,5 +257,12 @@
     "privacy": "Privacidad",
     "accessibility": "Declaración de accesibilidad",
     "nav": "Información legal"
+  },
+  "addToCalendar": {
+    "label": "Añadir al calendario",
+    "google": "Google Calendar",
+    "outlook": "Outlook",
+    "other": "Apple Calendar y otros (.ics)",
+    "newTab": "se abre en una pestaña nueva"
   }
 }

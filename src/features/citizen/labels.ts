@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useTranslation } from 'react-i18next';
-import { toIcs } from '../../domain/ics';
+import { toIcs, type CalendarEvent } from '../../domain/ics';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
 import type { Facility, Reservation, Tenant } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
@@ -28,26 +28,30 @@ export function useSlotDescription(facility: Facility) {
   };
 }
 
-export function useReservationsIcs() {
+/** A reservation as a calendar event: the same text for the .ics file and the Google and Outlook links. */
+export function useCalendarEvent() {
   const { t } = useTranslation('citizen');
   const subspaceName = useSubspaceName();
+  return (reservation: Reservation, facility: Facility): CalendarEvent => ({
+    uid: `${reservation.id}@quenda`,
+    summary: `${facility.name}, ${subspaceName(facility, reservation.subspaceId)}`,
+    location: facility.address,
+    description: `${t('reservation.code')}: ${reservation.code}`,
+    date: reservation.date,
+    start: reservation.start,
+    end: reservation.end,
+    stamp: reservation.history.at(-1)?.at ?? reservation.createdAt,
+  });
+}
+
+export function useReservationsIcs() {
+  const { t } = useTranslation('citizen');
+  const toEvent = useCalendarEvent();
   return (tenant: Tenant, reservations: Reservation[], facilities: Facility[]) =>
     toIcs(
       reservations.flatMap((reservation) => {
         const facility = facilities.find((f) => f.id === reservation.facilityId);
-        if (!facility) return [];
-        return [
-          {
-            uid: `${reservation.id}@quenda`,
-            summary: `${facility.name}, ${subspaceName(facility, reservation.subspaceId)}`,
-            location: facility.address,
-            description: `${t('reservation.code')}: ${reservation.code}`,
-            date: reservation.date,
-            start: reservation.start,
-            end: reservation.end,
-            stamp: reservation.history.at(-1)?.at ?? reservation.createdAt,
-          },
-        ];
+        return facility ? [toEvent(reservation, facility)] : [];
       }),
       t('calendar.calendarName', { tenant: tenant.name }),
     );

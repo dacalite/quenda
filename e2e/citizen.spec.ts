@@ -105,6 +105,27 @@ test('book and cancel using only the keyboard, with axe at every step', async ({
   await expect(page.getByRole('img', { name: `Código QR da reserva ${code}` })).toBeVisible();
   await expectNoAxeViolations(page);
 
+  const addToCalendar = page.getByRole('button', { name: 'Engadir ao calendario' });
+  await tabTo(page, addToCalendar);
+  await page.keyboard.press('Enter');
+  const calendars = page.getByRole('menu');
+  await expect(calendars.getByRole('menuitem')).toHaveText([
+    /Google Calendar/,
+    /Outlook/,
+    'Apple Calendar e outros (.ics)',
+  ]);
+  await expect(calendars.getByRole('menuitem', { name: /Google Calendar/ })).toHaveAttribute(
+    'href',
+    /^https:\/\/calendar\.google\.com\/calendar\/render\?action=TEMPLATE&/,
+  );
+  await expect(calendars.getByRole('menuitem', { name: /Google Calendar/ })).toHaveAccessibleName(
+    'Google Calendar, ábrese nunha lapela nova',
+  );
+  await expectNoAxeViolations(page);
+  await page.keyboard.press('Escape');
+  await expect(calendars).toBeHidden();
+  await expect(addToCalendar).toBeFocused();
+
   await openMenu();
   await tabTo(page, menu.getByRole('link', { name: 'Reservas' }));
   await page.keyboard.press('Enter');

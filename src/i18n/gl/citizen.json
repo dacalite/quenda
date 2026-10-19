@@ -2,7 +2,7 @@
   "nav": {
     "label": "Menú principal",
     "home": "Inicio",
-    "facilities": "Instala\u00adcións",
+    "facilities": "Instala­cións",
     "reservations": "Reservas",
     "notifications": "Avisos",
     "unread_one": "{{count}} sen ler",
@@ -139,7 +139,6 @@
     "status": "Estado",
     "payment": "Pagamento",
     "channel": "Canle",
-    "addToCalendar": "Engadir ao calendario (.ics)",
     "change": "Cambiar a hora",
     "cancel": "Cancelar a reserva",
     "cancelTitle": "Cancelar a reserva?",
@@ -258,5 +257,12 @@
     "privacy": "Privacidade",
     "accessibility": "Declaración de accesibilidade",
     "nav": "Información legal"
+  },
+  "addToCalendar": {
+    "label": "Engadir ao calendario",
+    "google": "Google Calendar",
+    "outlook": "Outlook",
+    "other": "Apple Calendar e outros (.ics)",
+    "newTab": "ábrese nunha lapela nova"
   }
 }

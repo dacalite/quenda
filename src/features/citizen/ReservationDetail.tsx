@@ -1,20 +1,17 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router';
-import { downloadFile } from '../../app/download';
 import { Page } from '../../app/Page';
 import { useFacility } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import type { Facility, Reservation } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
 import { useSubspaceName } from '../../i18n/labels';
-import { Button } from '../../ui/Button';
-import { Icon } from '../../ui/Icon';
 import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import layout from '../../ui/layout.module.css';
 import styles from './citizen.module.css';
-import { useReservationsIcs } from './labels';
+import { AddToCalendar } from './AddToCalendar';
 import { useCitizen, useReservation } from './queries';
 import { ReservationActions } from './ReservationActions';
 import { ReservationQr } from './ReservationQr';
@@ -49,10 +46,8 @@ const STATUS_TONE = {
 function Detail({ reservation, facility }: { reservation: Reservation; facility: Facility }) {
   const { t } = useTranslation(['citizen', 'domain']);
   const [params] = useSearchParams();
-  const { tenant } = useCitizen();
   const format = useFormat();
   const subspaceName = useSubspaceName();
-  const ics = useReservationsIcs();
   const isNew = params.has('nova');
   const changed = params.has('cambiada');
   const title = isNew
@@ -114,18 +109,7 @@ function Detail({ reservation, facility }: { reservation: Reservation; facility:
           </dl>
           {active && (
             <p>
-              <Button
-                onPress={() => {
-                  downloadFile(
-                    `reserva-${reservation.code}.ics`,
-                    ics(tenant, [reservation], [facility]),
-                    'text/calendar',
-                  );
-                }}
-              >
-                <Icon name="calendar" />
-                {t('reservation.addToCalendar')}
-              </Button>
+              <AddToCalendar reservation={reservation} facility={facility} />
             </p>
           )}
           <ReservationActions reservation={reservation} facility={facility} />
