@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from './axe';
+import { freezeDate } from './clock';
 
 const heading = (page: Page) => page.getByRole('heading', { level: 1 });
 
@@ -170,6 +171,32 @@ test.describe('citizen screens pass axe', () => {
       await expectNoAxeViolations(page);
     });
   }
+
+  test('the personal calendar shows booked days and their bookings, by keyboard', async ({
+    page,
+  }) => {
+    await freezeDate(page);
+    await page.goto('./bouzalonga/calendario');
+    await expect(heading(page)).toHaveText('Calendario persoal');
+    const month = page.getByRole('grid', { name: /^As túas reservas, outubro de 2026/ });
+    await expect(month).toBeVisible();
+    await expect(
+      month.getByRole('button', { name: /^venres, 30 de outubro de 2026/ }),
+    ).toHaveAccessibleDescription('1 reserva');
+    await expectNoAxeViolations(page);
+
+    await tabTo(page, month.getByRole('button', { name: /19 de outubro de 2026/ }));
+    await page.keyboard.press('ArrowDown');
+    for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowRight');
+    await expect(
+      month.getByRole('button', { name: /^venres, 30 de outubro de 2026/ }),
+    ).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('status')).toHaveText('venres, 30 de outubro: 1 reserva');
+    const day = page.getByRole('region', { name: 'venres, 30 de outubro' });
+    await expect(day.getByRole('link', { name: /^Reserva QDA-/ })).toBeVisible();
+    await expectNoAxeViolations(page);
+  });
 
   test('a council closure offers to move the booking', async ({ page }) => {
     await page.goto('./bouzalonga/avisos');
