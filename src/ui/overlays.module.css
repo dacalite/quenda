@@ -54,6 +54,12 @@
   outline: none;
 }
 
+/* Menu items that are links look like the rest of the menu. */
+a.option {
+  color: inherit;
+  text-decoration: none;
+}
+
 .option[data-hovered] {
   background: var(--color-surface);
 }
