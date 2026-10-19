@@ -17,6 +17,7 @@ Proposta para o **I Certame GOBTEC de Software Libre**.
 - Buscar instalacións por tipo, día, franxa, accesibilidade física ou dispoñibilidade inmediata.
 - Ver a dispoñibilidade como lista de franxas, con recomendación das horas con menos xente.
 - Reservar, cambiar e cancelar coas normas e o prezo visibles, e recibir un código QR e o evento para o calendario.
+- Ver as propias reservas nun calendario mensual e levalas a Google Calendar, Outlook ou calquera aplicación de calendario.
 - Consultar o historial e os avisos do concello, como un peche por mantemento que obriga a escoller outra hora.
 - Descargar os propios datos e axustar o tamaño do texto, o contraste e o movemento.
 

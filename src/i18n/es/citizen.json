@@ -2,7 +2,7 @@
   "nav": {
     "label": "Menú principal",
     "home": "Inicio",
-    "facilities": "Instala\u00adciones",
+    "facilities": "Instala­ciones",
     "reservations": "Reservas",
     "notifications": "Avisos",
     "unread_one": "{{count}} sin leer",
@@ -139,7 +139,6 @@
     "status": "Estado",
     "payment": "Pago",
     "channel": "Canal",
-    "addToCalendar": "Añadir al calendario (.ics)",
     "change": "Cambiar la hora",
     "cancel": "Cancelar la reserva",
     "cancelTitle": "¿Cancelar la reserva?",
@@ -194,7 +193,7 @@
   },
   "calendar": {
     "title": "Calendario personal",
-    "intro": "Lleva tus reservas al calendario del móvil o del ordenador.",
+    "intro": "Consulta tus reservas mes a mes y llévalas al calendario del móvil o del ordenador.",
     "downloadTitle": "Descargar las reservas",
     "downloadHelp": "Un archivo .ics con tus próximas reservas, que abre cualquier aplicación de calendario.",
     "download": "Descargar el calendario (.ics)",
@@ -204,7 +203,14 @@
     "copy": "Copiar la dirección",
     "copied": "Dirección copiada.",
     "simulated": "En el prototipo esta dirección es simulada. En el servicio real sería una dirección personal del servidor, que puedes anular en cualquier momento.",
-    "calendarName": "Reservas · {{tenant}}"
+    "calendarName": "Reservas · {{tenant}}",
+    "monthTitle": "Tus reservas",
+    "monthHelp": "Los días con reservas llevan un número. Elige un día para ver sus reservas.",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "dayCount_one": "{{count}} reserva",
+    "dayCount_other": "{{count}} reservas",
+    "dayEmpty": "No tienes reservas este día."
   },
   "profile": {
     "title": "Mi perfil",
@@ -258,5 +264,12 @@
     "privacy": "Privacidad",
     "accessibility": "Declaración de accesibilidad",
     "nav": "Información legal"
+  },
+  "addToCalendar": {
+    "label": "Añadir al calendario",
+    "google": "Google Calendar",
+    "outlook": "Outlook",
+    "other": "Apple Calendar y otros (.ics)",
+    "newTab": "se abre en una pestaña nueva"
   }
 }

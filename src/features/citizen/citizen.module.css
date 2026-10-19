@@ -476,3 +476,25 @@ a.slot .slotStatus {
   margin: 0;
   list-style: none;
 }
+
+/* Personal calendar: the month beside the chosen day's bookings, stacked on narrow screens. */
+.calendarLayout {
+  display: grid;
+  gap: var(--space-4) var(--space-5);
+  align-items: start;
+  margin-block: var(--space-4);
+}
+
+@media (min-width: 60rem) {
+  .calendarLayout {
+    grid-template-columns: minmax(0, 30rem) minmax(0, 1fr);
+  }
+}
+
+.calendarDay {
+  min-width: 0;
+}
+
+.calendarDayTitle::first-letter {
+  text-transform: uppercase;
+}

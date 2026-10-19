@@ -23,7 +23,8 @@ Quenda usa estándares abertos en cada punto onde se comunica con outros sistema
 
 - Cada reserva descárgase como un ficheiro `.ics` cun evento (`VEVENT`) que inclúe a definición da zona horaria (`VTIMEZONE`), de modo que o calendario a sitúa ben aínda que o móbil estea noutra zona.
 - A subscrición é un enderezo `/calendar-feeds/{segredo}.ics` que as aplicacións de calendario consultan periodicamente. Como estas aplicacións non poden iniciar sesión, o acceso depende dun segredo propio de cada persoa, que pode revogar.
-- O código está en `src/domain/ics.ts`, con tests que comproban o formato, os saltos de liña e o escape de caracteres.
+- Google Calendar e Outlook ábrense co evento xa cuberto mediante as súas ligazóns públicas de creación de eventos. A plataforma non se conecta a eles: os datos da reserva só saen cando a persoa escolle esa opción.
+- O código está en `src/domain/ics.ts` e `src/domain/calendarLinks.ts`, con tests que comproban o formato, os saltos de liña e o escape de caracteres.
 
 ### Identificación con Cl@ve e Chave365
 

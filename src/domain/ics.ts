@@ -14,7 +14,7 @@ export interface CalendarEvent {
 }
 
 // shortcut: only the Europe/Madrid zone is described; councils in Canarias would need Atlantic/Canary.
-const TIME_ZONE = 'Europe/Madrid';
+export const TIME_ZONE = 'Europe/Madrid';
 const VTIMEZONE = [
   'BEGIN:VTIMEZONE',
   `TZID:${TIME_ZONE}`,

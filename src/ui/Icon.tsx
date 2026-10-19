@@ -8,6 +8,7 @@ const PATHS = {
   info: 'M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19zM12 11v6M12 7.5v.5',
   neutral: 'M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19zM8 12h8',
   close: 'M6 6l12 12M18 6L6 18',
+  external: 'M14 4.5h5.5V10M19.5 4.5l-8 8M17.5 13.5v6h-13v-13h6',
   chevronDown: 'M6 9l6 6 6-6',
   chevronLeft: 'M15 6l-6 6 6 6',
   chevronRight: 'M9 6l6 6-6 6',

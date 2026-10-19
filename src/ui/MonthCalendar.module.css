@@ -1,0 +1,97 @@
+/* SPDX-License-Identifier: EUPL-1.2 */
+
+.calendar {
+  width: 100%;
+  max-width: 30rem;
+}
+
+.header {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: var(--space-2);
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--font-size-4);
+}
+
+.heading::first-letter {
+  text-transform: uppercase;
+}
+
+.grid {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 2px;
+}
+
+.grid th {
+  padding-block-end: var(--space-1);
+  font-size: var(--font-size-1);
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  font-variant-numeric: tabular-nums;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-1);
+  cursor: pointer;
+  outline: none;
+}
+
+.cell[data-outside-month] {
+  visibility: hidden;
+}
+
+.cell[data-marked] {
+  font-weight: 700;
+  background: var(--color-surface);
+  border-color: var(--color-border-subtle);
+}
+
+.cell[data-hovered] {
+  border-color: var(--color-primary);
+}
+
+.cell[data-today] {
+  border: var(--control-border-width) solid var(--color-text);
+}
+
+.cell[data-selected] {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.cell[data-focus-visible] {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.count {
+  min-width: 1.5em;
+  padding: 0 0.35em;
+  font-size: var(--font-size-1);
+  line-height: 1.4;
+  color: var(--color-on-primary);
+  text-align: center;
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+}
+
+.cell[data-selected] .count {
+  color: var(--color-primary);
+  background: var(--color-on-primary);
+}

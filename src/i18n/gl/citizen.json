@@ -2,7 +2,7 @@
   "nav": {
     "label": "Menú principal",
     "home": "Inicio",
-    "facilities": "Instala\u00adcións",
+    "facilities": "Instala­cións",
     "reservations": "Reservas",
     "notifications": "Avisos",
     "unread_one": "{{count}} sen ler",
@@ -139,7 +139,6 @@
     "status": "Estado",
     "payment": "Pagamento",
     "channel": "Canle",
-    "addToCalendar": "Engadir ao calendario (.ics)",
     "change": "Cambiar a hora",
     "cancel": "Cancelar a reserva",
     "cancelTitle": "Cancelar a reserva?",
@@ -194,7 +193,7 @@
   },
   "calendar": {
     "title": "Calendario persoal",
-    "intro": "Leva as túas reservas ao calendario do móbil ou do ordenador.",
+    "intro": "Consulta as túas reservas mes a mes e lévaas ao calendario do móbil ou do ordenador.",
     "downloadTitle": "Descargar as reservas",
     "downloadHelp": "Un ficheiro .ics coas túas próximas reservas, que abre calquera aplicación de calendario.",
     "download": "Descargar o calendario (.ics)",
@@ -204,7 +203,14 @@
     "copy": "Copiar o enderezo",
     "copied": "Enderezo copiado.",
     "simulated": "No prototipo este enderezo é simulado. No servizo real sería un enderezo persoal do servidor, que podes anular en calquera momento.",
-    "calendarName": "Reservas · {{tenant}}"
+    "calendarName": "Reservas · {{tenant}}",
+    "monthTitle": "As túas reservas",
+    "monthHelp": "Os días con reservas levan un número. Escolle un día para ver as súas reservas.",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes seguinte",
+    "dayCount_one": "{{count}} reserva",
+    "dayCount_other": "{{count}} reservas",
+    "dayEmpty": "Non tes reservas este día."
   },
   "profile": {
     "title": "O meu perfil",
@@ -258,5 +264,12 @@
     "privacy": "Privacidade",
     "accessibility": "Declaración de accesibilidade",
     "nav": "Información legal"
+  },
+  "addToCalendar": {
+    "label": "Engadir ao calendario",
+    "google": "Google Calendar",
+    "outlook": "Outlook",
+    "other": "Apple Calendar e outros (.ics)",
+    "newTab": "ábrese nunha lapela nova"
   }
 }
