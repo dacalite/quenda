@@ -6,6 +6,14 @@ import type { Facility, Reservation, Tenant } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
 import { useSubspaceName } from '../../i18n/labels';
 
+/** Badge tone for each reservation status. */
+export const RESERVATION_TONE = {
+  confirmed: 'success',
+  cancelled: 'danger',
+  completed: 'neutral',
+  noShow: 'warning',
+} as const;
+
 /** What a screen reader hears for a slot: «Pista 1, martes 20 de outubro, 18:00 a 19:00, libre, 4,00 €». */
 export function useSlotDescription(facility: Facility) {
   const { t } = useTranslation(['domain', 'citizen']);

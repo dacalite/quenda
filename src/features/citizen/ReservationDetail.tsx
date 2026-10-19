@@ -12,6 +12,7 @@ import { StatusBadge } from '../../ui/StatusBadge';
 import layout from '../../ui/layout.module.css';
 import styles from './citizen.module.css';
 import { AddToCalendar } from './AddToCalendar';
+import { RESERVATION_TONE } from './labels';
 import { useCitizen, useReservation } from './queries';
 import { ReservationActions } from './ReservationActions';
 import { ReservationQr } from './ReservationQr';
@@ -35,13 +36,6 @@ export function ReservationDetail() {
   if (!reservation.data || !facility.data) return null;
   return <Detail reservation={reservation.data} facility={facility.data} />;
 }
-
-const STATUS_TONE = {
-  confirmed: 'success',
-  cancelled: 'danger',
-  completed: 'neutral',
-  noShow: 'warning',
-} as const;
 
 function Detail({ reservation, facility }: { reservation: Reservation; facility: Facility }) {
   const { t } = useTranslation(['citizen', 'domain']);
@@ -96,7 +90,7 @@ function Detail({ reservation, facility }: { reservation: Reservation; facility:
             <dd>{format.timeRange(reservation.start, reservation.end)}</dd>
             <dt>{t('reservation.status')}</dt>
             <dd>
-              <StatusBadge tone={STATUS_TONE[reservation.status]}>
+              <StatusBadge tone={RESERVATION_TONE[reservation.status]}>
                 {t(`domain:reservationStatus.${reservation.status}`)}
               </StatusBadge>
             </dd>

@@ -11,15 +11,9 @@ import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { Tab, TabList, TabPanel, Tabs } from '../../ui/Tabs';
 import layout from '../../ui/layout.module.css';
+import { RESERVATION_TONE } from './labels';
 import { useCitizen, useMyReservations } from './queries';
 import { Ticket } from './Ticket';
-
-const STATUS_TONE = {
-  confirmed: 'success',
-  cancelled: 'danger',
-  completed: 'neutral',
-  noShow: 'warning',
-} as const;
 
 /** Same weekday, from tomorrow on. */
 const nextSameWeekday = (date: IsoDate, today: IsoDate) =>
@@ -107,7 +101,7 @@ function ReservationCard({
       muted={Boolean(repeatDate)}
     >
       <p className={layout.row}>
-        <StatusBadge tone={STATUS_TONE[reservation.status]}>
+        <StatusBadge tone={RESERVATION_TONE[reservation.status]}>
           {t(`domain:reservationStatus.${reservation.status}`)}
         </StatusBadge>
       </p>
