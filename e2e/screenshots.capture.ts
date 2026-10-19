@@ -100,6 +100,10 @@ test('citizen screens', async ({ page }) => {
   await page.goto('./bouzalonga/reservas');
   await capture(page, '05-reservas');
 
+  await page.goto('./bouzalonga/calendario');
+  await page.getByRole('button', { name: /30 de outubro de 2026/ }).click();
+  await capture(page, '14-calendario');
+
   await page.goto('./ribasmeiras');
   await capture(page, '12-inicio-ribasmeiras');
 });
