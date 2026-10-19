@@ -41,19 +41,34 @@ async function settle(page: Page) {
   await page.waitForTimeout(300);
 }
 
-async function capture(page: Page, name: string) {
+/** On the `readme` device it also keeps the first screenful, which the README shows instead of the whole page. */
+async function capture(
+  page: Page,
+  name: string,
+  { readme }: { readme?: 'mobil' | 'escritorio' } = {},
+) {
   await settle(page);
   // Nothing should keep the focus ring of the last click in the picture.
   await page.evaluate(() => {
     (document.activeElement as HTMLElement | null)?.blur();
   });
+  const device = test.info().project.name;
   await page.screenshot({
-    path: `docs/capturas/${test.info().project.name}/${name}.png`,
+    path: `docs/capturas/${device}/${name}.png`,
     fullPage: true,
     animations: 'disabled',
     // A transformed ancestor holds the residents' fixed tab bar, so it lands at the end of the page.
     style: '[data-tabbar] { transform: translateZ(0); }',
   });
+  if (readme === device) {
+    await page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await page.screenshot({
+      path: `docs/capturas/readme/${device}-${name}.png`,
+      animations: 'disabled',
+    });
+  }
 }
 
 /** React Aria names a select's button «value label», so the label is matched at the end. */
@@ -76,13 +91,13 @@ test('citizen screens', async ({ page }) => {
   await capture(page, '00-perfil');
 
   await page.goto('./bouzalonga');
-  await capture(page, '01-inicio');
+  await capture(page, '01-inicio', { readme: 'mobil' });
 
   await page.goto('./bouzalonga/instalacions/bouzalonga-pavillon');
   await capture(page, '02-ficha');
 
   await page.goto('./bouzalonga/instalacions/bouzalonga-padel/reservar');
-  await capture(page, '03-franxas');
+  await capture(page, '03-franxas', { readme: 'mobil' });
 
   const reservation = await page.evaluate(() => {
     const db = JSON.parse(localStorage.getItem('quenda.db') ?? '{}') as {
@@ -95,14 +110,14 @@ test('citizen screens', async ({ page }) => {
   });
   expect(reservation).toBeTruthy();
   await page.goto(`./bouzalonga/reservas/${String(reservation)}?nova=1`);
-  await capture(page, '04-confirmacion');
+  await capture(page, '04-confirmacion', { readme: 'mobil' });
 
   await page.goto('./bouzalonga/reservas');
   await capture(page, '05-reservas');
 
   await page.goto('./bouzalonga/calendario');
   await page.getByRole('button', { name: /30 de outubro de 2026/ }).click();
-  await capture(page, '14-calendario');
+  await capture(page, '14-calendario', { readme: 'mobil' });
 
   await page.goto('./ribasmeiras');
   await capture(page, '12-inicio-ribasmeiras');
@@ -112,7 +127,7 @@ test('council screens', async ({ page }) => {
   await prepare(page, 'staff');
 
   await page.goto('./ribasmeiras/xestion');
-  await capture(page, '06-panel');
+  await capture(page, '06-panel', { readme: 'escritorio' });
 
   await page.goto('./ribasmeiras/xestion/bloqueos');
   await settle(page);
@@ -140,17 +155,17 @@ test('council screens', async ({ page }) => {
   await capture(page, '08-tempada');
 
   await page.goto('./ribasmeiras/xestion/indicadores');
-  await capture(page, '09-indicadores');
+  await capture(page, '09-indicadores', { readme: 'escritorio' });
 
   await page.goto('./ribasmeiras/xestion/configuracion');
-  await capture(page, '10-configuracion');
+  await capture(page, '10-configuracion', { readme: 'escritorio' });
 });
 
 test('deputación screens', async ({ page }) => {
   await prepare(page, 'deputacion');
 
   await page.goto('./deputacion');
-  await capture(page, '11-deputacion');
+  await capture(page, '11-deputacion', { readme: 'escritorio' });
 
   await page.goto('./deputacion/novo-concello');
   await capture(page, '13-alta-concello');
