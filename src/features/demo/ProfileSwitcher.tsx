@@ -21,12 +21,11 @@ import { Select } from '../../ui/Select';
 import { useToast } from '../../ui/toasts';
 import styles from './ProfileSwitcher.module.css';
 import { RoleCards } from './RoleCards';
-import { useStartTour } from './tours';
 
 const CITIZENS: CitizenPersona[] = ['uxia', 'manuel', 'brais'];
 const STAFF: StaffPersona[] = ['carme', 'xose'];
 
-/** Demo controls behind one button: profile, person, council, guided tour and reset. */
+/** Demo controls behind one button: profile, person, council and reset. */
 export function ProfileSwitcher() {
   const { t } = useTranslation('demo');
   const navigate = useNavigate();
@@ -35,8 +34,6 @@ export function ProfileSwitcher() {
   const tenants = useTenants();
   const demo = useDemo();
   const updatePreferences = usePreferences((state) => state.update);
-  const startTour = useStartTour();
-  const triggerId = useId();
   const detailsId = useId();
 
   const tenant = tenants.data?.find((item) => item.id === demo.tenantId) ?? tenants.data?.[0];
@@ -54,7 +51,7 @@ export function ProfileSwitcher() {
   return (
     <DialogTrigger>
       {/* Narrow screens show «Perfil», which the accessible name still contains. */}
-      <Button variant="quiet" id={triggerId} aria-label={t('switcher.open')}>
+      <Button variant="quiet" aria-label={t('switcher.open')}>
         <Icon name="swap" />
         <span className="hide-narrow" aria-hidden="true">
           {t('switcher.open')}
@@ -109,15 +106,6 @@ export function ProfileSwitcher() {
               </section>
             )}
             <div className={styles.actions}>
-              <Button
-                onPress={() => {
-                  close();
-                  startTour(demo.role, triggerId);
-                }}
-              >
-                <Icon name="info" />
-                {t('tour.start')}
-              </Button>
               <DialogTrigger>
                 <Button>
                   <Icon name="refresh" />

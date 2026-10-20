@@ -16,8 +16,6 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     locale: 'gl-ES',
     trace: 'retain-on-failure',
-    // The guided tours open by themselves on a first visit; each test that needs one starts it.
-    storageState: 'e2e/storage-state.json',
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },

@@ -53,7 +53,7 @@
 
 /* Residents: a tab bar at the bottom of small screens. */
 @media (max-width: 55.99rem) and (min-height: 30rem) {
-  /* Room that other bottom-fixed layers (tour steps, toasts) leave for the bar. */
+  /* Room that other bottom-fixed layers (toasts) leave for the bar. */
   :global(:root:has(nav[data-variant='tabs'])) {
     --tabbar-space: calc(4rem + env(safe-area-inset-bottom));
   }

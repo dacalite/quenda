@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { useAnnounce } from '../ui/announcer';
 import { useSite } from './contexts';
-import { useTour } from './state';
 import styles from './Page.module.css';
 
 /** Every view: one h1, the document title and, after navigating, focus and an announcement. */
@@ -27,8 +26,6 @@ export function Page({
   const announce = useAnnounce();
   const heading = useRef<HTMLHeadingElement>(null);
   const onNavigate = useEffectEvent(() => {
-    // A guided tour moves between pages itself and keeps the focus on its own step.
-    if (useTour.getState().active) return;
     heading.current?.focus();
     announce(announcement ?? title);
   });

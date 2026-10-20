@@ -93,35 +93,3 @@ export const usePreferences = create<PreferencesState>()(
     { name: `${APP_NAME}.preferences` },
   ),
 );
-
-interface TourState {
-  /** Roles whose guided tour has already been offered, so it only opens by itself once. */
-  seen: DemoRole[];
-  /** `returnTo`: id of the control that gets the focus back when the tour ends. */
-  active: { role: DemoRole; step: number; returnTo?: string | undefined } | null;
-  start: (role: DemoRole, returnTo?: string) => void;
-  go: (step: number) => void;
-  stop: () => void;
-}
-
-export const useTour = create<TourState>()(
-  persist(
-    (set) => ({
-      seen: [],
-      active: null,
-      start: (role, returnTo) => {
-        set(({ seen }) => ({
-          active: { role, step: 0, returnTo },
-          seen: seen.includes(role) ? seen : [...seen, role],
-        }));
-      },
-      go: (step) => {
-        set(({ active }) => (active ? { active: { ...active, step } } : {}));
-      },
-      stop: () => {
-        set({ active: null });
-      },
-    }),
-    { name: `${APP_NAME}.tours`, partialize: ({ seen }) => ({ seen }) },
-  ),
-);

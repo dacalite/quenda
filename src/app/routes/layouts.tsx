@@ -8,7 +8,6 @@ import { NotFoundError } from '../../data/ports/errors';
 import { DEPUTACION } from '../../data/seed/catalog';
 import { StaffNav, StaffSession } from '../../features/admin/StaffNav';
 import { CitizenNav, CitizenSession } from '../../features/citizen/CitizenNav';
-import { GuidedTour } from '../../features/demo/GuidedTour';
 import { ProfileSwitcher } from '../../features/demo/ProfileSwitcher';
 import { DeputacionNav, DeputacionSession } from '../../features/deputacion/DeputacionNav';
 import { currentLanguage } from '../../i18n';
@@ -52,7 +51,6 @@ export function AppShell() {
     >
       <SkipLink targetId="main">{t('skipLink')}</SkipLink>
       <Outlet />
-      <GuidedTour />
     </AriaRouterProvider>
   );
 }
