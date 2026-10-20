@@ -9,7 +9,7 @@ O obxectivo é o nivel **AA das WCAG 2.1**, a referencia da norma EN 301 549 e d
 | Erros comúns no código      | `eslint-plugin-jsx-a11y` en modo estrito                          | `npm run lint`, en cada commit e na integración continua                   |
 | Compoñentes                 | axe-core en jsdom                                                 | Tests unitarios de `src/ui`                                                |
 | Pantallas e estados clave   | Playwright con axe (WCAG 2.0, 2.1 e 2.2 A e AA, e boas prácticas) | `npm run e2e`, en escritorio e en móbil; falla con **calquera** infracción |
-| Fluxos só co teclado        | Playwright                                                        | Reserva e cancelación, alta dun concello, visitas guiadas                  |
+| Fluxos só co teclado        | Playwright                                                        | Reserva e cancelación, alta dun concello, calendario                       |
 | Reflow                      | Playwright a 320 px de ancho                                      | Sen desprazamento horizontal                                               |
 | Contraste das cores         | Tests sobre os tokens e as cores dos concellos                    | `src/ui/tokens.test.ts` e `src/ui/contrast.test.ts`                        |
 | Lectores de pantalla e zoom | Probas manuais                                                    | [informe-probas.md](informe-probas.md)                                     |
@@ -30,7 +30,7 @@ As ferramentas automáticas detectan unha parte dos problemas. As probas manuais
 
 ### Operable
 
-- **Teclado (2.1.1 e 2.1.2).** Todo funciona co teclado. Os diálogos modais pechan con Escape e devolven o foco a quen os abriu; as visitas guiadas son diálogos non modais que tampouco atrapan o foco.
+- **Teclado (2.1.1 e 2.1.2).** Todo funciona co teclado. Os diálogos modais pechan con Escape e devolven o foco a quen os abriu.
 - **Saltar bloques (2.4.1).** Enlace «Saltar ao contido» como primeira parada do tabulador.
 - **Títulos (2.4.2).** Ao cambiar de pantalla actualízase o título do documento: «Reservar: Pista de pádel · Concello de Bouzalonga».
 - **Orde e foco visible (2.4.3 e 2.4.7).** O foco móvese ao `h1` da nova vista e anúnciase o cambio; o indicador de foco é propio, groso e con contraste.
@@ -57,7 +57,6 @@ As ferramentas automáticas detectan unha parte dos problemas. As probas manuais
 - **Preferencias propias** de tamaño de texto (normal, grande e moi grande), alto contraste e movemento reducido, que se suman ás do sistema. O perfil de Manuel, a persoa de demostración que usa lector de pantalla, activa o texto grande.
 - **O resumo de erros recibe o foco**, ao estilo de GOV.UK, en vez do primeiro campo con erro: a persoa escoita primeiro cantos erros hai e cales son.
 - **Asistentes por pasos** (reserva de tempada e alta dun concello) que indican «Paso 2 de 3» e levan o foco ao título de cada paso.
-- **Visitas guiadas propias**: diálogos non modais con `role="dialog"` e `aria-labelledby`, que reciben o foco, indican o progreso, avanzan e retroceden coas frechas, pechan con Escape e devolven o foco.
 - **Ningún mapa incrustado**: a localización ábrese na aplicación de mapas da persoa.
 - **Nunca superposicións nin _widgets_ de accesibilidade**, que a comunidade de persoas con discapacidade rexeita.
 

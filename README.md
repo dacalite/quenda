@@ -91,7 +91,7 @@ Todas as pantallas completas, en móbil e escritorio, están en [`docs/capturas`
 
 - **WCAG 2.1 AA**, a referencia da EN 301 549 e do Real decreto 1112/2018.
 - **axe en cada pantalla** dos tests de extremo a extremo, en escritorio e móbil: calquera infracción fai fallar o cambio.
-- **Todo co teclado e co lector de pantalla**, con foco sempre visible, anuncios dos cambios e visitas guiadas.
+- **Todo co teclado e co lector de pantalla**, con foco sempre visible e anuncios dos cambios.
 - **Axustes para cada persoa**: tamaño do texto, alto contraste e menos movemento.
 - **Gráficas con táboa e resumo en texto**, e a cor nunca como único medio.
 
@@ -105,7 +105,7 @@ As cores son as da Xunta e de Galicia: branco, azul celeste e azuis escuros, coa
 
 ## Probalo
 
-Ao entrar escóllese como ver a demostración: cidadanía, persoal do concello ou deputación. Despois, o botón «Cambiar de perfil» da franxa superior permite cambiar de perfil, de persoa e de concello, iniciar unha **visita guiada** e reiniciar os datos.
+Ao entrar escóllese como ver a demostración: cidadanía, persoal do concello ou deputación. Despois, o botón «Cambiar de perfil» da franxa superior permite cambiar de perfil, de persoa e de concello e reiniciar os datos.
 
 | Persoa | Perfil                                                              |
 | ------ | ------------------------------------------------------------------- |

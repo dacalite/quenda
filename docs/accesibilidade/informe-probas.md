@@ -20,7 +20,7 @@ Antes de cada bloque, reinicia a demostración desde «Cambiar de perfil» › �
 | Código | Fluxo                         | Pasos                                                                                                                                              | Resultado esperado                                                                                                                                                                                                                                                                                           |
 | ------ | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | F1     | Orientación                   | Abrir `/bouzalonga`. Percorrer as rexións e os encabezados. Usar «Saltar ao contido».                                                              | Anúncianse cabeceira, navegación, contido principal e pé; un único encabezado de nivel 1; o salto leva ao contido.                                                                                                                                                                                           |
-| F2     | Visita guiada                 | Abrir a demostración por primeira vez e escoller un perfil (ou «Cambiar de perfil» › «Visita guiada»). Avanzar e retroceder; saír con Escape.      | Anúnciase «Paso 1 de 7» e o título do paso; cada paso leva á súa pantalla; ao saír, o foco volve a onde estaba.                                                                                                                                                                                              |
+| F2     | Escoller perfil               | Abrir a demostración (`/`), percorrer os tres perfís e escoller «Cidadanía». Despois, «Cambiar de perfil» e escoller outro perfil e outra persoa.  | Cada perfil lese como ligazón co seu título e descrición, e o actual anúnciase como actual; ao cambiar, o foco vai ao título da páxina nova e anúnciase.                                                                                                                                                     |
 | F3     | Buscar                        | Ir a «Instalacións». Filtrar por «Pádel» e por «Acceso sen chanzos». Abrir unha instalación.                                                       | Os filtros teñen nome; anúnciase o número de resultados; a ficha le a accesibilidade física, as normas e as tarifas.                                                                                                                                                                                         |
 | F4     | Dispoñibilidade               | Na ficha, «Ver dispoñibilidade e reservar». Cambiar de día. Percorrer as franxas de «Tarde». Escoitar as recomendacións.                           | Cada franxa le espazo, día, hora, estado e prezo («…, libre, 4,00 €»); as recomendacións explican a ocupación media.                                                                                                                                                                                         |
 | F5     | Acceso                        | Escoller unha franxa libre. Na pantalla de acceso, «Entrar con Cl@ve (simulado)».                                                                  | O botón e a pantalla simulada anúncianse con claridade; volve á reserva.                                                                                                                                                                                                                                     |
@@ -123,7 +123,7 @@ Navegador: ____
 
 Pasos previos: non usar o rato nin o panel táctil.
 
-Comprobacións específicas: o foco vese sempre e con contraste; a orde de tabulación segue a lectura; non hai trampas de foco fóra dos diálogos modais; Escape pecha diálogos e a visita guiada; frechas nas lapelas, nos grupos de opcións e na visita guiada.
+Comprobacións específicas: o foco vese sempre e con contraste; a orde de tabulación segue a lectura; non hai trampas de foco fóra dos diálogos modais; Escape pecha os diálogos; frechas nas lapelas e nos grupos de opcións.
 
 | Fluxo | Resultado | Observacións |
 | ----- | --------- | ------------ |
@@ -149,7 +149,7 @@ Navegador e resolución: ____
 
 Pasos previos: zoom do navegador ao 200 % nunha xanela de 1280 px de ancho.
 
-Comprobacións específicas: sen desprazamento horizontal (agás dentro das táboas); nada se solapa nin se corta; a barra de lapelas e a visita guiada non tapan o contido.
+Comprobacións específicas: sen desprazamento horizontal (agás dentro das táboas); nada se solapa nin se corta; a barra de lapelas non tapa o contido.
 
 | Fluxo | Resultado | Observacións |
 | ----- | --------- | ------------ |

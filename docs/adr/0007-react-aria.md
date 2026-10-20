@@ -18,4 +18,4 @@ A accesibilidade é o eixo da proposta: os compoñentes complexos (selectores, c
 - Selectores, calendario, diálogos e lapelas compórtanse como esperan as tecnoloxías de apoio, e os tests de axe pasan sen axustes.
 - A aparencia é totalmente propia e pode cambiar sen tocar o comportamento.
 - Algúns compoñentes impoñen detalles que hai que respectar; por exemplo, o nome accesible dun selector inclúe o valor escollido e a etiqueta.
-- Os compoñentes simples (enlaces, botóns, táboas, resumo de erros, visita guiada) son HTML semántico propio, sen a biblioteca, onde non achega nada.
+- Os compoñentes simples (enlaces, botóns, táboas, resumo de erros) son HTML semántico propio, sen a biblioteca, onde non achega nada.
