@@ -11,7 +11,7 @@ import { canCancel } from '../../domain/rules/cancellation';
 import { zonedNow } from '../../domain/time';
 import type { Facility, Reservation } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
-import { useSubspaceName } from '../../i18n/labels';
+import { useSpaceLabel } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { ConfirmDialog, DialogTrigger } from '../../ui/Dialog';
 import layout from '../../ui/layout.module.css';
@@ -38,7 +38,7 @@ function Record({ reservation, facility }: { reservation: Reservation; facility:
   const format = useFormat();
   const toast = useToast();
   const holderName = useHolderName();
-  const subspaceName = useSubspaceName();
+  const spaceLabel = useSpaceLabel();
   const userId = reservation.holder.kind === 'user' ? reservation.holder.userId : null;
   const holder = useStaffQuery(
     ['users', userId],
@@ -78,7 +78,7 @@ function Record({ reservation, facility }: { reservation: Reservation; facility:
           {holder.data && ` · ${holder.data.phone}`}
         </dd>
         <dt>{t('record.place')}</dt>
-        <dd>{`${facility.name} · ${subspaceName(facility, reservation.subspaceId)}`}</dd>
+        <dd>{`${facility.name} · ${spaceLabel(facility, reservation)}`}</dd>
         <dt>{t('record.when')}</dt>
         <dd>
           {`${format.longDate(reservation.date)}, ${format.timeRange(reservation.start, reservation.end)}`}

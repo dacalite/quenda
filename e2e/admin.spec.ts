@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: EUPL-1.2
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoAxeViolations } from './axe';
 
 const heading = (page: Page) => page.getByRole('heading', { level: 1 });
@@ -34,6 +34,11 @@ async function asStaff(page: Page, staff: 'carme' | 'xose' = 'carme') {
       }),
     );
   }, staff);
+}
+
+async function press(target: Locator, key: string) {
+  await target.focus();
+  await target.press(key);
 }
 
 async function open(page: Page, path: string) {
@@ -127,6 +132,11 @@ test('a season booking previews its conflicts and skips them', async ({ page }) 
 
   await choose(page, 'Instalación', 'Pavillón municipal da Ribeira');
   await page.getByRole('button', { name: 'Seguinte' }).click();
+  await expect(
+    page.getByRole('link', { name: 'Escolle o deporte que vai practicar o club.' }),
+  ).toBeVisible();
+  await choose(page, 'Deporte', 'Baloncesto');
+  await page.getByRole('button', { name: 'Seguinte' }).click();
   await choose(page, 'Hora de inicio', '18:00');
   await page.getByRole('button', { name: 'Seguinte' }).click();
   await expect(step).toHaveText('Paso 4 de 5: tempada');
@@ -147,7 +157,13 @@ test('a phone booking registers the caller and the door checks them in', async (
   await open(page, '/nova-reserva');
 
   await page.getByRole('button', { name: 'Confirmar a reserva' }).click();
-  await expect(page.getByRole('heading', { name: 'Hai 2 erros no formulario' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Hai 3 erros no formulario' })).toBeVisible();
+  await page
+    .getByRole('link', { name: 'Escolle o deporte para o que se reserva o espazo.' })
+    .click();
+  await expect(page.getByRole('button', { name: /Deporte$/ })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await page.getByRole('option', { name: 'Baloncesto' }).click();
 
   await page.getByRole('button', { name: 'Dar de alta unha persoa nova' }).click();
   await page.getByRole('textbox', { name: 'Nome' }).fill('Antía');
@@ -165,6 +181,7 @@ test('a phone booking registers the caller and the door checks them in', async (
   await expect(heading(page)).toHaveText(/^Reserva QDA-/);
   const code = (await heading(page).textContent())?.replace('Reserva ', '') ?? '';
   await expect(page.getByText('Teléfono', { exact: true })).toBeVisible();
+  await expect(page.getByText(/· Baloncesto$/)).toBeVisible();
 
   await open(page, '/acceso');
   await page.getByRole('textbox', { name: 'Código da reserva' }).fill(code.toLowerCase());
@@ -236,6 +253,37 @@ test('a facility photo needs its alternative text and then shows to residents', 
   await expect(
     page.getByRole('img', { name: 'Sala multiusos con cadeiras apiladas' }),
   ).toBeVisible();
+});
+
+test('each space says which sports it takes and which spaces it also fills', async ({ page }) => {
+  await asStaff(page);
+  await open(page, '/instalacions/ribasmeiras-pavillon');
+  const court = page.getByRole('group', { name: 'Espazo 1' });
+  await expect(court.getByRole('group', { name: 'Deportes' })).toBeVisible();
+  await expect(court.getByRole('checkbox', { name: 'Baloncesto' })).toBeChecked();
+  await press(court.getByRole('checkbox', { name: 'Fútbol sala' }), 'Space');
+  await press(
+    court
+      .getByRole('group', { name: 'Ao reservalo, ocupa tamén' })
+      .getByRole('checkbox', { name: 'Pista completa' }),
+    'Space',
+  );
+  await expectNoAxeViolations(page);
+
+  const save = page.getByRole('button', { name: 'Gardar os cambios' });
+  await save.click();
+  await expect(page.getByRole('heading', { name: 'Hai 2 erros no formulario' })).toBeVisible();
+  await page
+    .getByRole('link', { name: /Espazos que ocupa tamén o espazo 1.*ocuparse o un ao outro/ })
+    .click();
+  await expect(page.locator('#facility-subspaces-0-contains')).toBeFocused();
+  await press(court.getByRole('checkbox', { name: 'Pista completa' }), 'Space');
+  await save.click();
+  await expect(toasts(page)).toContainText('Cambios gardados.');
+
+  await page.goto('./ribasmeiras/instalacions/ribasmeiras-pavillon');
+  await expect(page.getByRole('heading', { name: 'Espazos e deportes' })).toBeVisible();
+  await expect(page.locator('dt:text-is("Pista 1") + dd')).toContainText('Fútbol sala');
 });
 
 test('the facility form lists every problem and leads to each field', async ({ page }) => {

@@ -15,7 +15,7 @@ import type {
   User,
 } from '../../../domain/types';
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 /** Everything the prototype stores: the rows the real system keeps in PostgreSQL. */
 export interface Database {

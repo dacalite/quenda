@@ -2,7 +2,7 @@
 import { useTranslation } from 'react-i18next';
 import type { RuleViolation } from '../domain/rules/booking';
 import type { CancelViolation, ModifyViolation } from '../domain/rules/cancellation';
-import type { Facility, Id, LocalizedText, Weekday } from '../domain/types';
+import type { Facility, Id, LocalizedText, Sport, Weekday } from '../domain/types';
 import { currentLanguage } from '.';
 import { useFormat } from './format';
 
@@ -18,6 +18,23 @@ export function useSubspaceName() {
     const subspace = facility.subspaces.find((s) => s.id === subspaceId);
     return subspace ? localized(subspace.name) : '';
   };
+}
+
+/** «Pista 1 · Baloncesto» when the booking names its sport, otherwise the space alone. */
+export function useSpaceLabel() {
+  const { t } = useTranslation('domain');
+  const subspaceName = useSubspaceName();
+  return (facility: Facility, slot: { subspaceId: Id; sport?: Sport | undefined }) => {
+    const name = subspaceName(facility, slot.subspaceId);
+    return slot.sport ? `${name} · ${t(`sport.${slot.sport}`)}` : name;
+  };
+}
+
+/** «Baloncesto, Voleibol e Bádminton» */
+export function useSportList() {
+  const { t } = useTranslation('domain');
+  const format = useFormat();
+  return (sports: Sport[]) => format.list(sports.map((sport) => t(`sport.${sport}`)));
 }
 
 export function useViolationText() {

@@ -22,7 +22,7 @@ describe('validateFacility', () => {
       address: '',
       capacity: 0,
       coordinates: { lat: 95, lng: -200 },
-      subspaces: [{ id: 's', name: { gl: '', es: '' }, capacity: 0, contains: [] }],
+      subspaces: [{ id: 's', name: { gl: '', es: '' }, capacity: 0, contains: [], sports: [] }],
       pricing: {
         residentCents: -1,
         nonResidentCents: 1.5,

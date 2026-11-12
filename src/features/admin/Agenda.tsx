@@ -266,7 +266,9 @@ function AgendaCell({
     <div className={styles.cell}>
       {here.map((r) => (
         <Link key={r.id} href={paths.reservation(r.id)}>
-          {`${holderName(r.holder)} (${r.code})`}
+          {r.sport
+            ? `${holderName(r.holder)} · ${t(`domain:sport.${r.sport}`)} (${r.code})`
+            : `${holderName(r.holder)} (${r.code})`}
         </Link>
       ))}
       {slot.status === 'free' ? (

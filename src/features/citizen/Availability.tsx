@@ -11,9 +11,10 @@ import { citizenPaths } from '../../app/routes/paths';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
 import { computePrice } from '../../domain/rules/pricing';
 import { addDays, daypart, startOfWeek, zonedNow, type Daypart } from '../../domain/time';
-import type { Facility, IsoDate } from '../../domain/types';
+import { facilitySports } from '../../domain/sports';
+import type { Facility, IsoDate, Sport } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
-import { useLocalized } from '../../i18n/labels';
+import { useLocalized, useSportList } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { DataTable } from '../../ui/DataTable';
 import { DatePicker } from '../../ui/DatePicker';
@@ -27,6 +28,7 @@ import { useSlotDescription } from './labels';
 import { useCitizen, useMe, useRecommendations, useReservation } from './queries';
 
 const DAYPARTS: Daypart[] = ['morning', 'afternoon', 'evening'];
+const ANY = 'any';
 const isIsoDate = (value: string | null): value is IsoDate =>
   Boolean(value && /^\d{4}-\d{2}-\d{2}$/.test(value));
 
@@ -44,6 +46,7 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
   const paths = citizenPaths(tenant.slug);
   const format = useFormat();
   const localized = useLocalized();
+  const sportList = useSportList();
   const navigate = useNavigate();
   const describe = useSlotDescription(facility);
   const [params] = useSearchParams();
@@ -51,10 +54,13 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
 
   const requested = params.get('data');
   const date = isIsoDate(requested) && requested >= today ? requested : today;
-  const subspaceId =
-    facility.subspaces.find((s) => s.id === params.get('espazo'))?.id ??
-    facility.subspaces[0]?.id ??
-    '';
+  const sports = facilitySports(facility);
+  const sport = sports.find((s) => s === params.get('deporte'));
+  const spaces = sport
+    ? facility.subspaces.filter((s) => s.sports.includes(sport))
+    : facility.subspaces;
+  const subspaceId = spaces.find((s) => s.id === params.get('espazo'))?.id ?? spaces[0]?.id ?? '';
+  const space = facility.subspaces.find((s) => s.id === subspaceId);
   const week = params.get('vista') === 'semana';
   const replaces = params.get('cambiar') ?? undefined;
 
@@ -64,11 +70,17 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
   const recommendations = useRecommendations(facility.id, date);
   const changing = useReservation(replaces ?? '');
 
-  const go = (changes: { date?: IsoDate; subspaceId?: string; week?: boolean }) => {
+  const go = (changes: {
+    date?: IsoDate;
+    subspaceId?: string;
+    sport?: Sport | undefined;
+    week?: boolean;
+  }) => {
     void navigate(
       paths.availability(facility.id, {
         date: changes.date ?? date,
         subspaceId: changes.subspaceId ?? subspaceId,
+        sport: 'sport' in changes ? changes.sport : sport,
         week: changes.week ?? week,
         ...(replaces ? { replaces } : {}),
       }),
@@ -90,6 +102,7 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
       date: slot.date,
       start: slot.start,
       end: slot.end,
+      sport,
       replaces,
     });
 
@@ -125,6 +138,7 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
               href={paths.availability(facility.id, {
                 date: day,
                 subspaceId,
+                sport,
                 week,
                 ...(replaces ? { replaces } : {}),
               })}
@@ -171,14 +185,39 @@ function AvailabilityFor({ facility }: { facility: Facility }) {
             <Icon name="chevronRight" />
           </Button>
         </div>
-        {facility.subspaces.length > 1 && (
+        {sports.length > 1 && (
+          <Select
+            label={t('availability.sport')}
+            value={sport ?? ANY}
+            onChange={(value) => {
+              const chosen = sports.find((s) => s === value);
+              go({
+                sport: chosen,
+                subspaceId:
+                  chosen && !space?.sports.includes(chosen)
+                    ? facility.subspaces.find((s) => s.sports.includes(chosen))?.id
+                    : subspaceId,
+              });
+            }}
+            options={[
+              { id: ANY, label: t('availability.anySport') },
+              ...sports.map((s) => ({ id: s, label: t(`domain:sport.${s}`) })),
+            ]}
+          />
+        )}
+        {spaces.length > 1 && (
           <Select
             label={t('availability.subspace')}
             value={subspaceId}
+            description={
+              !sport && space && space.sports.length > 1
+                ? t('availability.spaceSports', { sports: sportList(space.sports) })
+                : undefined
+            }
             onChange={(value) => {
               go({ subspaceId: value });
             }}
-            options={facility.subspaces.map((s) => ({ id: s.id, label: localized(s.name) }))}
+            options={spaces.map((s) => ({ id: s.id, label: localized(s.name) }))}
           />
         )}
       </div>

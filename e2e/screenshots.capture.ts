@@ -147,6 +147,7 @@ test('council screens', async ({ page }) => {
   await page.keyboard.press('Space');
   await page.getByRole('button', { name: 'Seguinte' }).click();
   await choose(page, 'Instalación', 'Pavillón municipal da Ribeira');
+  await choose(page, 'Deporte', 'Baloncesto');
   await page.getByRole('button', { name: 'Seguinte' }).click();
   await choose(page, 'Hora de inicio', '18:00');
   await page.getByRole('button', { name: 'Seguinte' }).click();

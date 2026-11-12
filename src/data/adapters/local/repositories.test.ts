@@ -304,6 +304,20 @@ describe('reservations', () => {
     expect(quote.violations).toEqual([{ code: 'residentsOnly' }]);
   });
 
+  it('asks which sport when the space is shared by several, and keeps it', async () => {
+    const { repos, db } = setup({ userId: uxia.userId });
+    const court = freeSlot(db.read(), `${B}-pavillon`, TOMORROW);
+    const input = { ...court, holder: uxia, channel: 'web' as const };
+    expect((await repos.reservations.quote(B, input)).violations).toEqual([
+      { code: 'sportRequired' },
+    ]);
+    expect((await repos.reservations.quote(B, { ...input, sport: 'tennis' })).violations).toEqual([
+      { code: 'sportNotOffered' },
+    ]);
+    const reservation = await repos.reservations.create(B, { ...input, sport: 'basketball' });
+    expect(reservation.sport).toBe('basketball');
+  });
+
   it('quotes a change of an existing booking with the modification rules', async () => {
     const { repos, db } = setup({ userId: uxia.userId });
     const first = freeSlot(db.read(), `${B}-tenis`, addDays(TODAY, 3));
@@ -503,6 +517,7 @@ describe('recurring bookings', () => {
     entityId: `${B}-patinaxe`,
     facilityId: `${B}-pavillon`,
     subspaceId,
+    sport: 'skating' as const,
     weekday: 1 as const,
     times: { start, end },
     season: { from: '2026-09-01', to: '2026-12-31' },
@@ -511,7 +526,10 @@ describe('recurring bookings', () => {
 
   it('previews the clashes with existing season bookings', async () => {
     const { repos } = setup();
-    const conflicts = await repos.recurringBookings.preview(B, pattern('full', '18:00', '20:00'));
+    const conflicts = await repos.recurringBookings.preview(B, {
+      ...pattern('full', '18:00', '20:00'),
+      sport: 'basketball',
+    });
     expect(conflicts.length).toBeGreaterThan(5);
     expect(conflicts.every((c) => c.problem === 'booked' || c.problem === 'closed')).toBe(true);
   });
@@ -527,9 +545,21 @@ describe('recurring bookings', () => {
     expect(instances.length).toBeGreaterThan(5);
     expect(instances.some((r) => conflicts.some((c) => c.date === r.date))).toBe(false);
     expect(instances.every((r) => r.amountCents === 0 && r.payment === 'free')).toBe(true);
+    expect(instances.every((r) => r.sport === 'skating')).toBe(true);
     expect(await repos.recurringBookings.list(B, { entityId: `${B}-patinaxe` })).toContainEqual(
       booking,
     );
+  });
+
+  it('needs a sport the space offers', async () => {
+    const { repos } = setup();
+    const { sport: _sport, ...withoutSport } = pattern('court-1', '09:00', '10:00');
+    await expect(repos.recurringBookings.preview(B, withoutSport)).rejects.toMatchObject({
+      problems: [{ field: 'sport', code: 'required' }],
+    });
+    await expect(
+      repos.recurringBookings.create(B, { ...withoutSport, sport: 'tennis' }),
+    ).rejects.toMatchObject({ problems: [{ field: 'sport', code: 'range' }] });
   });
 });
 

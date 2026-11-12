@@ -81,6 +81,18 @@ export type FacilityType =
   | 'multipurposeRoom'
   | 'gym';
 
+export type Sport =
+  | 'futsal'
+  | 'basketball'
+  | 'volleyball'
+  | 'handball'
+  | 'badminton'
+  | 'football'
+  | 'padel'
+  | 'tennis'
+  | 'swimming'
+  | 'skating';
+
 export type AccessibilityFeature =
   'stepFreeAccess' | 'adaptedChangingRoom' | 'adaptedToilet' | 'reservedParking' | 'hearingLoop';
 
@@ -102,6 +114,8 @@ export interface Subspace {
   capacity: number;
   /** Subspaces this one also occupies, e.g. the whole pitch contains both halves. */
   contains: Id[];
+  /** Sports it can be booked for; with more than one, each booking says which. Empty for a gym or a room. */
+  sports: Sport[];
 }
 
 export interface Photo {
@@ -225,6 +239,8 @@ export interface Slot {
   date: IsoDate;
   start: Time;
   end: Time;
+  /** Only when the subspace offers more than one sport. */
+  sport?: Sport;
 }
 
 export type Holder = { kind: 'user'; userId: Id } | { kind: 'entity'; entityId: Id };
@@ -263,6 +279,7 @@ export interface RecurringBooking {
   entityId: Id;
   facilityId: Id;
   subspaceId: Id;
+  sport?: Sport;
   weekday: Weekday;
   times: TimeRange;
   season: DateRange;

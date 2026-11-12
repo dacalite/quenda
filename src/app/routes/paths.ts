@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import type { RESERVED_SLUGS } from '../../domain/councils';
-import type { Id, IsoDate, Time } from '../../domain/types';
+import type { Id, IsoDate, Sport, Time } from '../../domain/types';
 import type { DemoRole } from '../state';
 
 export const ADMIN_PATH = 'xestion';
@@ -26,6 +26,7 @@ export interface BookingParams {
   date: IsoDate;
   start: Time;
   end: Time;
+  sport?: Sport | undefined;
   replaces?: Id | undefined;
 }
 
@@ -43,10 +44,17 @@ export const citizenPaths = (slug: string) => ({
   facility: (id: Id) => `/${slug}/instalacions/${id}`,
   availability: (
     id: Id,
-    options: { date?: IsoDate; subspaceId?: Id; replaces?: Id; week?: boolean } = {},
+    options: {
+      date?: IsoDate;
+      subspaceId?: Id;
+      sport?: Sport | undefined;
+      replaces?: Id;
+      week?: boolean;
+    } = {},
   ) =>
     `/${slug}/instalacions/${id}/reservar${query({
       data: options.date,
+      deporte: options.sport,
       espazo: options.subspaceId,
       cambiar: options.replaces,
       vista: options.week ? 'semana' : undefined,
@@ -55,6 +63,7 @@ export const citizenPaths = (slug: string) => ({
     `/${slug}/reservar${query({
       instalacion: params.facilityId,
       espazo: params.subspaceId,
+      deporte: params.sport,
       data: params.date,
       inicio: params.start,
       fin: params.end,
