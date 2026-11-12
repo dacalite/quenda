@@ -1193,9 +1193,24 @@ components:
       type: string
       enum:
         [sportsHall, paddleCourt, tennisCourt, footballPitch, swimmingPool, multipurposeRoom, gym]
+    Sport:
+      type: string
+      enum:
+        [
+          football,
+          futsal,
+          basketball,
+          volleyball,
+          handball,
+          badminton,
+          padel,
+          tennis,
+          swimming,
+          skating,
+        ]
     Subspace:
       type: object
-      required: [id, name, capacity, contains]
+      required: [id, name, capacity, contains, sports]
       properties:
         id: { $ref: '#/components/schemas/Id' }
         name: { $ref: '#/components/schemas/LocalizedText' }
@@ -1207,6 +1222,12 @@ components:
           type: array
           description: Espazos que tamén ocupa, p. ex. o campo enteiro contén os dous medios.
           items: { $ref: '#/components/schemas/Id' }
+        sports:
+          type: array
+          description: >-
+            Deportes para os que se reserva. Con máis dun, cada reserva indica o seu; baleiro nunha
+            sala ou nun ximnasio.
+          items: { $ref: '#/components/schemas/Sport' }
     Pricing:
       type: object
       required: [residentCents, nonResidentCents, concessions, entitiesFree]
@@ -1379,6 +1400,9 @@ components:
         date: { $ref: '#/components/schemas/IsoDate' }
         start: { $ref: '#/components/schemas/Time' }
         end: { $ref: '#/components/schemas/Time' }
+        sport:
+          $ref: '#/components/schemas/Sport'
+          description: Obrigatorio cando o espazo ten máis dun deporte.
     AvailabilitySlot:
       allOf:
         - $ref: '#/components/schemas/Slot'
@@ -1475,6 +1499,8 @@ components:
             - notCancellable
             - alreadyStarted
             - modificationWindowClosed
+            - sportRequired
+            - sportNotOffered
         slotMinutes: { type: integer }
         hours: { type: integer }
         days: { type: integer }
@@ -1543,6 +1569,9 @@ components:
         entityId: { $ref: '#/components/schemas/Id' }
         facilityId: { $ref: '#/components/schemas/Id' }
         subspaceId: { $ref: '#/components/schemas/Id' }
+        sport:
+          $ref: '#/components/schemas/Sport'
+          description: Obrigatorio cando o espazo ten máis dun deporte.
         weekday: { $ref: '#/components/schemas/Weekday' }
         times: { $ref: '#/components/schemas/TimeRange' }
         season: { $ref: '#/components/schemas/DateRange' }
