@@ -9,7 +9,7 @@ import { attendanceOf, canCheckIn } from '../../domain/rules/attendance';
 import { byDateAndStart, zonedNow, type LocalDateTime } from '../../domain/time';
 import type { Facility, Reservation } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
-import { useSubspaceName } from '../../i18n/labels';
+import { useSpaceLabel } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { DataTable } from '../../ui/DataTable';
 import layout from '../../ui/layout.module.css';
@@ -136,7 +136,7 @@ function Verdict({
   const { t } = useTranslation(['admin', 'common']);
   const format = useFormat();
   const holderName = useHolderName();
-  const subspaceName = useSubspaceName();
+  const spaceLabel = useSpaceLabel();
   const attendance = attendanceOf(reservation, now);
   const tone = attendance === 'checkedIn' || canCheckIn(reservation, now) ? 'success' : 'warning';
   const message = canCheckIn(reservation, now)
@@ -158,9 +158,7 @@ function Verdict({
         <dt>{t('record.holder')}</dt>
         <dd>{holderName(reservation.holder)}</dd>
         <dt>{t('record.place')}</dt>
-        <dd>
-          {facility ? `${facility.name} · ${subspaceName(facility, reservation.subspaceId)}` : ''}
-        </dd>
+        <dd>{facility ? `${facility.name} · ${spaceLabel(facility, reservation)}` : ''}</dd>
         <dt>{t('record.when')}</dt>
         <dd>{`${format.longDate(reservation.date)}, ${format.timeRange(reservation.start, reservation.end)}`}</dd>
         <dt>{t('record.status')}</dt>
@@ -240,7 +238,7 @@ function TodayTable({
   const paths = adminPaths(tenant.slug);
   const format = useFormat();
   const holderName = useHolderName();
-  const subspaceName = useSubspaceName();
+  const spaceLabel = useSpaceLabel();
 
   return (
     <DataTable
@@ -259,7 +257,7 @@ function TodayTable({
           header: t('table.place'),
           render: (r) => {
             const facility = facilities.find((f) => f.id === r.facilityId);
-            return facility ? `${facility.name} · ${subspaceName(facility, r.subspaceId)}` : '';
+            return facility ? `${facility.name} · ${spaceLabel(facility, r)}` : '';
           },
         },
         { key: 'holder', header: t('table.holder'), render: (r) => holderName(r.holder) },

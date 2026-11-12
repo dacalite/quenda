@@ -11,6 +11,7 @@ import type {
   Pricing,
   Schedule,
   SlotMinutes,
+  Sport,
   Subspace,
   Tenant,
   TimeRange,
@@ -53,18 +54,26 @@ export const subspace = (
   gl: string,
   es: string,
   extra: Partial<Subspace> = {},
-): Subspace => ({ id, name: text(gl, es), capacity: 1, contains: [], ...extra });
+): Subspace => ({ id, name: text(gl, es), capacity: 1, contains: [], sports: [], ...extra });
+
+const COURT_SPORTS: Sport[] = ['basketball', 'volleyball', 'badminton', 'skating'];
 
 export const HALL_SPACES = [
-  subspace('court-1', 'Pista 1', 'Pista 1'),
-  subspace('court-2', 'Pista 2', 'Pista 2'),
-  subspace('full', 'Pista completa', 'Pista completa', { contains: ['court-1', 'court-2'] }),
+  subspace('court-1', 'Pista 1', 'Pista 1', { sports: COURT_SPORTS }),
+  subspace('court-2', 'Pista 2', 'Pista 2', { sports: COURT_SPORTS }),
+  subspace('full', 'Pista completa', 'Pista completa', {
+    contains: ['court-1', 'court-2'],
+    sports: ['futsal', 'handball', 'basketball', 'volleyball'],
+  }),
 ];
 
 export const PITCH_SPACES = [
-  subspace('half-a', 'Medio campo A', 'Medio campo A'),
-  subspace('half-b', 'Medio campo B', 'Medio campo B'),
-  subspace('full', 'Campo completo', 'Campo completo', { contains: ['half-a', 'half-b'] }),
+  subspace('half-a', 'Medio campo A', 'Medio campo A', { sports: ['football'] }),
+  subspace('half-b', 'Medio campo B', 'Medio campo B', { sports: ['football'] }),
+  subspace('full', 'Campo completo', 'Campo completo', {
+    contains: ['half-a', 'half-b'],
+    sports: ['football'],
+  }),
 ];
 
 export const legalTexts = (council: string): Tenant['legal'] => ({
@@ -192,7 +201,7 @@ const TEMPLATES: Record<FacilityType, Template> = {
     name: 'Pista de pádel',
     description: text('Pista de pádel con iluminación.', 'Pista de pádel con iluminación.'),
     capacity: 4,
-    subspaces: [subspace('main', 'Pista', 'Pista')],
+    subspaces: [subspace('main', 'Pista', 'Pista', { sports: ['padel'] })],
     weekly: OUTDOOR,
     slotMinutes: 90,
     residentCents: 600,
@@ -201,7 +210,7 @@ const TEMPLATES: Record<FacilityType, Template> = {
     name: 'Pista de tenis',
     description: text('Pista de tenis exterior.', 'Pista de tenis exterior.'),
     capacity: 4,
-    subspaces: [subspace('main', 'Pista', 'Pista')],
+    subspaces: [subspace('main', 'Pista', 'Pista', { sports: ['tennis'] })],
     weekly: OUTDOOR,
     slotMinutes: 60,
     residentCents: 500,
@@ -223,7 +232,9 @@ const TEMPLATES: Record<FacilityType, Template> = {
     description: text('Piscina cuberta de catro rúas.', 'Piscina cubierta de cuatro calles.'),
     capacity: 40,
     subspaces: [1, 2, 3, 4].map((n) =>
-      subspace(`lane-${String(n)}`, `Rúa ${String(n)}`, `Calle ${String(n)}`),
+      subspace(`lane-${String(n)}`, `Rúa ${String(n)}`, `Calle ${String(n)}`, {
+        sports: ['swimming'],
+      }),
     ),
     weekly: EARLY,
     slotMinutes: 60,

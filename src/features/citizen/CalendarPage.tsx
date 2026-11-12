@@ -9,7 +9,7 @@ import { citizenPaths } from '../../app/routes/paths';
 import { zonedNow } from '../../domain/time';
 import type { IsoDate, Reservation } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
-import { useSubspaceName } from '../../i18n/labels';
+import { useSpaceLabel } from '../../i18n/labels';
 import { useAnnounce } from '../../ui/announcer';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
@@ -33,7 +33,7 @@ export function CalendarPage() {
   const toast = useToast();
   const announce = useAnnounce();
   const format = useFormat();
-  const subspaceName = useSubspaceName();
+  const spaceLabel = useSpaceLabel();
   const today = zonedNow(new Date(), tenant.timeZone).date;
   const [day, setDay] = useState<IsoDate>(today);
 
@@ -94,7 +94,7 @@ export function CalendarPage() {
                     <Ticket
                       key={reservation.id}
                       reservation={reservation}
-                      facilityName={`${facility.name}, ${subspaceName(facility, reservation.subspaceId)}`}
+                      facilityName={`${facility.name}, ${spaceLabel(facility, reservation)}`}
                       href={paths.reservation(reservation.id)}
                       muted={reservation.status !== 'confirmed'}
                     >

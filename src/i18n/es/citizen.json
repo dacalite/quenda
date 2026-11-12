@@ -53,7 +53,10 @@
     "noResults": "Ninguna instalación cumple estos filtros. Prueba a quitar alguno.",
     "seeAvailability": "Ver disponibilidad",
     "map": "Ver en el mapa",
-    "mapLabel": "Ver en el mapa: {{name}} (Google Maps)"
+    "mapLabel": "Ver en el mapa: {{name}} (Google Maps)",
+    "sport": "Deporte",
+    "anySport": "Todos los deportes",
+    "sports": "Deportes: {{sports}}."
   },
   "facility": {
     "type": "Tipo",
@@ -79,7 +82,10 @@
     "noNextFree": "No hay horas libres en los próximos 7 días.",
     "book": "Ver disponibilidad y reservar",
     "drawingAlt": "Dibujo: {{type}}",
-    "morePhotos": "Más fotos"
+    "morePhotos": "Más fotos",
+    "sports": "Deportes",
+    "spacesTitle": "Espacios y deportes",
+    "spaceContains": "Ocupa también {{spaces}}."
   },
   "availability": {
     "title": "Reservar: {{name}}",
@@ -100,7 +106,10 @@
     "recommendation": "Recomendado a las {{time}}: suele estar libre (ocupación media {{percent}})",
     "weekCaption": "Semana del {{date}}",
     "timeColumn": "Hora",
-    "changing": "Estás cambiando la reserva {{code}}. Elige la nueva hora."
+    "changing": "Estás cambiando la reserva {{code}}. Elige la nueva hora.",
+    "sport": "Deporte",
+    "anySport": "Cualquier deporte",
+    "spaceSports": "En este espacio: {{sports}}."
   },
   "booking": {
     "title": "Revisa tu reserva",
@@ -125,7 +134,10 @@
     "taken": "Alguien acaba de reservar esta hora.",
     "alternatives": "Estas horas están libres y suelen tener poca gente:",
     "missing": "Falta información de la reserva. Vuelve a elegir la hora.",
-    "saving": "Guardando la reserva…"
+    "saving": "Guardando la reserva…",
+    "sport": "Deporte",
+    "sportHelp": "Este espacio lo comparten varios deportes. Elige el que vas a practicar.",
+    "sportError": "Elige el deporte que vas a practicar."
   },
   "reservation": {
     "confirmedTitle": "Reserva confirmada",

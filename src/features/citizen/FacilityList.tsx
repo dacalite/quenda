@@ -9,7 +9,9 @@ import { useAvailabilityQuery, useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
 import { daypart, minutesBetween, zonedNow, type Daypart } from '../../domain/time';
-import type { AccessibilityFeature, FacilityType } from '../../domain/types';
+import { facilitySports } from '../../domain/sports';
+import type { AccessibilityFeature, Facility, FacilityType, Sport } from '../../domain/types';
+import { useSportList } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { Checkbox } from '../../ui/Checkbox';
@@ -42,10 +44,12 @@ export function FacilityList() {
   const facilities = useFacilities();
   const availabilityQuery = useAvailabilityQuery();
   const now = zonedNow(new Date(), tenant.timeZone);
+  const sportList = useSportList();
 
   const applied = {
     q: params.get('q') ?? '',
     type: params.get('tipo') ?? ANY,
+    sport: params.get('deporte') ?? ANY,
     date: params.get('data'),
     daypart: params.get('franxa') ?? ANY,
     features: (params.get('acc') ?? '').split(',').filter(Boolean),
@@ -64,10 +68,16 @@ export function FacilityList() {
     })),
   });
 
-  const hasFreeSlot = (slots: AvailabilitySlot[] | undefined) =>
+  const offers = (facility: Facility, subspaceId: string) =>
+    applied.sport === ANY ||
+    facility.subspaces.some(
+      (s) => s.id === subspaceId && s.sports.includes(applied.sport as Sport),
+    );
+  const hasFreeSlot = (facility: Facility, slots: AvailabilitySlot[] | undefined) =>
     (slots ?? []).some(
       (slot) =>
         slot.status === 'free' &&
+        offers(facility, slot.subspaceId) &&
         (applied.daypart === ANY || daypart(slot.start) === applied.daypart) &&
         (!applied.now || minutesBetween(now, { date: slot.date, time: slot.start }) <= 60),
     );
@@ -77,15 +87,22 @@ export function FacilityList() {
     (facility, index) =>
       facility.status === 'active' &&
       (!search ||
-        `${facility.name} ${t(`domain:facilityType.${facility.type}`)}`
+        [
+          facility.name,
+          t(`domain:facilityType.${facility.type}`),
+          ...facilitySports(facility).map((sport) => t(`domain:sport.${sport}`)),
+        ]
+          .join(' ')
           .toLowerCase()
           .includes(search)) &&
       (applied.type === ANY || facility.type === applied.type) &&
+      (applied.sport === ANY || facilitySports(facility).includes(applied.sport as Sport)) &&
       applied.features.every((f) => facility.accessibility.includes(f as AccessibilityFeature)) &&
-      (!checkDate || hasFreeSlot(availability[index]?.data)),
+      (!checkDate || hasFreeSlot(facility, availability[index]?.data)),
   );
   const loading = facilities.isPending || availability.some((q) => q.isPending && checkDate);
   const types = [...new Set(all.map((f) => f.type))];
+  const sports = facilitySports({ subspaces: all.flatMap((f) => f.subspaces) });
 
   return (
     <Page title={t('list.title')}>
@@ -97,6 +114,7 @@ export function FacilityList() {
           setParams({
             ...(draft.q ? { q: draft.q } : {}),
             ...(draft.type !== ANY ? { tipo: draft.type } : {}),
+            ...(draft.sport !== ANY ? { deporte: draft.sport } : {}),
             ...(draft.date ? { data: draft.date } : {}),
             ...(draft.daypart !== ANY ? { franxa: draft.daypart } : {}),
             ...(draft.features.length ? { acc: draft.features.join(',') } : {}),
@@ -141,6 +159,17 @@ export function FacilityList() {
                   id: type,
                   label: t(`domain:facilityType.${type}`),
                 })),
+              ]}
+            />
+            <Select
+              label={t('list.sport')}
+              value={draft.sport}
+              onChange={(sport) => {
+                setDraft({ ...draft, sport });
+              }}
+              options={[
+                { id: ANY, label: t('list.anySport') },
+                ...sports.map((sport) => ({ id: sport, label: t(`domain:sport.${sport}`) })),
               ]}
             />
             <DatePicker
@@ -199,7 +228,15 @@ export function FacilityList() {
             <Link
               href={paths.facilities()}
               onPress={() => {
-                setDraft({ q: '', type: ANY, date: null, daypart: ANY, features: [], now: false });
+                setDraft({
+                  q: '',
+                  type: ANY,
+                  sport: ANY,
+                  date: null,
+                  daypart: ANY,
+                  features: [],
+                  now: false,
+                });
               }}
             >
               {t('list.clear')}
@@ -223,7 +260,10 @@ export function FacilityList() {
             footer={
               <>
                 <Link
-                  href={paths.availability(facility.id, applied.date ? { date: applied.date } : {})}
+                  href={paths.availability(facility.id, {
+                    ...(applied.date ? { date: applied.date } : {}),
+                    ...(applied.sport !== ANY ? { sport: applied.sport as Sport } : {}),
+                  })}
                   variant="primary"
                 >
                   {t('list.seeAvailability')}
@@ -241,6 +281,11 @@ export function FacilityList() {
             <p className={layout.meta}>
               {t(`domain:facilityType.${facility.type}`)} · {facility.address}
             </p>
+            {facilitySports(facility).length > 1 && (
+              <p className={layout.meta}>
+                {t('list.sports', { sports: sportList(facilitySports(facility)) })}
+              </p>
+            )}
             {facility.accessibility.length > 0 && (
               <ul className={styles.featureList} aria-label={t('list.accessibility')}>
                 {facility.accessibility.map((feature) => (

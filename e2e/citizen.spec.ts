@@ -146,6 +146,46 @@ test('book and cancel using only the keyboard, with axe at every step', async ({
   await expectNoAxeViolations(page);
 });
 
+test('a shared court is booked for the sport each person chooses', async ({ page }) => {
+  await signedInAs(page);
+  await page.goto('./ribasmeiras/instalacions?deporte=handball');
+  await expect(
+    page.getByRole('link', { name: 'Pavillón municipal da Ribeira', exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Pistas de pádel do Malecón' })).toHaveCount(0);
+  await expectNoAxeViolations(page);
+
+  await page.getByRole('link', { name: 'Ver dispoñibilidade', exact: true }).click();
+  await expect(heading(page)).toHaveText('Reservar: Pavillón municipal da Ribeira');
+  await expect(page.getByRole('button', { name: /Deporte$/ })).toContainText('Balonmán');
+  // Only the whole court takes handball, so there is no space to choose.
+  await expect(page.getByRole('button', { name: /Espazo$/ })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Día seguinte' }).click();
+  await page.locator('a[data-status="free"]').first().click();
+  await expect(heading(page)).toHaveText('Revisa a túa reserva');
+  await expect(page.getByRole('radio', { name: 'Balonmán' })).toBeChecked();
+  await expectNoAxeViolations(page);
+  const accept = page.getByRole('checkbox', { name: 'Lin e acepto as normas de uso' });
+  await accept.focus();
+  await accept.press('Space');
+  await page.getByRole('button', { name: 'Confirmar a reserva' }).click();
+  await expect(heading(page)).toHaveText('Reserva confirmada');
+  await expect(page.getByRole('definition').filter({ hasText: 'Balonmán' })).toBeVisible();
+
+  await page.goto('./ribasmeiras/instalacions/ribasmeiras-pavillon/reservar');
+  await expect(
+    page.getByText('Neste espazo: Baloncesto, Voleibol, Bádminton e Patinaxe.'),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Día seguinte' }).click();
+  await page.locator('a[data-status="free"]').first().click();
+  await expect(heading(page)).toHaveText('Revisa a túa reserva');
+  await page.getByRole('button', { name: 'Confirmar a reserva' }).click();
+  await expect(page.getByRole('heading', { name: 'Hai 2 erros no formulario' })).toBeVisible();
+  await page.getByRole('link', { name: 'Escolle o deporte que vas practicar.' }).click();
+  await expect(page.getByRole('radio', { name: 'Baloncesto' })).toBeFocused();
+  await expectNoAxeViolations(page);
+});
+
 test.describe('citizen screens pass axe', () => {
   test.beforeEach(async ({ page }) => {
     await signedInAs(page);
@@ -154,6 +194,7 @@ test.describe('citizen screens pass axe', () => {
   for (const [path, title] of [
     ['/bouzalonga/instalacions?tipo=paddleCourt', 'Instalacións'],
     ['/ribasmeiras/instalacions/ribasmeiras-piscina', 'Piscina municipal cuberta'],
+    ['/ribasmeiras/instalacions/ribasmeiras-pavillon', 'Pavillón municipal da Ribeira'],
     [
       '/ribasmeiras/instalacions/ribasmeiras-padel/reservar?vista=semana',
       'Reservar: Pistas de pádel do Malecón',

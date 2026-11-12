@@ -23,6 +23,7 @@ import {
   type FacilityContext,
   type SlotProblem,
 } from './availability';
+import { sportProblem, type SportProblem } from '../sports';
 
 export type RuleViolation =
   | { code: 'facilityInactive' }
@@ -38,7 +39,8 @@ export type RuleViolation =
   | { code: 'weeklyLimit'; max: number }
   | { code: 'residentsOnly' }
   | { code: 'entitiesOnly' }
-  | { code: 'suspended'; until: IsoDate };
+  | { code: 'suspended'; until: IsoDate }
+  | { code: SportProblem };
 
 export type Decision<V> = { ok: true } | { ok: false; violations: V[] };
 
@@ -113,6 +115,10 @@ export function canBook(
   if (rules.eligibility === 'residents' && holder.kind === 'user' && !holder.user.resident) {
     violations.push({ code: 'residentsOnly' });
   }
+
+  const subspace = facility.subspaces.find((s) => s.id === slot.subspaceId);
+  const sport = subspace && sportProblem(subspace, slot.sport);
+  if (sport) violations.push({ code: sport });
 
   const problem = findSlotProblem({ ...context, reservations: others(context.reservations) }, slot);
   // An inactive facility reads as closed; its own reason is clearer.

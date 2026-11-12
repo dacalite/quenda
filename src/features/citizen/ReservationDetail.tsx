@@ -84,6 +84,12 @@ function Detail({ reservation, facility }: { reservation: Reservation; facility:
             <dd>{facility.name}</dd>
             <dt>{t('booking.space')}</dt>
             <dd>{subspaceName(facility, reservation.subspaceId)}</dd>
+            {reservation.sport && (
+              <>
+                <dt>{t('booking.sport')}</dt>
+                <dd>{t(`domain:sport.${reservation.sport}`)}</dd>
+              </>
+            )}
             <dt>{t('booking.date')}</dt>
             <dd>{format.longDate(reservation.date)}</dd>
             <dt>{t('booking.time')}</dt>

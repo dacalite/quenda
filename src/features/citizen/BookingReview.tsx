@@ -7,6 +7,7 @@ import { useFacility } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import { ConflictError, RuleViolationError } from '../../data/ports/errors';
 import type { ReservationInput } from '../../data/ports/repositories';
+import { needsSport } from '../../domain/sports';
 import type { Facility, Holder, Id } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
 import { useLocalized, useSubspaceName, useViolationText } from '../../i18n/labels';
@@ -14,10 +15,12 @@ import { Button } from '../../ui/Button';
 import { Checkbox } from '../../ui/Checkbox';
 import { ErrorSummary, type FormError } from '../../ui/ErrorSummary';
 import { Link } from '../../ui/Link';
+import { RadioGroup } from '../../ui/RadioGroup';
 import layout from '../../ui/layout.module.css';
 import { useBook, useCitizen, useQuote, useRecommendations } from './queries';
 
 const ACCEPT_ID = 'accept-rules';
+const SPORT_ID = 'booking-sport';
 
 export function BookingReview() {
   const { t } = useTranslation('citizen');
@@ -50,6 +53,7 @@ export function BookingReview() {
     <Review
       facility={facility.data}
       input={{ ...slot, holder, channel: 'web' }}
+      requestedSport={params.get('deporte')}
       replaces={params.get('cambiar') ?? undefined}
     />
   );
@@ -57,11 +61,13 @@ export function BookingReview() {
 
 function Review({
   facility,
-  input,
+  input: slotInput,
+  requestedSport,
   replaces,
 }: {
   facility: Facility;
   input: ReservationInput & { holder: Holder };
+  requestedSport: string | null;
   replaces: Id | undefined;
 }) {
   const { t } = useTranslation(['citizen', 'domain']);
@@ -72,6 +78,10 @@ function Review({
   const localized = useLocalized();
   const subspaceName = useSubspaceName();
   const violationText = useViolationText();
+  const space = facility.subspaces.find((s) => s.id === slotInput.subspaceId);
+  const choosesSport = space ? needsSport(space) : false;
+  const [sport, setSport] = useState(space?.sports.find((s) => s === requestedSport));
+  const input = sport ? { ...slotInput, sport } : slotInput;
   const quote = useQuote(input, replaces);
   const book = useBook();
   const recommendations = useRecommendations(facility.id, input.date);
@@ -79,24 +89,28 @@ function Review({
   const [errors, setErrors] = useState<FormError[]>([]);
 
   const conflict = book.error instanceof ConflictError;
-  const violations =
+  // The sport is chosen in the form below, so a missing one is a form error, not a reason to stop.
+  const violations = (
     book.error instanceof RuleViolationError
       ? book.error.violations
-      : (quote.data?.violations ?? []);
+      : (quote.data?.violations ?? [])
+  ).filter((v) => v.code !== 'sportRequired');
   const blocked = conflict || violations.length > 0;
   const backHref = paths.availability(facility.id, {
     date: input.date,
     subspaceId: input.subspaceId,
+    sport,
     ...(replaces ? { replaces } : {}),
   });
 
   const submit = () => {
     if (book.isPending) return;
-    if (!accepted) {
-      setErrors([{ fieldId: ACCEPT_ID, message: t('booking.acceptError') }]);
-      return;
-    }
-    setErrors([]);
+    const found: FormError[] = [
+      ...(choosesSport && !sport ? [{ fieldId: SPORT_ID, message: t('booking.sportError') }] : []),
+      ...(!accepted ? [{ fieldId: ACCEPT_ID, message: t('booking.acceptError') }] : []),
+    ];
+    setErrors(found);
+    if (found.length > 0) return;
     book.mutate(
       { input, replaces },
       {
@@ -147,6 +161,12 @@ function Review({
           <dd>{facility.name}</dd>
           <dt>{t('booking.space')}</dt>
           <dd>{subspaceName(facility, input.subspaceId)}</dd>
+          {sport && (
+            <>
+              <dt>{t('booking.sport')}</dt>
+              <dd>{t(`domain:sport.${sport}`)}</dd>
+            </>
+          )}
           <dt>{t('booking.date')}</dt>
           <dd>{format.longDate(input.date)}</dd>
           <dt>{t('booking.time')}</dt>
@@ -187,17 +207,31 @@ function Review({
             submit();
           }}
         >
+          {choosesSport && space && (
+            <RadioGroup
+              id={SPORT_ID}
+              label={t('booking.sport')}
+              description={t('booking.sportHelp')}
+              value={sport ?? null}
+              isRequired
+              errorMessage={errors.find((e) => e.fieldId === SPORT_ID)?.message}
+              onChange={(value) => {
+                setSport(space.sports.find((s) => s === value));
+              }}
+              options={space.sports.map((s) => ({ id: s, label: t(`domain:sport.${s}`) }))}
+            />
+          )}
           <h2 id="booking-rules">{t('booking.rulesTitle')}</h2>
           <p>{localized(facility.usageRules)}</p>
           <Checkbox
             id={ACCEPT_ID}
             isSelected={accepted}
-            isInvalid={errors.length > 0}
+            isInvalid={errors.some((e) => e.fieldId === ACCEPT_ID)}
             onChange={setAccepted}
           >
             {t('booking.accept')}
           </Checkbox>
-          {errors.length > 0 && (
+          {errors.some((e) => e.fieldId === ACCEPT_ID) && (
             <p className={layout.meta} data-tone="danger">
               {t('booking.acceptError')}
             </p>

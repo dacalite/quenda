@@ -8,6 +8,18 @@
     "multipurposeRoom": "Sala multiusos",
     "gym": "Ximnasio"
   },
+  "sport": {
+    "football": "Fútbol",
+    "futsal": "Fútbol sala",
+    "basketball": "Baloncesto",
+    "volleyball": "Voleibol",
+    "handball": "Balonmán",
+    "badminton": "Bádminton",
+    "padel": "Pádel",
+    "tennis": "Tenis",
+    "swimming": "Natación",
+    "skating": "Patinaxe"
+  },
   "accessibility": {
     "stepFreeAccess": "Acceso sen chanzos",
     "adaptedChangingRoom": "Vestiario adaptado",
@@ -75,7 +87,9 @@
     "notCancellable": "Esta reserva xa non se pode cancelar.",
     "alreadyStarted": "Esta reserva xa comezou.",
     "modificationWindowClosed_one": "Os cambios só se poden facer ata {{count}} hora antes.",
-    "modificationWindowClosed_other": "Os cambios só se poden facer ata {{count}} horas antes."
+    "modificationWindowClosed_other": "Os cambios só se poden facer ata {{count}} horas antes.",
+    "sportRequired": "Escolle o deporte que vas practicar.",
+    "sportNotOffered": "Ese espazo non se pode reservar para ese deporte."
   },
   "notificationType": {
     "confirmation": "Reserva confirmada",
