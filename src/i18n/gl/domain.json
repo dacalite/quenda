@@ -89,7 +89,9 @@
     "modificationWindowClosed_one": "Os cambios só se poden facer ata {{count}} hora antes.",
     "modificationWindowClosed_other": "Os cambios só se poden facer ata {{count}} horas antes.",
     "sportRequired": "Escolle o deporte que vas practicar.",
-    "sportNotOffered": "Ese espazo non se pode reservar para ese deporte."
+    "sportNotOffered": "Ese espazo non se pode reservar para ese deporte.",
+    "tooYoung_one": "Esta instalación só se pode reservar para menores a partir dun ano.",
+    "tooYoung_other": "Esta instalación só se pode reservar para menores a partir dos {{count}} anos."
   },
   "notificationType": {
     "confirmation": "Reserva confirmada",

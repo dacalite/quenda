@@ -196,6 +196,23 @@ test('a phone booking registers the caller and the door checks them in', async (
   await expect(page.getByText('A entrada desta reserva xa está rexistrada.')).toBeVisible();
 });
 
+test('a phone booking can be for a child in the caller’s care', async ({ page }) => {
+  await asStaff(page, 'xose');
+  await open(page, '/nova-reserva');
+  await page.getByRole('searchbox', { name: 'Buscar a persoa' }).fill('Uxía Varela');
+  await page.getByRole('radio', { name: /^Uxía Varela Pena/ }).focus();
+  await page.keyboard.press('Space');
+  await choose(page, 'Para quen', 'Martiño Rial Varela');
+  await choose(page, 'Instalación', 'Pista de tenis do Malecón');
+  await page.getByRole('button', { name: /Hora libre$/ }).click();
+  await page.getByRole('option').last().click();
+  await expect(page.getByText(/^Prezo:/)).toBeVisible();
+  await expectNoAxeViolations(page);
+  await page.getByRole('button', { name: 'Confirmar a reserva' }).click();
+  await expect(heading(page)).toHaveText(/^Reserva QDA-/);
+  await expect(page.getByText('Uxía Varela Pena, para Martiño Rial Varela')).toBeVisible();
+});
+
 test('an unknown code is reported, not ignored', async ({ page }) => {
   await asStaff(page, 'xose');
   await open(page, '/acceso');

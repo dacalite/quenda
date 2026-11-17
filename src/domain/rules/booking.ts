@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 import {
   addDays,
+  ageOn,
   daysBetween,
   minutesBetween,
   startOfWeek,
@@ -9,6 +10,7 @@ import {
 } from '../time';
 import type {
   BookingRules,
+  Dependent,
   Entity,
   Id,
   IsoDate,
@@ -40,11 +42,15 @@ export type RuleViolation =
   | { code: 'residentsOnly' }
   | { code: 'entitiesOnly' }
   | { code: 'suspended'; until: IsoDate }
+  | { code: 'tooYoung'; age: number }
   | { code: SportProblem };
 
 export type Decision<V> = { ok: true } | { ok: false; violations: V[] };
 
-export type BookingHolder = { kind: 'user'; user: User } | { kind: 'entity'; entity: Entity };
+/** `dependent`: the person in the user's care the booking is for. */
+export type BookingHolder =
+  | { kind: 'user'; user: User; dependent?: Dependent | undefined }
+  | { kind: 'entity'; entity: Entity };
 
 export interface BookingContext extends FacilityContext {
   rules: BookingRules;
@@ -142,6 +148,14 @@ export function canBook(
   }
   if (duration > rules.maxDurationMinutes) {
     violations.push({ code: 'tooLong', minutes: rules.maxDurationMinutes });
+  }
+
+  if (
+    holder.kind === 'user' &&
+    holder.dependent &&
+    ageOn(holder.dependent.birthDate, slot.date) < rules.minAge
+  ) {
+    violations.push({ code: 'tooYoung', age: rules.minAge });
   }
 
   if (holder.kind === 'user') {

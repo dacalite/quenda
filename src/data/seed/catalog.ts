@@ -4,6 +4,7 @@ import type {
   BookingRules,
   Concession,
   Deputacion,
+  Dependent,
   EntityKind,
   Facility,
   LocalizedText,
@@ -170,6 +171,7 @@ export const TENANTS: TenantSeed[] = [
         maxDurationMinutes: 120,
         maxBookingsPerWeek: 3,
         freeCancellationHours: 12,
+        minAge: 0,
         noShow: { strikesForSuspension: 3, windowDays: 60, suspensionDays: 14 },
         eligibility: 'everyone',
       },
@@ -370,6 +372,7 @@ export const TENANTS: TenantSeed[] = [
         maxDurationMinutes: 120,
         maxBookingsPerWeek: 2,
         freeCancellationHours: 24,
+        minAge: 0,
         noShow: { strikesForSuspension: 2, windowDays: 30, suspensionDays: 14 },
         eligibility: 'everyone',
       },
@@ -556,7 +559,7 @@ export const TENANTS: TenantSeed[] = [
           'Toalla obrigatoria. Limpa as máquinas despois de usalas.',
           'Toalla obligatoria. Limpia las máquinas después de usarlas.',
         ),
-        rules: { maxDurationMinutes: 60 },
+        rules: { maxDurationMinutes: 60, minAge: 16 },
         pricing: {
           residentCents: 250,
           nonResidentCents: 500,
@@ -676,6 +679,7 @@ export interface PersonaSeed {
   textSize: TextSize;
   maskedDni: string;
   phone: string;
+  dependents?: Omit<Dependent, 'id'>[];
 }
 
 export const PERSONAS: PersonaSeed[] = [
@@ -689,6 +693,10 @@ export const PERSONAS: PersonaSeed[] = [
     textSize: 'normal',
     maskedDni: '***4521**',
     phone: '600 100 234',
+    dependents: [
+      { firstName: 'Martiño', lastName: 'Rial Varela', birthDate: '2017-03-14' },
+      { firstName: 'Iria', lastName: 'Rial Varela', birthDate: '2011-05-02' },
+    ],
   },
   {
     key: 'manuel',

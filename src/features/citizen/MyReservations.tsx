@@ -11,7 +11,7 @@ import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { Tab, TabList, TabPanel, Tabs } from '../../ui/Tabs';
 import layout from '../../ui/layout.module.css';
-import { RESERVATION_TONE } from './labels';
+import { RESERVATION_TONE, useDependentName } from './labels';
 import { useCitizen, useMyReservations } from './queries';
 import { Ticket } from './Ticket';
 
@@ -92,6 +92,8 @@ function ReservationCard({
   const { tenant } = useCitizen();
   const paths = citizenPaths(tenant.slug);
   const spaceLabel = useSpaceLabel();
+  const dependentName = useDependentName();
+  const forName = dependentName(reservation.dependentId);
   return (
     <Ticket
       reservation={reservation}
@@ -100,6 +102,9 @@ function ReservationCard({
       headingLevel={2}
       muted={Boolean(repeatDate)}
     >
+      {forName && (
+        <p className={layout.meta}>{t('reservations.forDependent', { name: forName })}</p>
+      )}
       <p className={layout.row}>
         <StatusBadge tone={RESERVATION_TONE[reservation.status]}>
           {t(`domain:reservationStatus.${reservation.status}`)}

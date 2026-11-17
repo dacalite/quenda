@@ -51,6 +51,8 @@ export function useViolationText() {
       case 'tooShort':
       case 'tooLong':
         return t(`violation.${violation.code}`, { minutes: violation.minutes });
+      case 'tooYoung':
+        return t('violation.tooYoung', { count: violation.age });
       case 'weeklyLimit':
         return t('violation.weeklyLimit', { count: violation.max });
       case 'suspended':

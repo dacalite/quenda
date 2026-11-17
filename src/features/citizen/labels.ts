@@ -2,9 +2,10 @@
 import { useTranslation } from 'react-i18next';
 import { toIcs, type CalendarEvent } from '../../domain/ics';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
-import type { Facility, Reservation, Tenant } from '../../domain/types';
+import type { Facility, Id, Reservation, Tenant } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
 import { useSpaceLabel, useSubspaceName } from '../../i18n/labels';
+import { useMe } from './queries';
 
 /** Badge tone for each reservation status. */
 export const RESERVATION_TONE = {
@@ -63,4 +64,13 @@ export function useReservationsIcs() {
       }),
       t('calendar.calendarName', { tenant: tenant.name }),
     );
+}
+
+/** Full name of the person in the resident's care a booking is for, if any. */
+export function useDependentName() {
+  const me = useMe();
+  return (dependentId: Id | undefined) => {
+    const dependent = me.data?.dependents.find((d) => d.id === dependentId);
+    return dependent ? `${dependent.firstName} ${dependent.lastName}` : null;
+  };
 }

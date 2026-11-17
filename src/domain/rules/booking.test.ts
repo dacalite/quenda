@@ -118,6 +118,19 @@ describe('canBook', () => {
     expect(canBook(entities, asEntity, slot).ok).toBe(true);
   });
 
+  it('keeps minors in someone’s care out of facilities below their age', () => {
+    const gym = makeContext({ rules: { ...RULES, minAge: 16 } });
+    const child = (birthDate: string): BookingHolder => ({
+      kind: 'user',
+      user,
+      dependent: { id: 'd1', firstName: 'Iria', lastName: 'Rial', birthDate },
+    });
+    expect(codes(canBook(gym, child('2011-05-02'), slot))).toEqual(['tooYoung']);
+    expect(canBook(gym, child('2010-10-20'), slot).ok).toBe(true);
+    // Adults booking for themselves are not asked their age.
+    expect(canBook(gym, asUser, slot).ok).toBe(true);
+  });
+
   it('limits active bookings per person and week, ignoring cancelled ones', () => {
     const holderReservations = [
       makeReservation({ date: '2026-10-21' }),

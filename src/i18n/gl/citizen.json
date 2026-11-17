@@ -137,7 +137,12 @@
     "saving": "Gardando a reserva…",
     "sport": "Deporte",
     "sportHelp": "Este espazo compárteno varios deportes. Escolle o que vas practicar.",
-    "sportError": "Escolle o deporte que vas practicar."
+    "sportError": "Escolle o deporte que vas practicar.",
+    "for": "Para quen",
+    "forHelp": "Podes reservar para ti ou para unha persoa ao teu cargo. Ti quedas como responsable.",
+    "forSelf": "Para min",
+    "forDependent_one": "{{name}} ({{count}} ano)",
+    "forDependent_other": "{{name}} ({{count}} anos)"
   },
   "reservation": {
     "confirmedTitle": "Reserva confirmada",
@@ -179,7 +184,8 @@
     "noHistory": "Aínda non tes reservas pasadas.",
     "find": "Buscar unha instalación",
     "repeat": "Repetir a reserva",
-    "calendar": "Engade as túas reservas ao calendario do teu móbil"
+    "calendar": "Engade as túas reservas ao calendario do teu móbil",
+    "forDependent": "Para {{name}}"
   },
   "notifications": {
     "title": "Avisos",
@@ -257,6 +263,32 @@
     "deleteBody": "Eliminaranse a túa conta e o teu historial de reservas, agás o que a lei obrigue a conservar. No prototipo esta acción é simulada.",
     "deleteConfirm": "Si, pedir a eliminación",
     "deleteDone": "Petición rexistrada. No servizo real recibirías a resposta nun prazo máximo dun mes."
+  },
+  "dependents": {
+    "title": "Persoas ao teu cargo",
+    "intro": "Fillas, fillos ou outras persoas menores ao teu cargo. Non precisan conta propia: reservas ti por elas, a reserva leva o seu nome e ti figuras como responsable. Aplícaselles a bonificación de menores segundo a súa idade.",
+    "none": "Non tes ningunha persoa ao teu cargo.",
+    "item_one": "{{name}}, {{count}} ano",
+    "item_other": "{{name}}, {{count}} anos",
+    "remove": "Quitar a {{name}}",
+    "removeShort": "Quitar",
+    "removeTitle": "Quitar a {{name}}?",
+    "removeConfirm": "Quitar",
+    "removeBody": "As súas reservas feitas seguen igual; só deixará de aparecer ao reservar.",
+    "removed": "Quitouse a {{name}}.",
+    "add": "Engadir unha persoa",
+    "newTitle": "Nova persoa ao teu cargo",
+    "firstName": "Nome",
+    "lastName": "Apelidos",
+    "birthDate": "Data de nacemento",
+    "save": "Gardar",
+    "cancel": "Cancelar",
+    "added": "Engadiuse a {{name}}.",
+    "errors": {
+      "firstName": "Escribe o nome.",
+      "lastName": "Escribe os apelidos.",
+      "birthDate": "Escolle unha data de nacemento que xa pasase."
+    }
   },
   "signIn": {
     "title": "Acceder",

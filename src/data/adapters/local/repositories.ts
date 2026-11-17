@@ -18,10 +18,11 @@ import { reservationCode } from '../../../domain/reservationCode';
 import { sportProblem } from '../../../domain/sports';
 import { toMinutes, zonedNow, type LocalDateTime } from '../../../domain/time';
 import {
+  type FieldProblem,
+  validateDependent,
   validateFacility,
   validateSchedule,
   validateTenant,
-  type FieldProblem,
 } from '../../../domain/validation';
 import type {
   AuditAction,
@@ -175,10 +176,19 @@ export function createLocalRepositories({
     data().notifications.push(notification);
   };
 
-  const holderOf = (tenantId: Id, holder: Holder): BookingHolder =>
-    holder.kind === 'user'
-      ? { kind: 'user', user: findIn(data().users, tenantId, holder.userId, 'user') }
-      : { kind: 'entity', entity: findIn(data().entities, tenantId, holder.entityId, 'entity') };
+  const holderOf = (tenantId: Id, holder: Holder, dependentId?: Id): BookingHolder => {
+    if (holder.kind === 'entity') {
+      return {
+        kind: 'entity',
+        entity: findIn(data().entities, tenantId, holder.entityId, 'entity'),
+      };
+    }
+    const user = findIn(data().users, tenantId, holder.userId, 'user');
+    if (!dependentId) return { kind: 'user', user };
+    const dependent = user.dependents.find((d) => d.id === dependentId);
+    if (!dependent) throw new ValidationError([{ field: 'dependentId', code: 'range' }]);
+    return { kind: 'user', user, dependent };
+  };
 
   const scheduleOf = (tenantId: Id, facilityId: Id) => {
     const schedule = data().schedules.find(
@@ -276,6 +286,7 @@ export function createLocalRepositories({
       facility.pricing,
       slotMinutes,
       toMinutes(slot.end) - toMinutes(slot.start),
+      slot.date,
     );
   };
 
@@ -524,13 +535,14 @@ export function createLocalRepositories({
         respond(() => {
           const {
             holder,
+            dependentId,
             channel: _channel,
             notes: _notes,
             confirmBy: _confirmBy,
             ...slot
           } = input;
           requireHolderAllowed(tenantId, holder);
-          const bookingHolder = holderOf(tenantId, holder);
+          const bookingHolder = holderOf(tenantId, holder, dependentId);
           const context = bookingContext(tenantId, slot.facilityId, holder);
           const decision = replaces
             ? canModify(context, bookingHolder, visibleReservation(tenantId, replaces), slot)
@@ -542,9 +554,9 @@ export function createLocalRepositories({
         }),
       create: (tenantId, input) =>
         respond(() => {
-          const { holder, channel, notes = '', confirmBy, ...slot } = input;
+          const { holder, dependentId, channel, notes = '', confirmBy, ...slot } = input;
           requireHolderAllowed(tenantId, holder);
-          const bookingHolder = holderOf(tenantId, holder);
+          const bookingHolder = holderOf(tenantId, holder, dependentId);
           const decision = canBook(
             bookingContext(tenantId, slot.facilityId, holder),
             bookingHolder,
@@ -559,6 +571,7 @@ export function createLocalRepositories({
             tenantId,
             code: uniqueCode(tenantId),
             holder,
+            ...(dependentId ? { dependentId } : {}),
             status: 'confirmed',
             channel,
             amountCents: quote.totalCents,
@@ -577,7 +590,7 @@ export function createLocalRepositories({
       reschedule: (tenantId, id, slot) =>
         respond(() => {
           const reservation = visibleReservation(tenantId, id);
-          const bookingHolder = holderOf(tenantId, reservation.holder);
+          const bookingHolder = holderOf(tenantId, reservation.holder, reservation.dependentId);
           const decision = canModify(
             bookingContext(tenantId, slot.facilityId, reservation.holder),
             bookingHolder,
@@ -731,6 +744,12 @@ export function createLocalRepositories({
         respond(() => {
           requireSelfOrStaff(tenantId, id);
           const user = findIn(data().users, tenantId, id, 'user');
+          if (patch.dependents) {
+            const problems = patch.dependents.flatMap((d, i) =>
+              validateDependent(d, localNow(tenantId).date, `dependents.${String(i)}`),
+            );
+            if (problems.length > 0) throw new ValidationError(problems);
+          }
           Object.assign(user, patch);
           db.commit();
           return user;

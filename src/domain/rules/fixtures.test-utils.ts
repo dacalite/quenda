@@ -13,6 +13,7 @@ export const RULES: BookingRules = {
   maxDurationMinutes: 120,
   maxBookingsPerWeek: 2,
   freeCancellationHours: 24,
+  minAge: 0,
   noShow: { strikesForSuspension: 2, windowDays: 30, suspensionDays: 14 },
   eligibility: 'everyone',
 };
@@ -101,6 +102,7 @@ export function makeUser(overrides: Partial<User> = {}): User {
     phone: '600000000',
     resident: true,
     concessions: [],
+    dependents: [],
     role: 'citizen',
     preferences: {
       language: 'gl',

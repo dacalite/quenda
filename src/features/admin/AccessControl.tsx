@@ -156,7 +156,7 @@ function Verdict({
       </p>
       <dl className={layout.details}>
         <dt>{t('record.holder')}</dt>
-        <dd>{holderName(reservation.holder)}</dd>
+        <dd>{holderName(reservation.holder, reservation.dependentId)}</dd>
         <dt>{t('record.place')}</dt>
         <dd>{facility ? `${facility.name} · ${spaceLabel(facility, reservation)}` : ''}</dd>
         <dt>{t('record.when')}</dt>
@@ -260,7 +260,11 @@ function TodayTable({
             return facility ? `${facility.name} · ${spaceLabel(facility, r)}` : '';
           },
         },
-        { key: 'holder', header: t('table.holder'), render: (r) => holderName(r.holder) },
+        {
+          key: 'holder',
+          header: t('table.holder'),
+          render: (r) => holderName(r.holder, r.dependentId),
+        },
         {
           key: 'code',
           header: t('table.code'),

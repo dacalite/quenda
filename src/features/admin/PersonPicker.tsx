@@ -152,6 +152,7 @@ function NewPerson({
         maskedDni: '',
         resident,
         concessions: [],
+        dependents: [],
         role: 'citizen',
         preferences: {
           language: 'gl',

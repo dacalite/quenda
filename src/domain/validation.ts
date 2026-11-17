@@ -1,6 +1,14 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { toMinutes } from './time';
-import type { BookingRules, Facility, Schedule, Tenant, TimeRange } from './types';
+import type {
+  BookingRules,
+  Dependent,
+  Facility,
+  IsoDate,
+  Schedule,
+  Tenant,
+  TimeRange,
+} from './types';
 
 export type ProblemCode =
   'required' | 'positive' | 'range' | 'order' | 'overlap' | 'format' | 'taken' | 'mutual';
@@ -18,6 +26,7 @@ export const NUMERIC_RULES = [
   'maxDurationMinutes',
   'maxBookingsPerWeek',
   'freeCancellationHours',
+  'minAge',
 ] as const;
 
 const blank = (text: string) => text.trim() === '';
@@ -43,6 +52,22 @@ export function validateRules(rules: Partial<BookingRules>, prefix = 'rules'): F
       if (!isCount(value))
         problems.push({ field: `${prefix}.noShow.${key}`, code: countProblem(value) });
     }
+  }
+  return problems;
+}
+
+/** A person in someone's care: named, and born on a real date that has already passed. */
+export function validateDependent(
+  dependent: Pick<Dependent, 'firstName' | 'lastName' | 'birthDate'>,
+  today: IsoDate,
+  prefix = 'dependent',
+): FieldProblem[] {
+  const problems: FieldProblem[] = [];
+  if (blank(dependent.firstName)) problems.push({ field: `${prefix}.firstName`, code: 'required' });
+  if (blank(dependent.lastName)) problems.push({ field: `${prefix}.lastName`, code: 'required' });
+  if (!dependent.birthDate) problems.push({ field: `${prefix}.birthDate`, code: 'required' });
+  else if (!/^\d{4}-\d{2}-\d{2}$/.test(dependent.birthDate) || dependent.birthDate > today) {
+    problems.push({ field: `${prefix}.birthDate`, code: 'range' });
   }
   return problems;
 }

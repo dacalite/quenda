@@ -12,6 +12,7 @@ import { ErrorSummary, type FormError } from '../../ui/ErrorSummary';
 import { TextField } from '../../ui/TextField';
 import { useToast } from '../../ui/toasts';
 import layout from '../../ui/layout.module.css';
+import { Dependents } from './Dependents';
 import { useMe, useMyReservations, useNotifications, useUpdateMe } from './queries';
 
 type Fields = Pick<User, 'firstName' | 'lastName' | 'email' | 'phone'>;
@@ -124,6 +125,8 @@ function ProfileForm({ user }: { user: User }) {
           </ul>
         )}
       </section>
+
+      <Dependents user={user} />
 
       <section className={layout.section} aria-labelledby="profile-preferences">
         <h2 id="profile-preferences">{t('profile.preferences')}</h2>

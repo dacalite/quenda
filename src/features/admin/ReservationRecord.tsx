@@ -74,7 +74,7 @@ function Record({ reservation, facility }: { reservation: Reservation; facility:
       <dl className={layout.details}>
         <dt>{t('record.holder')}</dt>
         <dd>
-          {holderName(reservation.holder)}
+          {holderName(reservation.holder, reservation.dependentId)}
           {holder.data && ` · ${holder.data.phone}`}
         </dd>
         <dt>{t('record.place')}</dt>

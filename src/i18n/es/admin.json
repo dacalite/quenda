@@ -48,6 +48,7 @@
     "maxDurationMinutes": "Duración máxima (minutos)",
     "maxBookingsPerWeek": "Reservas por persona y semana",
     "freeCancellationHours": "Cancelación sin penalización (horas antes)",
+    "minAge": "Edad mínima (años)",
     "eligibility": "Quién puede reservar",
     "inherited": "Si lo dejas vacío, se aplica el valor del ayuntamiento: {{value}}.",
     "eligibilityInherited": "Igual que en el ayuntamiento ({{value}})"
@@ -160,7 +161,12 @@
       "sport": "Elige el deporte para el que se reserva el espacio."
     },
     "sport": "Deporte",
-    "sportPlaceholder": "Elige un deporte"
+    "sportPlaceholder": "Elige un deporte",
+    "for": "Para quién",
+    "forHelp": "Puede reservar para una persona a su cargo; queda como responsable.",
+    "forSelf": "Para {{name}}",
+    "forDependent_one": "{{name}} ({{count}} año)",
+    "forDependent_other": "{{name}} ({{count}} años)"
   },
   "record": {
     "title": "Reserva {{code}}",
@@ -555,5 +561,8 @@
     "what": "Acción",
     "subject": "Sobre qué",
     "unknown": "Persona sin identificar"
+  },
+  "holder": {
+    "forDependent": "{{holder}}, para {{dependent}}"
   }
 }

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { describe, expect, it } from 'vitest';
 import {
+  ageOn,
   addDays,
   byDateAndStart,
   daypart,
@@ -70,6 +71,14 @@ describe('time helpers', () => {
       time: '00:30',
     });
     expect(zonedNow(new Date('2026-07-01T10:00:00Z'), 'Europe/Madrid').time).toBe('12:00');
+  });
+});
+
+describe('ageOn', () => {
+  it('counts whole years, turning a year older on the birthday', () => {
+    expect(ageOn('2011-05-02', '2026-05-01')).toBe(14);
+    expect(ageOn('2011-05-02', '2026-05-02')).toBe(15);
+    expect(ageOn('2012-02-29', '2026-02-28')).toBe(13);
   });
 });
 

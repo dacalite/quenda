@@ -54,7 +54,11 @@ export function ReservationTable({
             return facility ? `${facility.name} · ${spaceLabel(facility, r)}` : '';
           },
         },
-        { key: 'holder', header: t('table.holder'), render: (r) => holderName(r.holder) },
+        {
+          key: 'holder',
+          header: t('table.holder'),
+          render: (r) => holderName(r.holder, r.dependentId),
+        },
         {
           key: 'attendance',
           header: t('table.attendance'),
