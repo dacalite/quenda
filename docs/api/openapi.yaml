@@ -1110,6 +1110,7 @@ components:
         - maxDurationMinutes
         - maxBookingsPerWeek
         - freeCancellationHours
+        - minAge
         - noShow
         - eligibility
       properties:
@@ -1119,6 +1120,10 @@ components:
         maxDurationMinutes: { type: integer, minimum: 0 }
         maxBookingsPerWeek: { type: integer, minimum: 0 }
         freeCancellationHours: { type: integer, minimum: 0 }
+        minAge:
+          type: integer
+          minimum: 0
+          description: Idade mínima dunha persoa ao cargo para a que se reserva; 0 sen límite.
         noShow: { $ref: '#/components/schemas/NoShowPolicy' }
         eligibility:
           type: string
@@ -1315,6 +1320,7 @@ components:
         maxDurationMinutes: { type: integer, minimum: 0 }
         maxBookingsPerWeek: { type: integer, minimum: 0 }
         freeCancellationHours: { type: integer, minimum: 0 }
+        minAge: { type: integer, minimum: 0 }
         noShow: { $ref: '#/components/schemas/NoShowPolicy' }
         eligibility: { type: string, enum: [everyone, residents, entities] }
     Facility:
@@ -1453,6 +1459,9 @@ components:
           required: [holder, channel]
           properties:
             holder: { $ref: '#/components/schemas/Holder' }
+            dependentId:
+              $ref: '#/components/schemas/Id'
+              description: Persoa ao cargo da titular que vai usar a reserva.
             channel: { $ref: '#/components/schemas/Channel' }
             notes: { type: string }
             confirmBy:
@@ -1477,7 +1486,7 @@ components:
       required: [code]
       description: >-
         Norma incumprida, cos datos para explicala: `slotMinutes`, `hours`, `days`, `minutes`,
-        `max` ou `until` segundo o código.
+        `max`, `until` ou `age` segundo o código.
       properties:
         code:
           type: string
@@ -1501,12 +1510,14 @@ components:
             - modificationWindowClosed
             - sportRequired
             - sportNotOffered
+            - tooYoung
         slotMinutes: { type: integer }
         hours: { type: integer }
         days: { type: integer }
         minutes: { type: integer }
         max: { type: integer }
         until: { $ref: '#/components/schemas/IsoDate' }
+        age: { type: integer }
     ReservationQuote:
       type: object
       required: [price, violations]
@@ -1537,6 +1548,7 @@ components:
             tenantId: { $ref: '#/components/schemas/Id' }
             code: { type: string, pattern: '^QDA-[A-Z0-9]{4}$' }
             holder: { $ref: '#/components/schemas/Holder' }
+            dependentId: { $ref: '#/components/schemas/Id' }
             status: { $ref: '#/components/schemas/ReservationStatus' }
             channel: { $ref: '#/components/schemas/Channel' }
             amountCents: { $ref: '#/components/schemas/Cents' }
@@ -1610,6 +1622,7 @@ components:
         - phone
         - resident
         - concessions
+        - dependents
         - role
         - preferences
       properties:
@@ -1626,6 +1639,12 @@ components:
         concessions:
           type: array
           items: { type: string, enum: [minor, senior, disability, largeFamily] }
+        dependents:
+          type: array
+          description: >-
+            Persoas ao seu cargo, como fillas e fillos menores, que reservan a través dela e non
+            teñen conta propia.
+          items: { $ref: '#/components/schemas/Dependent' }
         role: { $ref: '#/components/schemas/Role' }
         preferences:
           type: object
@@ -1642,6 +1661,14 @@ components:
                 textSize: { type: string, enum: [normal, large, xlarge] }
                 highContrast: { type: boolean }
                 reducedMotion: { type: boolean }
+    Dependent:
+      type: object
+      required: [id, firstName, lastName, birthDate]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        firstName: { type: string, minLength: 1 }
+        lastName: { type: string, minLength: 1 }
+        birthDate: { $ref: '#/components/schemas/IsoDate' }
     UserPatch:
       description: Calquera subconxunto dos campos da persoa.
       allOf:
