@@ -13,13 +13,11 @@ Proposta para o I Certame GOBTEC de Software Libre
 [![Galego e castelán](https://img.shields.io/badge/idiomas-galego_·_castelán-0b5cad)](src/i18n)
 [![CI](https://github.com/dacalite/quenda/actions/workflows/ci.yml/badge.svg)](https://github.com/dacalite/quenda/actions/workflows/ci.yml)
 
-**[Probar a demostración](https://dacalite.github.io/quenda/)** · [Ver o vídeo](https://drive.google.com/file/d/17YjD5p25-TKYCOU9gqyLJfKe3WNKlxGY/view) · [Documentación](docs)
-
+**[Probar a demostración](https://dacalite.github.io/quenda/)** · [Ver o vídeo](https://drive.google.com/file/d/1jz23LuPh-fIedanGovESCPjbUu3cvzVq/view) · [Documentación](docs)
 
 https://github.com/user-attachments/assets/44edf4c4-bfaf-41ed-809a-80581a65732b
 
-
-<sub>Vídeo de presentación (35 s). Tamén en [Google Drive](https://drive.google.com/file/d/17YjD5p25-TKYCOU9gqyLJfKe3WNKlxGY/view).</sub>
+<sub>Vídeo de presentación (1:23). Tamén en [Google Drive](https://drive.google.com/file/d/1jz23LuPh-fIedanGovESCPjbUu3cvzVq/view).</sub>
 
 </div>
 
