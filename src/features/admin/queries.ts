@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { skipToken, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useCurrentTenant } from '../../app/contexts';
 import { useRepositories } from '../../app/repositories';
 import { sessionUserId, useDemo } from '../../app/state';
@@ -51,14 +52,24 @@ export function useStaffMutation<V, R>(
 }
 
 /** Names of the people and clubs behind bookings, for staff screens. */
+/** «Uxía Varela Pena», or «Uxía Varela Pena, para Martiño Rial Varela» when booked for someone in her care. */
 export function useHolderName() {
-  const users = useStaffQuery(['users'], (r, t) => r.users.list(t));
-  const entities = useStaffQuery(['entities'], (r, t) => r.entities.list(t));
-  return (holder: Holder) => {
+  const { t } = useTranslation('admin');
+  const users = useStaffQuery(['users'], (r, tenantId) => r.users.list(tenantId));
+  const entities = useStaffQuery(['entities'], (r, tenantId) => r.entities.list(tenantId));
+  return (holder: Holder, dependentId?: Id) => {
     if (holder.kind === 'entity') {
       return entities.data?.find((e) => e.id === holder.entityId)?.name ?? '';
     }
     const user = users.data?.find((u) => u.id === holder.userId);
-    return user ? `${user.firstName} ${user.lastName}` : '';
+    if (!user) return '';
+    const name = `${user.firstName} ${user.lastName}`;
+    const dependent = user.dependents.find((d) => d.id === dependentId);
+    return dependent
+      ? t('holder.forDependent', {
+          holder: name,
+          dependent: `${dependent.firstName} ${dependent.lastName}`,
+        })
+      : name;
   };
 }

@@ -8,6 +8,7 @@ import { citizenPaths } from '../../app/routes/paths';
 import { ConflictError, RuleViolationError } from '../../data/ports/errors';
 import type { ReservationInput } from '../../data/ports/repositories';
 import { needsSport } from '../../domain/sports';
+import { ageOn } from '../../domain/time';
 import type { Facility, Holder, Id } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
 import { useLocalized, useSubspaceName, useViolationText } from '../../i18n/labels';
@@ -17,10 +18,11 @@ import { ErrorSummary, type FormError } from '../../ui/ErrorSummary';
 import { Link } from '../../ui/Link';
 import { RadioGroup } from '../../ui/RadioGroup';
 import layout from '../../ui/layout.module.css';
-import { useBook, useCitizen, useQuote, useRecommendations } from './queries';
+import { useBook, useCitizen, useMe, useQuote, useRecommendations } from './queries';
 
 const ACCEPT_ID = 'accept-rules';
 const SPORT_ID = 'booking-sport';
+const SELF = 'self';
 
 export function BookingReview() {
   const { t } = useTranslation('citizen');
@@ -81,7 +83,16 @@ function Review({
   const space = facility.subspaces.find((s) => s.id === slotInput.subspaceId);
   const choosesSport = space ? needsSport(space) : false;
   const [sport, setSport] = useState(space?.sports.find((s) => s === requestedSport));
-  const input = sport ? { ...slotInput, sport } : slotInput;
+  const me = useMe();
+  // A change keeps who the booking is for; only a new one asks.
+  const dependents = replaces ? [] : (me.data?.dependents ?? []);
+  const [forWhom, setForWhom] = useState(SELF);
+  const dependent = dependents.find((d) => d.id === forWhom);
+  const input = {
+    ...slotInput,
+    ...(sport ? { sport } : {}),
+    ...(dependent ? { dependentId: dependent.id } : {}),
+  };
   const quote = useQuote(input, replaces);
   const book = useBook();
   const recommendations = useRecommendations(facility.id, input.date);
@@ -167,6 +178,12 @@ function Review({
               <dd>{t(`domain:sport.${sport}`)}</dd>
             </>
           )}
+          {dependent && (
+            <>
+              <dt>{t('booking.for')}</dt>
+              <dd>{`${dependent.firstName} ${dependent.lastName}`}</dd>
+            </>
+          )}
           <dt>{t('booking.date')}</dt>
           <dd>{format.longDate(input.date)}</dd>
           <dt>{t('booking.time')}</dt>
@@ -207,6 +224,24 @@ function Review({
             submit();
           }}
         >
+          {dependents.length > 0 && (
+            <RadioGroup
+              label={t('booking.for')}
+              description={t('booking.forHelp')}
+              value={forWhom}
+              onChange={setForWhom}
+              options={[
+                { id: SELF, label: t('booking.forSelf') },
+                ...dependents.map((d) => ({
+                  id: d.id,
+                  label: t('booking.forDependent', {
+                    name: `${d.firstName} ${d.lastName}`,
+                    count: ageOn(d.birthDate, input.date),
+                  }),
+                })),
+              ]}
+            />
+          )}
           {choosesSport && space && (
             <RadioGroup
               id={SPORT_ID}

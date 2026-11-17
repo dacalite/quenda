@@ -40,6 +40,8 @@ export interface BookingRules {
   maxDurationMinutes: number;
   maxBookingsPerWeek: number;
   freeCancellationHours: number;
+  /** For bookings made for a minor in someone's care; 0 for no limit. */
+  minAge: number;
   noShow: NoShowPolicy;
   eligibility: Eligibility;
 }
@@ -200,6 +202,14 @@ export interface AccessibilityPreferences {
   reducedMotion: boolean;
 }
 
+/** A minor or other person in someone's care, who books through them and has no account. */
+export interface Dependent {
+  id: Id;
+  firstName: string;
+  lastName: string;
+  birthDate: IsoDate;
+}
+
 export interface User {
   id: Id;
   tenantId: Id;
@@ -210,6 +220,7 @@ export interface User {
   phone: string;
   resident: boolean;
   concessions: Concession[];
+  dependents: Dependent[];
   role: Role;
   preferences: {
     language: Language;
@@ -261,6 +272,8 @@ export interface Reservation extends Slot {
   /** Short human-readable code, e.g. `QDA-7K3M`. */
   code: string;
   holder: Holder;
+  /** The person in the holder's care who will use it, if not the holder. */
+  dependentId?: Id;
   status: ReservationStatus;
   channel: Channel;
   amountCents: Cents;

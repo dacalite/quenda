@@ -93,6 +93,8 @@ export interface ReservationFilter {
 
 export interface ReservationInput extends Slot {
   holder: Holder;
+  /** A person in the holder's care who will use the booking. */
+  dependentId?: Id | undefined;
   channel: Channel;
   notes?: string;
   /** Staff bookings can send the confirmation by text or email (simulated). */

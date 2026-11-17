@@ -25,6 +25,7 @@ O sistema trata datos persoais de veciñanza e, se se activa, cobros. Proponse a
 
 - **Base xurídica.** Exercicio de poderes públicos e misión de interese público na xestión de instalacións municipais (artigo 6.1.e do RGPD), e consentimento só para as canles de aviso opcionais.
 - **Minimización.** Só os datos necesarios para reservar e para aplicar a tarifa: nome, contacto, empadroamento e colectivo con bonificación. O DNI gárdase **enmascarado** (`***4521**`), que basta para identificar a persoa no mostrador. A exportación de reservas para o persoal non leva nomes.
+- **Menores.** As persoas menores non teñen conta propia: reserva por elas quen as ten ao seu cargo, que é a responsable do tratamento dos seus datos (art. 7 da LOPDGDD para menores de 14 anos). Delas só se garda nome, apelidos e data de nacemento, que basta para aplicar a bonificación e a idade mínima de cada instalación.
 - **Aloxamento na Unión Europea**, nos servidores da deputación, do concello ou dun provedor con centros de datos na UE.
 - **Roles e permisos.** Cada persoa só ve as súas reservas e os seus avisos; o persoal ve as do seu concello; a deputación só ve cifras agregadas dos seus concellos.
 - **Transparencia.** Política de privacidade e declaración de accesibilidade editables por cada concello desde a súa configuración, sen tocar código.

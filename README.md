@@ -65,6 +65,7 @@ Todas as pantallas completas, en móbil e escritorio, están en [`docs/capturas`
         <li>Ver as franxas libres, coas horas de menos xente recomendadas.</li>
         <li>Reservar, cambiar e cancelar coas normas e o prezo visibles, e recibir un QR.</li>
         <li>Calendario mensual coas propias reservas e envío a Google Calendar, Outlook ou .ics.</li>
+        <li>Reservar para fillas e fillos ao seu cargo, coa bonificación de menores e a idade mínima de cada instalación.</li>
         <li>Historial, avisos do concello e descarga dos propios datos.</li>
       </ul>
     </td>

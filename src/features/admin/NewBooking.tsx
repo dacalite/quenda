@@ -8,7 +8,7 @@ import { useAvailability, useFacilities } from '../../app/queries';
 import { adminPaths } from '../../app/routes/paths';
 import { ConflictError, RuleViolationError } from '../../data/ports/errors';
 import type { ReservationInput } from '../../data/ports/repositories';
-import { zonedNow } from '../../domain/time';
+import { ageOn, zonedNow } from '../../domain/time';
 import { needsSport } from '../../domain/sports';
 import type { Channel, Facility, IsoDate, Sport, User } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
@@ -27,6 +27,7 @@ import { useStaff, useStaffMutation, useStaffQuery } from './queries';
 const SLOT_FIELD_ID = 'booking-slot';
 const CONFIRM_FIELD_ID = 'booking-confirm';
 const SPORT_FIELD_ID = 'booking-sport';
+const SELF = 'self';
 type Confirmation = 'none' | 'sms' | 'email';
 
 export function NewBooking() {
@@ -57,6 +58,7 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
   const initialFacility =
     facilities.find((f) => f.id === params.get('instalacion')) ?? facilities[0];
   const [person, setPerson] = useState<User | null>(null);
+  const [dependentId, setDependentId] = useState(SELF);
   const [facilityId, setFacilityId] = useState(initialFacility?.id ?? '');
   const facility = facilities.find((f) => f.id === facilityId);
   const [subspaceId, setSubspaceId] = useState(
@@ -93,6 +95,7 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
           end: slot.end,
           ...(choosesSport && sport ? { sport } : {}),
           holder: { kind: 'user', userId: person.id },
+          ...(person.dependents.some((d) => d.id === dependentId) ? { dependentId } : {}),
           channel,
           notes,
           ...(confirmation === 'none' ? {} : { confirmBy: confirmation }),
@@ -163,9 +166,30 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
           <h2 id="booking-person-title">{t('newBooking.person')}</h2>
           <PersonPicker
             value={person}
-            onChange={setPerson}
+            onChange={(next) => {
+              setPerson(next);
+              setDependentId(SELF);
+            }}
             errorMessage={errorOf(PERSON_FIELD_ID)}
           />
+          {person && person.dependents.length > 0 && (
+            <Select
+              label={t('newBooking.for')}
+              description={t('newBooking.forHelp')}
+              value={dependentId}
+              onChange={setDependentId}
+              options={[
+                { id: SELF, label: t('newBooking.forSelf', { name: person.firstName }) },
+                ...person.dependents.map((d) => ({
+                  id: d.id,
+                  label: t('newBooking.forDependent', {
+                    name: `${d.firstName} ${d.lastName}`,
+                    count: ageOn(d.birthDate, date),
+                  }),
+                })),
+              ]}
+            />
+          )}
         </section>
 
         <section className={layout.section} aria-labelledby="booking-slot-title">

@@ -318,6 +318,32 @@ describe('reservations', () => {
     expect(reservation.sport).toBe('basketball');
   });
 
+  it('books for a minor in the person’s care, at the minor rate and within the age limit', async () => {
+    const { repos, db } = setup({ userId: uxia.userId });
+    const martino = `${uxia.userId}-d1`;
+    const iria = `${uxia.userId}-d2`;
+    const tennis = freeSlot(db.read(), `${B}-tenis`, TOMORROW);
+    const input = { ...tennis, holder: uxia, channel: 'web' as const };
+    const adult = await repos.reservations.quote(B, input);
+    const child = await repos.reservations.quote(B, { ...input, dependentId: martino });
+    expect(child.price).toMatchObject({ concession: 'minor' });
+    expect(child.price.totalCents).toBeLessThan(adult.price.totalCents);
+    const reservation = await repos.reservations.create(B, { ...input, dependentId: martino });
+    expect(reservation).toMatchObject({ holder: uxia, dependentId: martino });
+
+    const gym = freeSlot(db.read(), `${B}-ximnasio`, TOMORROW);
+    const tooYoung = await repos.reservations.quote(B, {
+      ...gym,
+      holder: uxia,
+      channel: 'web',
+      dependentId: iria,
+    });
+    expect(tooYoung.violations).toEqual([{ code: 'tooYoung', age: 16 }]);
+    await expect(
+      repos.reservations.quote(B, { ...input, dependentId: 'someone-else' }),
+    ).rejects.toMatchObject({ problems: [{ field: 'dependentId', code: 'range' }] });
+  });
+
   it('quotes a change of an existing booking with the modification rules', async () => {
     const { repos, db } = setup({ userId: uxia.userId });
     const first = freeSlot(db.read(), `${B}-tenis`, addDays(TODAY, 3));
@@ -564,6 +590,22 @@ describe('recurring bookings', () => {
 });
 
 describe('other repositories', () => {
+  it('lets residents keep the people in their care, checking each one', async () => {
+    const { repos } = setup({ userId: uxia.userId });
+    const me = await repos.users.get(B, uxia.userId);
+    expect(me.dependents.map((d) => d.firstName)).toEqual(['Martiño', 'Iria']);
+    await expect(
+      repos.users.update(B, uxia.userId, {
+        dependents: [{ id: 'new', firstName: ' ', lastName: 'Rial', birthDate: '2030-01-01' }],
+      }),
+    ).rejects.toMatchObject({
+      problems: [
+        { field: 'dependents.0.firstName', code: 'required' },
+        { field: 'dependents.0.birthDate', code: 'range' },
+      ],
+    });
+  });
+
   it('finds residents by name or phone, and staff by role', async () => {
     const { repos } = setup();
     const [byName] = await repos.users.list(B, { search: 'manuel castro' });

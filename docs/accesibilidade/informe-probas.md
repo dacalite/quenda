@@ -35,6 +35,7 @@ Antes de cada bloque, reinicia a demostración desde «Cambiar de perfil» › �
 | F14    | Persoal: indicadores          | Ir a «Indicadores». Percorrer a táboa de ocupación por día e hora.                                                                                                          | As cabeceiras de fila e de columna lense en cada cela; o resumo en texto está antes da táboa.                                                                                                                                                                                                                |
 | F15    | Deputación: alta              | «Ver como: Deputación». «Dar de alta un concello novo». Avanzar sen nome; corrixir; completar os tres pasos.                                                                | Anúnciase «Paso 1 de 3»; o resumo de erros recibe o foco; ao rematar, anúnciase a alta e o concello aparece na lista.                                                                                                                                                                                        |
 | F16    | Espazo compartido             | Ir a «Instalacións» e filtrar por «Balonmán». Abrir o pavillón e reservar unha franxa. Noutra franxa, confirmar sen escoller deporte e seguir a ligazón do resumo de erros. | O deporte lese como lista de opcións obrigatoria; sen el, o resumo nomea o erro e leva ao primeiro deporte; a reserva confirmada di o deporte.                                                                                                                                                               |
+| F17    | Persoas ao cargo              | En «Perfil», engadir unha persoa ao teu cargo gardando primeiro sen datos e seguindo o resumo de erros. Reservar unha pista para ela.                                       | O resumo leva a cada campo; a data de nacemento lese por partes; ao escoller para quen é a reserva, o resumo mostra o prezo coa bonificación.                                                                                                                                                                |
 
 ## Contornos
 
@@ -42,156 +43,162 @@ Repite os fluxos en cada contorno e anota o resultado.
 
 ### 1. VoiceOver en iOS (Safari)
 
-Versión de iOS: ____ · Dispositivo: ____
+Versión de iOS: \_**\_ · Dispositivo: \_\_**
 
 Pasos previos: activar VoiceOver (Axustes › Accesibilidade › VoiceOver) e o rotor con «Encabezados», «Ligazóns» e «Controis de formulario». Abrir a demostración en Safari e, se se quere, instalala na pantalla de inicio.
 
 Comprobacións específicas: navegación co rotor por encabezados; xestos de activación nos botóns de franxa; lectura das lapelas; selector de data.
 
 | Fluxo | Resultado | Observacións |
-| ----- | --------- | ------------ |
-| F1    |           |              |
-| F2    |           |              |
-| F3    |           |              |
-| F4    |           |              |
-| F5    |           |              |
-| F6    |           |              |
-| F7    |           |              |
-| F8    |           |              |
-| F9    |           |              |
-| F10   |           |              |
-| F11   |           |              |
-| F12   |           |              |
-| F13   |           |              |
-| F14   |           |              |
-| F15   |           |              |
-| F16   |           |              |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1 | | |
+| F2 | | |
+| F3 | | |
+| F4 | | |
+| F5 | | |
+| F6 | | |
+| F7 | | |
+| F8 | | |
+| F9 | | |
+| F10 | | |
+| F11 | | |
+| F12 | | |
+| F13 | | |
+| F14 | | |
+| F15 | | |
+| F16 | | |
+| F17 | Persoas ao cargo | En «Perfil», engadir unha persoa ao teu cargo gardando primeiro sen datos e seguindo o resumo de erros. Reservar unha pista para ela. | O resumo leva a cada campo; a data de nacemento lese por partes; ao escoller para quen é a reserva, o resumo mostra o prezo coa bonificación. |
 
 ### 2. TalkBack en Android (Chrome)
 
-Versión de Android: ____ · Dispositivo: ____
+Versión de Android: \_**\_ · Dispositivo: \_\_**
 
 Pasos previos: activar TalkBack (Axustes › Accesibilidade › TalkBack) e configurar o menú de lectura con «Encabezados» e «Controis».
 
 Comprobacións específicas: navegación por encabezados co menú de lectura; selectores despregables; diálogos; anuncios das rexións `aria-live`.
 
 | Fluxo | Resultado | Observacións |
-| ----- | --------- | ------------ |
-| F1    |           |              |
-| F2    |           |              |
-| F3    |           |              |
-| F4    |           |              |
-| F5    |           |              |
-| F6    |           |              |
-| F7    |           |              |
-| F8    |           |              |
-| F9    |           |              |
-| F10   |           |              |
-| F11   |           |              |
-| F12   |           |              |
-| F13   |           |              |
-| F14   |           |              |
-| F15   |           |              |
-| F16   |           |              |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1 | | |
+| F2 | | |
+| F3 | | |
+| F4 | | |
+| F5 | | |
+| F6 | | |
+| F7 | | |
+| F8 | | |
+| F9 | | |
+| F10 | | |
+| F11 | | |
+| F12 | | |
+| F13 | | |
+| F14 | | |
+| F15 | | |
+| F16 | | |
+| F17 | Persoas ao cargo | En «Perfil», engadir unha persoa ao teu cargo gardando primeiro sen datos e seguindo o resumo de erros. Reservar unha pista para ela. | O resumo leva a cada campo; a data de nacemento lese por partes; ao escoller para quen é a reserva, o resumo mostra o prezo coa bonificación. |
 
 ### 3. NVDA en Windows (Firefox e Chrome)
 
-Versión de NVDA: ____ · Navegador e versión: ____
+Versión de NVDA: \_**\_ · Navegador e versión: \_\_**
 
 Pasos previos: voz en galego se está dispoñible (se non, castelán). Probar en modo navegación (H, D, F, T) e en modo foco nos formularios.
 
 Comprobacións específicas: cambio automático a modo foco nos campos; lectura de táboas con Ctrl+Alt+frechas; anuncios ao cambiar de pantalla (comprobar se o título se le unha ou dúas veces).
 
 | Fluxo | Resultado | Observacións |
-| ----- | --------- | ------------ |
-| F1    |           |              |
-| F2    |           |              |
-| F3    |           |              |
-| F4    |           |              |
-| F5    |           |              |
-| F6    |           |              |
-| F7    |           |              |
-| F8    |           |              |
-| F9    |           |              |
-| F10   |           |              |
-| F11   |           |              |
-| F12   |           |              |
-| F13   |           |              |
-| F14   |           |              |
-| F15   |           |              |
-| F16   |           |              |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1 | | |
+| F2 | | |
+| F3 | | |
+| F4 | | |
+| F5 | | |
+| F6 | | |
+| F7 | | |
+| F8 | | |
+| F9 | | |
+| F10 | | |
+| F11 | | |
+| F12 | | |
+| F13 | | |
+| F14 | | |
+| F15 | | |
+| F16 | | |
+| F17 | Persoas ao cargo | En «Perfil», engadir unha persoa ao teu cargo gardando primeiro sen datos e seguindo o resumo de erros. Reservar unha pista para ela. | O resumo leva a cada campo; a data de nacemento lese por partes; ao escoller para quen é a reserva, o resumo mostra o prezo coa bonificación. |
 
 ### 4. Só teclado
 
-Navegador: ____
+Navegador: \_\_\_\_
 
 Pasos previos: non usar o rato nin o panel táctil.
 
 Comprobacións específicas: o foco vese sempre e con contraste; a orde de tabulación segue a lectura; non hai trampas de foco fóra dos diálogos modais; Escape pecha diálogos e a visita guiada; frechas nas lapelas, nos grupos de opcións e na visita guiada.
 
 | Fluxo | Resultado | Observacións |
-| ----- | --------- | ------------ |
-| F1    |           |              |
-| F2    |           |              |
-| F3    |           |              |
-| F4    |           |              |
-| F5    |           |              |
-| F6    |           |              |
-| F7    |           |              |
-| F8    |           |              |
-| F9    |           |              |
-| F10   |           |              |
-| F11   |           |              |
-| F12   |           |              |
-| F13   |           |              |
-| F14   |           |              |
-| F15   |           |              |
-| F16   |           |              |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1 | | |
+| F2 | | |
+| F3 | | |
+| F4 | | |
+| F5 | | |
+| F6 | | |
+| F7 | | |
+| F8 | | |
+| F9 | | |
+| F10 | | |
+| F11 | | |
+| F12 | | |
+| F13 | | |
+| F14 | | |
+| F15 | | |
+| F16 | | |
+| F17 | Persoas ao cargo | En «Perfil», engadir unha persoa ao teu cargo gardando primeiro sen datos e seguindo o resumo de erros. Reservar unha pista para ela. | O resumo leva a cada campo; a data de nacemento lese por partes; ao escoller para quen é a reserva, o resumo mostra o prezo coa bonificación. |
 
 ### 5. Zoom ao 200 %
 
-Navegador e resolución: ____
+Navegador e resolución: \_\_\_\_
 
 Pasos previos: zoom do navegador ao 200 % nunha xanela de 1280 px de ancho.
 
 Comprobacións específicas: sen desprazamento horizontal (agás dentro das táboas); nada se solapa nin se corta; a barra de lapelas e a visita guiada non tapan o contido.
 
 | Fluxo | Resultado | Observacións |
-| ----- | --------- | ------------ |
-| F1    |           |              |
-| F3    |           |              |
-| F4    |           |              |
-| F6    |           |              |
-| F7    |           |              |
-| F9    |           |              |
-| F11   |           |              |
-| F14   |           |              |
-| F15   |           |              |
-| F16   |           |              |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1 | | |
+| F3 | | |
+| F4 | | |
+| F6 | | |
+| F7 | | |
+| F9 | | |
+| F11 | | |
+| F14 | | |
+| F15 | | |
+| F16 | | |
+| F17 | Persoas ao cargo | En «Perfil», engadir unha persoa ao teu cargo gardando primeiro sen datos e seguindo o resumo de erros. Reservar unha pista para ela. | O resumo leva a cada campo; a data de nacemento lese por partes; ao escoller para quen é a reserva, o resumo mostra o prezo coa bonificación. |
 
 ### 6. Ancho de 320 px
 
-Navegador: ____
+Navegador: \_\_\_\_
 
 Pasos previos: modo de deseño adaptable do navegador a 320 × 640 px, ou un móbil pequeno.
 
 Comprobacións específicas: o menú pásase a un botón despregable; os obxectivos táctiles miden polo menos 44 × 44 px; sen desprazamento horizontal.
 
 | Fluxo | Resultado | Observacións |
-| ----- | --------- | ------------ |
-| F1    |           |              |
-| F2    |           |              |
-| F3    |           |              |
-| F4    |           |              |
-| F7    |           |              |
-| F8    |           |              |
-| F12   |           |              |
-| F15   |           |              |
-| F16   |           |              |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1 | | |
+| F2 | | |
+| F3 | | |
+| F4 | | |
+| F7 | | |
+| F8 | | |
+| F12 | | |
+| F15 | | |
+| F16 | | |
+| F17 | Persoas ao cargo | En «Perfil», engadir unha persoa ao teu cargo gardando primeiro sen datos e seguindo o resumo de erros. Reservar unha pista para ela. | O resumo leva a cada campo; a data de nacemento lese por partes; ao escoller para quen é a reserva, o resumo mostra o prezo coa bonificación. |
 
 ### 7. Alto contraste
 
-Contorno: ____ (p. ex. «Contraste alto» de Windows ou a preferencia «Alto contraste» da propia aplicación)
+Contorno: \_\_\_\_ (p. ex. «Contraste alto» de Windows ou a preferencia «Alto contraste» da propia aplicación)
 
 Comprobacións específicas: bordos e foco visibles; os estados (libre, ocupada, bloqueada) distínguense sen cor; as iconas seguen viéndose.
 

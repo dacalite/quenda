@@ -17,6 +17,24 @@ const club: Entity = {
 };
 
 describe('computePrice', () => {
+  it('gives a minor in someone’s care the minor rate and keeps a large-family one', () => {
+    const guardian = makeUser({ concessions: ['largeFamily', 'senior'] });
+    const minor = {
+      kind: 'user' as const,
+      user: guardian,
+      dependent: { id: 'd1', firstName: 'Martiño', lastName: 'Rial', birthDate: '2017-03-14' },
+    };
+    expect(computePrice(minor, pricing, 60, 60, '2026-10-20')).toMatchObject({
+      concession: 'minor',
+      discountPercent: 30,
+      totalCents: 280,
+    });
+    const grownUp = { ...minor, dependent: { ...minor.dependent, birthDate: '2008-01-01' } };
+    expect(
+      computePrice(grownUp, { ...pricing, concessions: { largeFamily: 20 } }, 60, 60, '2026-10-20'),
+    ).toMatchObject({ concession: 'largeFamily', totalCents: 320 });
+  });
+
   it('charges residents the resident rate per slot', () => {
     const quote = computePrice({ kind: 'user', user: makeUser() }, pricing, 60, 120);
     expect(quote).toEqual({

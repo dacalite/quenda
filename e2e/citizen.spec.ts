@@ -186,6 +186,54 @@ test('a shared court is booked for the sport each person chooses', async ({ page
   await expectNoAxeViolations(page);
 });
 
+test('a parent adds a child and books for them, at the minor rate and within the age limit', async ({
+  page,
+}) => {
+  await signedInAs(page);
+  await page.goto('./ribasmeiras/perfil');
+  const care = page.getByRole('region', { name: 'Persoas ao teu cargo' });
+  await expect(care.getByText(/^Martiño Rial Varela, \d+ anos$/)).toBeVisible();
+  await care.getByRole('button', { name: 'Engadir unha persoa' }).click();
+  await care.getByRole('button', { name: 'Gardar' }).click();
+  await expect(page.getByRole('heading', { name: 'Hai 3 erros no formulario' })).toBeVisible();
+  await expectNoAxeViolations(page);
+  await care.getByRole('textbox', { name: 'Nome' }).fill('Antón');
+  await care.getByRole('textbox', { name: 'Apelidos' }).fill('Rial Varela');
+  await care.getByRole('spinbutton', { name: /^día/ }).pressSequentially('10062020');
+  await care.getByRole('button', { name: 'Gardar' }).click();
+  await expect(page.getByRole('region', { name: 'Avisos' })).toContainText('Engadiuse a Antón.');
+  await expect(care.getByText(/^Antón Rial Varela, \d+ anos$/)).toBeVisible();
+
+  await page.goto('./ribasmeiras/instalacions/ribasmeiras-tenis/reservar');
+  await page.getByRole('button', { name: 'Día seguinte' }).click();
+  await page.locator('a[data-status="free"]').first().click();
+  await expect(heading(page)).toHaveText('Revisa a túa reserva');
+  const price = page.getByRole('definition').filter({ hasText: '€' });
+  const adultPrice = await price.textContent();
+  await page.getByRole('radio', { name: /^Martiño Rial Varela/ }).focus();
+  await page.keyboard.press('Space');
+  await expect(page.getByText(/Bonificación: Menores de idade, \d+\s%\sde desconto/)).toBeVisible();
+  await expect(price).not.toHaveText(adultPrice ?? '');
+  await expectNoAxeViolations(page);
+  const accept = page.getByRole('checkbox', { name: 'Lin e acepto as normas de uso' });
+  await accept.focus();
+  await accept.press('Space');
+  await page.getByRole('button', { name: 'Confirmar a reserva' }).click();
+  await expect(heading(page)).toHaveText('Reserva confirmada');
+  await expect(
+    page.getByRole('definition').filter({ hasText: 'Martiño Rial Varela' }),
+  ).toBeVisible();
+
+  await page.goto('./ribasmeiras/instalacions/ribasmeiras-ximnasio/reservar');
+  await page.getByRole('button', { name: 'Día seguinte' }).click();
+  await page.locator('a[data-status="free"]').first().click();
+  await page.getByRole('radio', { name: /^Iria Rial Varela/ }).focus();
+  await page.keyboard.press('Space');
+  await expect(
+    page.getByText('Esta instalación só se pode reservar para menores a partir dos 16 anos.'),
+  ).toBeVisible();
+});
+
 test.describe('citizen screens pass axe', () => {
   test.beforeEach(async ({ page }) => {
     await signedInAs(page);

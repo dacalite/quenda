@@ -20,6 +20,8 @@ erDiagram
   FACILITY ||--o{ RESERVATION : recibe
   SUBSPACE ||--o{ RESERVATION : ocupa
   USER |o--o{ RESERVATION : "é titular"
+  USER ||--o{ DEPENDENT : "ten ao seu cargo"
+  DEPENDENT |o--o{ RESERVATION : "usa"
   ENTITY |o--o{ RESERVATION : "é titular"
   ENTITY ||--o{ RECURRING_BOOKING : ten
   FACILITY ||--o{ RECURRING_BOOKING : acolle
@@ -117,6 +119,7 @@ erDiagram
     time end_time
     uuid user_id FK "titular persoa"
     uuid entity_id FK "titular entidade"
+    uuid dependent_id FK "persoa ao cargo que a usa"
     text status
     text channel "web, phone ou inPerson"
     int amount_cents
@@ -161,6 +164,13 @@ erDiagram
     text role "citizen, staff ou admin"
     jsonb preferences
   }
+  DEPENDENT {
+    uuid id PK
+    uuid user_id FK "persoa responsable"
+    text first_name
+    text last_name
+    date birth_date
+  }
   ENTITY {
     uuid id PK
     uuid tenant_id FK
@@ -198,6 +208,7 @@ erDiagram
 - **Titular dunha reserva.** É unha persoa ou unha entidade, nunca as dúas: unha restrición `CHECK (num_nonnulls(user_id, entity_id) = 1)` garánteo.
 - **Espazos que se conteñen.** Un campo enteiro (`full`) contén os dous medios campos. O dominio considera ocupados os espazos relacionados, de modo que non se pode reservar o campo enteiro se un medio xa está collido (`subspacesOverlap` en `src/domain/rules/availability.ts`). O concello configúrao en cada instalación («Ao reservalo, ocupa tamén»).
 - **Varios deportes nun mesmo espazo.** Cada espazo garda os deportes para os que se reserva (`sports`). Se ten máis dun, a reserva indica cal (`sport`) e o dominio rexeita unha reserva sen deporte ou cun que o espazo non ofrece (`sportProblem` en `src/domain/sports.ts`). Dúas metades da pista pódense reservar á vez para deportes distintos, e a pista enteira ocupa as dúas.
+- **Persoas ao cargo.** Unha persoa reserva para as menores ao seu cargo, que non teñen conta propia: a titular é ela e `dependent_id` indica quen a usa. A bonificación de menores aplícase pola idade nesa data e a de familia numerosa compártese; `min_age` nas normas fixa a idade mínima dunha instalación (por exemplo, 16 anos no ximnasio).
 - **Normas con herdanza.** `TENANT.default_rules` son as normas xerais e `FACILITY.rules` só garda as que cambian; `resolveRules` combínaas.
 - **Datas e horas locais.** As datas e horas de reservas, horarios e bloqueos son do calendario do concello (`time_zone`); os instantes (`created_at`, `checked_in_at`) gárdanse en UTC.
 - **Importes en céntimos** (`int`), para evitar erros de redondeo.

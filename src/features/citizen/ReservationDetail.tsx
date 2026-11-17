@@ -12,7 +12,7 @@ import { StatusBadge } from '../../ui/StatusBadge';
 import layout from '../../ui/layout.module.css';
 import styles from './citizen.module.css';
 import { AddToCalendar } from './AddToCalendar';
-import { RESERVATION_TONE } from './labels';
+import { RESERVATION_TONE, useDependentName } from './labels';
 import { useCitizen, useReservation } from './queries';
 import { ReservationActions } from './ReservationActions';
 import { ReservationQr } from './ReservationQr';
@@ -42,6 +42,8 @@ function Detail({ reservation, facility }: { reservation: Reservation; facility:
   const [params] = useSearchParams();
   const format = useFormat();
   const subspaceName = useSubspaceName();
+  const dependentName = useDependentName();
+  const forName = dependentName(reservation.dependentId);
   const isNew = params.has('nova');
   const changed = params.has('cambiada');
   const title = isNew
@@ -88,6 +90,12 @@ function Detail({ reservation, facility }: { reservation: Reservation; facility:
               <>
                 <dt>{t('booking.sport')}</dt>
                 <dd>{t(`domain:sport.${reservation.sport}`)}</dd>
+              </>
+            )}
+            {forName && (
+              <>
+                <dt>{t('booking.for')}</dt>
+                <dd>{forName}</dd>
               </>
             )}
             <dt>{t('booking.date')}</dt>

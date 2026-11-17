@@ -28,6 +28,12 @@ export const weekdayOf = (date: IsoDate) =>
 
 export const startOfWeek = (date: IsoDate) => addDays(date, 1 - weekdayOf(date));
 
+/** Whole years from a birth date to a date, as an age is counted. */
+export const ageOn = (birthDate: IsoDate, date: IsoDate) =>
+  Number(date.slice(0, 4)) -
+  Number(birthDate.slice(0, 4)) -
+  (date.slice(5) < birthDate.slice(5) ? 1 : 0);
+
 export const isInDateRange = (date: IsoDate, range: DateRange) =>
   date >= range.from && date <= range.to;
 

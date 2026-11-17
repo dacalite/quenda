@@ -50,7 +50,8 @@ const asciiSlug = (value: string) =>
 type UserData = Pick<
   User,
   'firstName' | 'lastName' | 'role' | 'resident' | 'concessions' | 'maskedDni' | 'phone'
->;
+> &
+  Partial<Pick<User, 'dependents'>>;
 
 function buildUser(
   tenantId: string,
@@ -59,6 +60,7 @@ function buildUser(
   textSize: User['preferences']['accessibility']['textSize'] = 'normal',
 ): User {
   return {
+    dependents: [],
     ...data,
     id,
     tenantId,
@@ -73,9 +75,11 @@ function buildUser(
 
 /** The demo people, with an account in every council so any of them can be tried anywhere. */
 export const personaUsers = (tenantId: string): User[] =>
-  PERSONAS.map(({ key, textSize, ...data }) =>
-    buildUser(tenantId, personaUserId(tenantId, key), data, textSize),
-  );
+  PERSONAS.map(({ key, textSize, dependents = [], ...data }) => {
+    const id = personaUserId(tenantId, key);
+    const people = dependents.map((d, i) => ({ ...d, id: `${id}-d${String(i + 1)}` }));
+    return buildUser(tenantId, id, { ...data, dependents: people }, textSize);
+  });
 
 const pad = (value: number) => String(value).padStart(2, '0');
 

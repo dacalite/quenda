@@ -43,6 +43,7 @@ export const DEFAULT_RULES: BookingRules = {
   maxDurationMinutes: 120,
   maxBookingsPerWeek: 3,
   freeCancellationHours: 24,
+  minAge: 0,
   noShow: { strikesForSuspension: 3, windowDays: 60, suspensionDays: 14 },
   eligibility: 'everyone',
 };
