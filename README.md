@@ -15,9 +15,9 @@ Proposta para o I Certame GOBTEC de Software Libre
 
 **[Probar a demostración](https://dacalite.github.io/quenda/)** · [Ver o vídeo](https://drive.google.com/file/d/1jz23LuPh-fIedanGovESCPjbUu3cvzVq/view) · [Documentación](docs)
 
-<a href="https://drive.google.com/file/d/1jz23LuPh-fIedanGovESCPjbUu3cvzVq/view"><img src="docs/capturas/readme/video.jpg" width="720" alt="Ver o vídeo de presentación de Quenda (1 minuto e 23 segundos)"></a>
+https://github.com/user-attachments/assets/44edf4c4-bfaf-41ed-809a-80581a65732b
 
-<sub>Vídeo de presentación (1:23), en [Google Drive](https://drive.google.com/file/d/1jz23LuPh-fIedanGovESCPjbUu3cvzVq/view).</sub>
+<sub>Vídeo de presentación (1:23). Tamén en [Google Drive](https://drive.google.com/file/d/1jz23LuPh-fIedanGovESCPjbUu3cvzVq/view).</sub>
 
 </div>
 
