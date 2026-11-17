@@ -13,11 +13,11 @@ Proposta para o I Certame GOBTEC de Software Libre
 [![Galego e castelán](https://img.shields.io/badge/idiomas-galego_·_castelán-0b5cad)](src/i18n)
 [![CI](https://github.com/dacalite/quenda/actions/workflows/ci.yml/badge.svg)](https://github.com/dacalite/quenda/actions/workflows/ci.yml)
 
-**[Probar a demostración](https://dacalite.github.io/quenda/)** · [Ver o vídeo](https://drive.google.com/file/d/17YjD5p25-TKYCOU9gqyLJfKe3WNKlxGY/view) · [Documentación](docs)
+**[Probar a demostración](https://dacalite.github.io/quenda/)** · [Ver o vídeo](https://drive.google.com/file/d/1jz23LuPh-fIedanGovESCPjbUu3cvzVq/view) · [Documentación](docs)
 
-https://github.com/user-attachments/assets/5f5f8d98-caa5-49b1-adf3-45ea617f0252
+<a href="https://drive.google.com/file/d/1jz23LuPh-fIedanGovESCPjbUu3cvzVq/view"><img src="docs/capturas/readme/video.jpg" width="720" alt="Ver o vídeo de presentación de Quenda (1 minuto e 23 segundos)"></a>
 
-<sub>Vídeo de presentación (1:23). Tamén en [Google Drive](https://drive.google.com/file/d/17YjD5p25-TKYCOU9gqyLJfKe3WNKlxGY/view).</sub>
+<sub>Vídeo de presentación (1:23), en [Google Drive](https://drive.google.com/file/d/1jz23LuPh-fIedanGovESCPjbUu3cvzVq/view).</sub>
 
 </div>
 
