@@ -107,8 +107,10 @@ export function NewCouncil() {
     setStep(index);
   };
 
-  const submit = () => {
-    const taken = (councils.data ?? []).map((c) => c.slug);
+  const submit = async () => {
+    // The addresses in use may still be loading; checking against an empty list would let a taken one through.
+    const known = councils.data ?? (await councils.refetch()).data ?? [];
+    const taken = known.map((c) => c.slug);
     const found = validateNewCouncil(draft, taken).filter((p) =>
       STEP_FIELDS[current].includes(p.field),
     );
@@ -160,7 +162,7 @@ export function NewCouncil() {
         noValidate
         onSubmit={(event) => {
           event.preventDefault();
-          submit();
+          void submit();
         }}
       >
         <h2 ref={heading} tabIndex={-1}>

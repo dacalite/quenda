@@ -15,6 +15,7 @@ import { getAvailability } from '../../../domain/rules/availability';
 import { computePrice, initialPaymentStatus } from '../../../domain/rules/pricing';
 import { detectConflicts, expandRecurring } from '../../../domain/rules/recurring';
 import { reservationCode } from '../../../domain/reservationCode';
+import { sportProblem } from '../../../domain/sports';
 import { toMinutes, zonedNow, type LocalDateTime } from '../../../domain/time';
 import {
   validateFacility,
@@ -314,6 +315,13 @@ export function createLocalRepositories({
 
   const recurringConflicts = (tenantId: Id, input: RecurringBookingInput) => {
     const facility = findIn(data().facilities, tenantId, input.facilityId, 'facility');
+    const subspace = facility.subspaces.find((s) => s.id === input.subspaceId);
+    const sport = subspace && sportProblem(subspace, input.sport);
+    if (sport) {
+      throw new ValidationError([
+        { field: 'sport', code: sport === 'sportRequired' ? 'required' : 'range' },
+      ]);
+    }
     const context = facilityContext(tenantId, facility);
     const from = context.now.date > input.season.from ? context.now.date : input.season.from;
     return { context, dates: expandRecurring(input, { from, to: input.season.to }) };
@@ -670,6 +678,7 @@ export function createLocalRepositories({
               code: uniqueCode(tenantId),
               facilityId: input.facilityId,
               subspaceId: input.subspaceId,
+              ...(input.sport ? { sport: input.sport } : {}),
               date,
               ...input.times,
               holder,

@@ -131,3 +131,10 @@
   gap: var(--space-5);
   align-items: start;
 }
+
+/* Checkboxes that read as a short list, side by side where there is room. */
+.choiceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  gap: 0 var(--space-3);
+}

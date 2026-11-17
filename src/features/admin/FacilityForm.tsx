@@ -14,7 +14,10 @@ import type {
   Concession,
   FacilityStatus,
   FacilityType,
+  Subspace,
 } from '../../domain/types';
+import { SPORTS } from '../../domain/sports';
+import { useLocalized } from '../../i18n/labels';
 import { DEFAULT_COORDINATES } from '../../domain/councils';
 import { NUMERIC_RULES, validateFacility } from '../../domain/validation';
 import { Button } from '../../ui/Button';
@@ -53,7 +56,13 @@ const CONCESSIONS: Concession[] = ['minor', 'senior', 'disability', 'largeFamily
 const STATUSES: FacilityStatus[] = ['active', 'inactive'];
 
 const text = () => ({ gl: '', es: '' });
-const newSpace = () => ({ id: crypto.randomUUID(), name: text(), capacity: 1, contains: [] });
+const newSpace = (): Subspace => ({
+  id: crypto.randomUUID(),
+  name: text(),
+  capacity: 1,
+  contains: [],
+  sports: [],
+});
 
 const blankFacility = (): FacilityInput => ({
   name: '',
@@ -119,15 +128,18 @@ function FacilityForm({ id, initial }: { id?: string; initial: FacilityInput }) 
         language: t(`facilityForm.language.${photo[2] as 'gl' | 'es'}`),
       });
     }
-    const space = /^subspaces\.(\d+)\.(?:name\.(gl|es)|capacity)$/.exec(path);
+    const space = /^subspaces\.(\d+)\.(?:name\.(gl|es)|(capacity)|contains)$/.exec(path);
     if (!space) return labels[path] ?? path;
     const n = Number(space[1]) + 1;
-    return space[2]
-      ? t('facilityForm.spaceName', {
-          n,
-          language: t(`facilityForm.language.${space[2] as 'gl' | 'es'}`),
-        })
-      : t('facilityForm.spaceCapacity', { n });
+    if (space[2]) {
+      return t('facilityForm.spaceName', {
+        n,
+        language: t(`facilityForm.language.${space[2] as 'gl' | 'es'}`),
+      });
+    }
+    return space[3]
+      ? t('facilityForm.spaceCapacity', { n })
+      : t('facilityForm.spaceContains', { n });
   };
   const messages = useProblemMessages(FORM, label);
   const errorOf = (inputId: string) => errors.find((e) => e.fieldId === inputId)?.message;
@@ -138,6 +150,16 @@ function FacilityForm({ id, initial }: { id?: string; initial: FacilityInput }) 
   const update = (patch: Partial<FacilityInput>) => {
     setDraft({ ...draft, ...patch });
   };
+  const localized = useLocalized();
+  const spaceName = (space: Subspace, i: number) =>
+    localized(space.name).trim() || t('facilityForm.space', { n: i + 1 });
+  const updateSpace = (id: string, patch: (space: Subspace) => Partial<Subspace>) => {
+    update({
+      subspaces: draft.subspaces.map((s) => (s.id === id ? { ...s, ...patch(s) } : s)),
+    });
+  };
+  const toggle = <T,>(list: T[], item: T, selected: boolean) =>
+    selected ? [...list, item] : list.filter((x) => x !== item);
   const localizedFields = (key: 'description' | 'usageRules') =>
     LANGUAGES.map((language) => (
       <TextField
@@ -296,12 +318,69 @@ function FacilityForm({ id, initial }: { id?: string; initial: FacilityInput }) 
                   }}
                 />
               </div>
+              <fieldset className={layout.fieldset}>
+                <legend>{t('facilityForm.spaceSports')}</legend>
+                <p className={layout.meta}>{t('facilityForm.spaceSportsHelp')}</p>
+                <div className={layout.choiceGrid}>
+                  {SPORTS.map((sport) => (
+                    <Checkbox
+                      key={sport}
+                      isSelected={space.sports.includes(sport)}
+                      onChange={(selected) => {
+                        updateSpace(space.id, (s) => ({
+                          sports: SPORTS.filter((x) =>
+                            toggle(s.sports, sport, selected).includes(x),
+                          ),
+                        }));
+                      }}
+                    >
+                      {t(`domain:sport.${sport}`)}
+                    </Checkbox>
+                  ))}
+                </div>
+              </fieldset>
+              {draft.subspaces.length > 1 && (
+                <fieldset className={layout.fieldset}>
+                  <legend id={fieldId(FORM, `subspaces.${String(i)}.contains`)} tabIndex={-1}>
+                    {t('facilityForm.spaceContainsShort')}
+                  </legend>
+                  <p className={layout.meta}>{t('facilityForm.spaceContainsHelp')}</p>
+                  {errorOf(fieldId(FORM, `subspaces.${String(i)}.contains`)) && (
+                    <p className={layout.notice} data-tone="danger">
+                      {errorOf(fieldId(FORM, `subspaces.${String(i)}.contains`))}
+                    </p>
+                  )}
+                  {draft.subspaces.map(
+                    (other, j) =>
+                      other.id !== space.id && (
+                        <Checkbox
+                          key={other.id}
+                          isSelected={space.contains.includes(other.id)}
+                          onChange={(selected) => {
+                            updateSpace(space.id, (s) => ({
+                              contains: toggle(s.contains, other.id, selected),
+                            }));
+                          }}
+                        >
+                          {spaceName(other, j)}
+                        </Checkbox>
+                      ),
+                  )}
+                </fieldset>
+              )}
               {!existingSpaces.has(space.id) && draft.subspaces.length > 1 && (
                 <p>
                   <Button
                     variant="quiet"
                     onPress={() => {
-                      update({ subspaces: draft.subspaces.filter((s) => s.id !== space.id) });
+                      update({
+                        subspaces: draft.subspaces
+                          .filter((s) => s.id !== space.id)
+                          .map((s) => ({
+                            ...s,
+                            contains: s.contains.filter((c) => c !== space.id),
+                          })),
+                      });
                     }}
                   >
                     {t('facilityForm.removeSpace', { n: i + 1 })}

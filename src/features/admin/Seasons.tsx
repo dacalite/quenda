@@ -6,7 +6,7 @@ import { useFacilities } from '../../app/queries';
 import { adminPaths } from '../../app/routes/paths';
 import type { RecurringBooking } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
-import { useSubspaceName, useWeekdayName } from '../../i18n/labels';
+import { useSpaceLabel, useWeekdayName } from '../../i18n/labels';
 import { DataTable } from '../../ui/DataTable';
 import layout from '../../ui/layout.module.css';
 import { Link } from '../../ui/Link';
@@ -18,7 +18,7 @@ export function Seasons() {
   const { tenant } = useStaff();
   const paths = adminPaths(tenant.slug);
   const format = useFormat();
-  const subspaceName = useSubspaceName();
+  const spaceLabel = useSpaceLabel();
   const facilities = useFacilities();
   const entities = useStaffQuery(['entities'], (r, id) => r.entities.list(id));
   const bookings = useStaffQuery(['recurringBookings'], (r, id) => r.recurringBookings.list(id));
@@ -56,9 +56,7 @@ export function Seasons() {
                 header: t('table.place'),
                 render: (b) => {
                   const facility = facilities.data.find((f) => f.id === b.facilityId);
-                  return facility
-                    ? `${facility.name} · ${subspaceName(facility, b.subspaceId)}`
-                    : '';
+                  return facility ? `${facility.name} · ${spaceLabel(facility, b)}` : '';
                 },
               },
               {

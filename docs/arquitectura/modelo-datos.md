@@ -72,6 +72,7 @@ erDiagram
     jsonb name
     int capacity
     text_array contains
+    text_array sports "deportes para os que se reserva"
   }
   SCHEDULE {
     uuid facility_id PK, FK
@@ -110,6 +111,7 @@ erDiagram
     text code UK "QDA-7K3M"
     uuid facility_id FK
     text subspace_id FK
+    text sport "se o espazo ten varios"
     date date
     time start_time
     time end_time
@@ -138,6 +140,7 @@ erDiagram
     uuid entity_id FK
     uuid facility_id FK
     text subspace_id
+    text sport
     int weekday
     time start_time
     time end_time
@@ -193,7 +196,8 @@ erDiagram
 ### Notas sobre o modelo
 
 - **Titular dunha reserva.** É unha persoa ou unha entidade, nunca as dúas: unha restrición `CHECK (num_nonnulls(user_id, entity_id) = 1)` garánteo.
-- **Espazos que se conteñen.** Un campo enteiro (`full`) contén os dous medios campos. O dominio considera ocupados os espazos relacionados, de modo que non se pode reservar o campo enteiro se un medio xa está collido (`subspacesOverlap` en `src/domain/rules/availability.ts`).
+- **Espazos que se conteñen.** Un campo enteiro (`full`) contén os dous medios campos. O dominio considera ocupados os espazos relacionados, de modo que non se pode reservar o campo enteiro se un medio xa está collido (`subspacesOverlap` en `src/domain/rules/availability.ts`). O concello configúrao en cada instalación («Ao reservalo, ocupa tamén»).
+- **Varios deportes nun mesmo espazo.** Cada espazo garda os deportes para os que se reserva (`sports`). Se ten máis dun, a reserva indica cal (`sport`) e o dominio rexeita unha reserva sen deporte ou cun que o espazo non ofrece (`sportProblem` en `src/domain/sports.ts`). Dúas metades da pista pódense reservar á vez para deportes distintos, e a pista enteira ocupa as dúas.
 - **Normas con herdanza.** `TENANT.default_rules` son as normas xerais e `FACILITY.rules` só garda as que cambian; `resolveRules` combínaas.
 - **Datas e horas locais.** As datas e horas de reservas, horarios e bloqueos son do calendario do concello (`time_zone`); os instantes (`created_at`, `checked_in_at`) gárdanse en UTC.
 - **Importes en céntimos** (`int`), para evitar erros de redondeo.

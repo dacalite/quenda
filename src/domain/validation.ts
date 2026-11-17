@@ -3,7 +3,7 @@ import { toMinutes } from './time';
 import type { BookingRules, Facility, Schedule, Tenant, TimeRange } from './types';
 
 export type ProblemCode =
-  'required' | 'positive' | 'range' | 'order' | 'overlap' | 'format' | 'taken';
+  'required' | 'positive' | 'range' | 'order' | 'overlap' | 'format' | 'taken' | 'mutual';
 
 /** A field path such as `subspaces.0.name.gl`, with what is wrong with it. */
 export interface FieldProblem {
@@ -67,6 +67,12 @@ export function validateFacility(facility: Omit<Facility, 'id' | 'tenantId'>): F
     if (!Number.isInteger(subspace.capacity) || subspace.capacity < 1) {
       add(`subspaces.${String(i)}.capacity`, 'positive');
     }
+    const mutual = subspace.contains.some(
+      (id) =>
+        id === subspace.id ||
+        facility.subspaces.find((other) => other.id === id)?.contains.includes(subspace.id),
+    );
+    if (mutual) add(`subspaces.${String(i)}.contains`, 'mutual');
   });
   if (!isCount(facility.pricing.residentCents)) add('pricing.residentCents', 'range');
   if (!isCount(facility.pricing.nonResidentCents)) add('pricing.nonResidentCents', 'range');

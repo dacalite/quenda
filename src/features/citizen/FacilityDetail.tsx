@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: EUPL-1.2
 import { useQuery } from '@tanstack/react-query';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { Pending } from '../../app/Pending';
@@ -8,10 +9,11 @@ import { useFacility, useSchedule } from '../../app/queries';
 import { useRepositories } from '../../app/repositories';
 import { citizenPaths } from '../../app/routes/paths';
 import { computePrice } from '../../domain/rules/pricing';
+import { facilitySports } from '../../domain/sports';
 import { addDays, zonedNow } from '../../domain/time';
 import type { Concession, Weekday } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
-import { useLocalized } from '../../i18n/labels';
+import { useLocalized, useSportList, useSubspaceName } from '../../i18n/labels';
 import { DataTable } from '../../ui/DataTable';
 import { Icon } from '../../ui/Icon';
 import { Link } from '../../ui/Link';
@@ -33,6 +35,8 @@ export function FacilityDetail() {
   const paths = citizenPaths(tenant.slug);
   const repositories = useRepositories();
   const localized = useLocalized();
+  const sportList = useSportList();
+  const subspaceName = useSubspaceName();
   const format = useFormat();
   const facility = useFacility(facilityId);
   const schedule = useSchedule(facilityId);
@@ -82,6 +86,12 @@ export function FacilityDetail() {
             <dd>{t(`domain:facilityType.${f.type}`)}</dd>
             <dt>{t('facility.address')}</dt>
             <dd>{f.address}</dd>
+            {facilitySports(f).length > 0 && (
+              <>
+                <dt>{t('facility.sports')}</dt>
+                <dd>{sportList(facilitySports(f))}</dd>
+              </>
+            )}
           </dl>
           <p className={layout.meta}>{t('facility.capacity', { count: f.capacity })}</p>
           {(nextFree.data || nextFree.isSuccess) && (
@@ -113,6 +123,32 @@ export function FacilityDetail() {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {f.subspaces.length > 1 && (
+        <section className={layout.section} aria-labelledby="facility-spaces">
+          <h2 id="facility-spaces">{t('facility.spacesTitle')}</h2>
+          <dl className={layout.details}>
+            {f.subspaces.map((space) => (
+              <Fragment key={space.id}>
+                <dt>{localized(space.name)}</dt>
+                <dd>
+                  {space.sports.length > 0 && sportList(space.sports)}
+                  {space.contains.length > 0 && (
+                    <span className={layout.meta}>
+                      {' '}
+                      {t('facility.spaceContains', {
+                        spaces: format.list(
+                          space.contains.map((id) => subspaceName(f, id)).filter(Boolean),
+                        ),
+                      })}
+                    </span>
+                  )}
+                </dd>
+              </Fragment>
+            ))}
+          </dl>
         </section>
       )}
 

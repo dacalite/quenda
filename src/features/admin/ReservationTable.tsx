@@ -4,7 +4,7 @@ import { adminPaths } from '../../app/routes/paths';
 import { zonedNow } from '../../domain/time';
 import type { Facility, Reservation } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
-import { useSubspaceName } from '../../i18n/labels';
+import { useSpaceLabel } from '../../i18n/labels';
 import { DataTable } from '../../ui/DataTable';
 import { Link } from '../../ui/Link';
 import { AttendanceBadge } from './labels';
@@ -27,7 +27,7 @@ export function ReservationTable({
   const paths = adminPaths(tenant.slug);
   const format = useFormat();
   const holderName = useHolderName();
-  const subspaceName = useSubspaceName();
+  const spaceLabel = useSpaceLabel();
   const now = zonedNow(new Date(), tenant.timeZone);
   const facilityOf = (r: Reservation) => facilities.find((f) => f.id === r.facilityId);
 
@@ -51,7 +51,7 @@ export function ReservationTable({
           header: t('table.place'),
           render: (r) => {
             const facility = facilityOf(r);
-            return facility ? `${facility.name} · ${subspaceName(facility, r.subspaceId)}` : '';
+            return facility ? `${facility.name} · ${spaceLabel(facility, r)}` : '';
           },
         },
         { key: 'holder', header: t('table.holder'), render: (r) => holderName(r.holder) },

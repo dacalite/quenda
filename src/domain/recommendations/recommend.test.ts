@@ -7,7 +7,9 @@ import { occupancyByStart, recommendSlots } from './recommend';
 
 const TUESDAY = '2026-10-20';
 const facility = makeFacility({
-  subspaces: [{ id: 'court', name: { gl: 'Pista', es: 'Pista' }, capacity: 1, contains: [] }],
+  subspaces: [
+    { id: 'court', name: { gl: 'Pista', es: 'Pista' }, capacity: 1, contains: [], sports: [] },
+  ],
 });
 const booked = (weeksAgo: number, start: string, subspaceId = 'court') =>
   makeReservation({
@@ -46,7 +48,7 @@ describe('occupancyByStart', () => {
 
   it('counts shared spaces by the places taken', () => {
     const gym = makeFacility({
-      subspaces: [{ id: 'gym', name: { gl: 'X', es: 'G' }, capacity: 4, contains: [] }],
+      subspaces: [{ id: 'gym', name: { gl: 'X', es: 'G' }, capacity: 4, contains: [], sports: [] }],
     });
     const rows = [1, 2, 3, 4, 5, 6, 7, 8].map((w) => booked(w, '18:00', 'gym'));
     const occupancy = occupancyByStart(makeContext({ facility: gym, reservations: rows }), TUESDAY);

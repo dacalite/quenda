@@ -3,6 +3,7 @@ import { subspacesOverlap } from '../../domain/rules/availability';
 import { computePrice, initialPaymentStatus } from '../../domain/rules/pricing';
 import { expandRecurring } from '../../domain/rules/recurring';
 import { reservationCode } from '../../domain/reservationCode';
+import { needsSport } from '../../domain/sports';
 import { addDays, fromMinutes, startOfWeek, toMinutes, weekdayOf } from '../../domain/time';
 import type {
   Channel,
@@ -14,6 +15,7 @@ import type {
   IsoDate,
   Reservation,
   ReservationStatus,
+  Sport,
   User,
   Weekday,
 } from '../../domain/types';
@@ -255,9 +257,17 @@ function seedTenant(
     holder: Holder;
     status: ReservationStatus;
     channel: Channel;
+    sport?: Sport | undefined;
     recurringBookingId?: string;
   }) => {
     const { facility, holder, status, date } = input;
+    // Spread over the sports of a shared space without drawing from the generator, so the rest stays the same.
+    const subspace = facility.subspaces.find((s) => s.id === input.subspaceId);
+    const sport =
+      input.sport ??
+      (subspace && needsSport(subspace)
+        ? subspace.sports[(input.start / 60 + Number(date.slice(-2))) % subspace.sports.length]
+        : undefined);
     let code = reservationCode(random.next);
     while (codes.has(code)) code = reservationCode(random.next);
     codes.add(code);
@@ -298,6 +308,7 @@ function seedTenant(
       date,
       start: fromMinutes(input.start),
       end: fromMinutes(input.end),
+      ...(sport ? { sport } : {}),
       holder,
       status,
       channel: input.channel,
@@ -335,6 +346,7 @@ function seedTenant(
         entityId: entity.id,
         facilityId: facility.id,
         subspaceId: pattern.subspaceId,
+        ...(pattern.sport ? { sport: pattern.sport } : {}),
         weekday,
         times: pattern.times,
         season,
@@ -367,6 +379,7 @@ function seedTenant(
           holder: { kind: 'entity', entityId: entity.id },
           status: date < today ? 'completed' : 'confirmed',
           channel: 'inPerson',
+          sport: pattern.sport,
           recurringBookingId: id,
         });
       }

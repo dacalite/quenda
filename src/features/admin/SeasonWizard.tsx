@@ -9,9 +9,10 @@ import { adminPaths } from '../../app/routes/paths';
 import type { RecurringBookingInput } from '../../data/ports/repositories';
 import { expandRecurring, type RecurringConflict } from '../../domain/rules/recurring';
 import { fromMinutes, toMinutes, zonedNow } from '../../domain/time';
-import type { Facility, IsoDate, Weekday } from '../../domain/types';
+import { needsSport } from '../../domain/sports';
+import type { Facility, IsoDate, Sport, Weekday } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
-import { useLocalized, useWeekdayName } from '../../i18n/labels';
+import { useLocalized, useSpaceLabel, useWeekdayName } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
 import { DataTable } from '../../ui/DataTable';
 import { DatePicker } from '../../ui/DatePicker';
@@ -66,6 +67,7 @@ function Wizard({
   const toast = useToast();
   const format = useFormat();
   const localized = useLocalized();
+  const spaceLabel = useSpaceLabel();
   const today = zonedNow(new Date(), tenant.timeZone).date;
   const heading = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
@@ -75,6 +77,9 @@ function Wizard({
   const [facilityId, setFacilityId] = useState(facilities[0]?.id ?? '');
   const facility = facilities.find((f) => f.id === facilityId);
   const [subspaceId, setSubspaceId] = useState(facility?.subspaces[0]?.id ?? '');
+  const [sport, setSport] = useState<Sport | null>(null);
+  const space = facility?.subspaces.find((s) => s.id === subspaceId);
+  const choosesSport = space ? needsSport(space) : false;
   const [weekday, setWeekday] = useState<Weekday>(1);
   const [start, setStart] = useState<string | null>(null);
   const [slots, setSlots] = useState(1);
@@ -104,6 +109,7 @@ function Wizard({
           entityId,
           facilityId,
           subspaceId,
+          ...(choosesSport && sport ? { sport } : {}),
           weekday,
           times: { start, end },
           season: { from, to },
@@ -128,6 +134,10 @@ function Wizard({
     switch (current) {
       case 'entity':
         return entityId ? [] : [{ fieldId: 'wizard-entity', message: t('wizard.errors.entity') }];
+      case 'place':
+        return choosesSport && !sport
+          ? [{ fieldId: 'wizard-sport', message: t('wizard.errors.sport') }]
+          : [];
       case 'time':
         return start ? [] : [{ fieldId: 'wizard-start', message: t('wizard.errors.start') }];
       case 'season':
@@ -193,6 +203,7 @@ function Wizard({
               onChange={(value) => {
                 setFacilityId(value);
                 setSubspaceId(facilities.find((f) => f.id === value)?.subspaces[0]?.id ?? '');
+                setSport(null);
                 setStart(null);
               }}
               options={facilities.map((f) => ({ id: f.id, label: f.name }))}
@@ -201,8 +212,25 @@ function Wizard({
               <Select
                 label={t('wizard.space')}
                 value={subspaceId}
-                onChange={setSubspaceId}
+                onChange={(value) => {
+                  setSubspaceId(value);
+                  setSport(null);
+                }}
                 options={facility.subspaces.map((s) => ({ id: s.id, label: localized(s.name) }))}
+              />
+            )}
+            {choosesSport && space && (
+              <Select
+                id="wizard-sport"
+                label={t('wizard.sport')}
+                placeholder={t('wizard.sportPlaceholder')}
+                value={sport}
+                isRequired
+                errorMessage={errorOf('wizard-sport')}
+                onChange={(value) => {
+                  setSport(space.sports.find((s) => s === value) ?? null);
+                }}
+                options={space.sports.map((s) => ({ id: s, label: t(`domain:sport.${s}`) }))}
               />
             )}
           </div>
@@ -276,7 +304,9 @@ function Wizard({
             <p>
               {t('wizard.summary', {
                 entity: entities.find((e) => e.id === entityId)?.name ?? '',
-                facility: facility?.name ?? '',
+                facility: facility
+                  ? `${facility.name} (${spaceLabel(facility, { subspaceId, sport: input.sport })})`
+                  : '',
                 day: weekdayName(weekday),
                 time: format.timeRange(input.times.start, input.times.end),
                 from: format.fullDate(input.season.from),

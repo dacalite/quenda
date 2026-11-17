@@ -61,7 +61,7 @@ Todas as pantallas completas, en móbil e escritorio, están en [`docs/capturas`
   <tr valign="top">
     <td>
       <ul>
-        <li>Buscar por tipo, día, franxa, accesibilidade física ou dispoñibilidade inmediata.</li>
+        <li>Buscar por tipo, deporte, día, franxa, accesibilidade física ou dispoñibilidade inmediata.</li>
         <li>Ver as franxas libres, coas horas de menos xente recomendadas.</li>
         <li>Reservar, cambiar e cancelar coas normas e o prezo visibles, e recibir un QR.</li>
         <li>Calendario mensual coas propias reservas e envío a Google Calendar, Outlook ou .ics.</li>
@@ -72,6 +72,7 @@ Todas as pantallas completas, en móbil e escritorio, están en [`docs/capturas`
       <ul>
         <li>Panel do día, axenda e reservas por teléfono ou no mostrador.</li>
         <li>Instalacións con fotos, horarios, festivos, normas e tarifas, sen código.</li>
+        <li>Espazos compartidos: os deportes de cada pista e que espazos ocupa a pista enteira.</li>
         <li>Bloqueos que avisan ás persoas afectadas e reservas de tempada dos clubs.</li>
         <li>Control de acceso por QR, indicadores con CSV e rexistro de actividade.</li>
         <li>Nome, escudo, cor, idiomas e textos legais configurables.</li>

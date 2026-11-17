@@ -6,7 +6,7 @@ import { useFacilities } from '../../app/queries';
 import { citizenPaths } from '../../app/routes/paths';
 import { addDays, weekdayOf, zonedNow } from '../../domain/time';
 import type { Facility, IsoDate, Reservation } from '../../domain/types';
-import { useSubspaceName } from '../../i18n/labels';
+import { useSpaceLabel } from '../../i18n/labels';
 import { Link } from '../../ui/Link';
 import { StatusBadge } from '../../ui/StatusBadge';
 import { Tab, TabList, TabPanel, Tabs } from '../../ui/Tabs';
@@ -91,11 +91,11 @@ function ReservationCard({
   const { t } = useTranslation(['citizen', 'domain']);
   const { tenant } = useCitizen();
   const paths = citizenPaths(tenant.slug);
-  const subspaceName = useSubspaceName();
+  const spaceLabel = useSpaceLabel();
   return (
     <Ticket
       reservation={reservation}
-      facilityName={`${facility.name}, ${subspaceName(facility, reservation.subspaceId)}`}
+      facilityName={`${facility.name}, ${spaceLabel(facility, reservation)}`}
       href={paths.reservation(reservation.id)}
       headingLevel={2}
       muted={Boolean(repeatDate)}
@@ -111,6 +111,7 @@ function ReservationCard({
             href={paths.availability(facility.id, {
               date: repeatDate,
               subspaceId: reservation.subspaceId,
+              sport: reservation.sport,
             })}
           >
             {t('reservations.repeat')}

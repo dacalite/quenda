@@ -92,6 +92,7 @@ export function Notifications() {
                           href={paths.availability(facility.id, {
                             date: reservation.date,
                             subspaceId: reservation.subspaceId,
+                            sport: reservation.sport,
                           })}
                         >
                           {t('notifications.relocate')}

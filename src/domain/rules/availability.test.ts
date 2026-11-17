@@ -116,7 +116,13 @@ describe('getAvailability', () => {
   it('keeps a shared space free until its capacity is reached', () => {
     const facility = makeFacility({
       subspaces: [
-        { id: 'gym', name: { gl: 'Ximnasio', es: 'Gimnasio' }, capacity: 2, contains: [] },
+        {
+          id: 'gym',
+          name: { gl: 'Ximnasio', es: 'Gimnasio' },
+          capacity: 2,
+          contains: [],
+          sports: [],
+        },
       ],
     });
     const one = [makeReservation({ subspaceId: 'gym' })];

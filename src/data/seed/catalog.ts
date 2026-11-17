@@ -9,6 +9,7 @@ import type {
   LocalizedText,
   Role,
   SlotMinutes,
+  Sport,
   Tenant,
   TextSize,
   TimeRange,
@@ -130,6 +131,7 @@ export interface RecurringSeed {
   entityKey: string;
   facilityKey: string;
   subspaceId: string;
+  sport?: Sport;
   weekdays: Weekday[];
   times: TimeRange;
 }
@@ -213,7 +215,7 @@ export const TENANTS: TenantSeed[] = [
         address: 'Rúa do Campo da Feira, 6, Bouzalonga',
         coordinates: { lat: 42.7615, lng: -8.1929 },
         capacity: 4,
-        subspaces: [subspace('main', 'Pista', 'Pista')],
+        subspaces: [subspace('main', 'Pista', 'Pista', { sports: ['padel'] })],
         accessibility: ['stepFreeAccess'],
         usageRules: COURT_RULES,
         pricing: {
@@ -238,7 +240,7 @@ export const TENANTS: TenantSeed[] = [
         address: 'Camiño do Souto, s/n, Bouzalonga',
         coordinates: { lat: 42.7598, lng: -8.1951 },
         capacity: 4,
-        subspaces: [subspace('main', 'Pista', 'Pista')],
+        subspaces: [subspace('main', 'Pista', 'Pista', { sports: ['tennis'] })],
         accessibility: [],
         usageRules: COURT_RULES,
         pricing: {
@@ -327,6 +329,7 @@ export const TENANTS: TenantSeed[] = [
         entityKey: 'futsal',
         facilityKey: 'pavillon',
         subspaceId: 'full',
+        sport: 'futsal',
         weekdays: [2, 4],
         times: range('19:00', '21:00'),
       },
@@ -407,8 +410,8 @@ export const TENANTS: TenantSeed[] = [
         coordinates: { lat: 42.5544, lng: -8.7489 },
         capacity: 8,
         subspaces: [
-          subspace('court-1', 'Pista 1', 'Pista 1'),
-          subspace('court-2', 'Pista 2', 'Pista 2'),
+          subspace('court-1', 'Pista 1', 'Pista 1', { sports: ['padel'] }),
+          subspace('court-2', 'Pista 2', 'Pista 2', { sports: ['padel'] }),
         ],
         accessibility: ['stepFreeAccess', 'adaptedToilet'],
         usageRules: COURT_RULES,
@@ -434,7 +437,7 @@ export const TENANTS: TenantSeed[] = [
         address: 'Paseo do Malecón, 5, Ribasmeiras',
         coordinates: { lat: 42.5547, lng: -8.7481 },
         capacity: 4,
-        subspaces: [subspace('main', 'Pista', 'Pista')],
+        subspaces: [subspace('main', 'Pista', 'Pista', { sports: ['tennis'] })],
         accessibility: ['stepFreeAccess'],
         usageRules: COURT_RULES,
         pricing: {
@@ -488,7 +491,9 @@ export const TENANTS: TenantSeed[] = [
         coordinates: { lat: 42.5522, lng: -8.7534 },
         capacity: 60,
         subspaces: [1, 2, 3, 4, 5, 6].map((n) =>
-          subspace(`lane-${String(n)}`, `Rúa ${String(n)}`, `Calle ${String(n)}`),
+          subspace(`lane-${String(n)}`, `Rúa ${String(n)}`, `Calle ${String(n)}`, {
+            sports: ['swimming'],
+          }),
         ),
         accessibility: ALL_FEATURES,
         usageRules: text(
@@ -600,6 +605,7 @@ export const TENANTS: TenantSeed[] = [
         entityKey: 'baloncesto',
         facilityKey: 'pavillon',
         subspaceId: 'full',
+        sport: 'basketball',
         weekdays: [1, 3],
         times: range('18:00', '20:00'),
       },
@@ -607,6 +613,7 @@ export const TENANTS: TenantSeed[] = [
         entityKey: 'patinaxe',
         facilityKey: 'pavillon',
         subspaceId: 'court-2',
+        sport: 'skating',
         weekdays: [2, 4],
         times: range('17:00', '19:00'),
       },

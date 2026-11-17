@@ -38,7 +38,8 @@
     "order": "«{{field}}»: o final ten que ser posterior ao inicio e o máximo non pode ser menor que o mínimo.",
     "overlap": "Os tramos de «{{field}}» solápanse.",
     "format": "«{{field}}» ten que ser unha cor no formato #RRGGBB, por exemplo #1A5E9A.",
-    "taken": "Xa hai outro concello con ese valor en «{{field}}». Escolle outro."
+    "taken": "Xa hai outro concello con ese valor en «{{field}}». Escolle outro.",
+    "mutual": "«{{field}}»: dous espazos non poden ocuparse o un ao outro."
   },
   "rules": {
     "minAdvanceHours": "Antelación mínima (horas)",
@@ -155,8 +156,11 @@
       "slot": "Escolle unha hora libre.",
       "taken": "Esa hora acaba de ocuparse. Escolle outra.",
       "noEmail": "Esta persoa non ten correo: envía a confirmación por SMS.",
-      "noPhone": "Esta persoa non ten teléfono: envía a confirmación por correo."
-    }
+      "noPhone": "Esta persoa non ten teléfono: envía a confirmación por correo.",
+      "sport": "Escolle o deporte para o que se reserva o espazo."
+    },
+    "sport": "Deporte",
+    "sportPlaceholder": "Escolle un deporte"
   },
   "record": {
     "title": "Reserva {{code}}",
@@ -245,13 +249,18 @@
       "inactive": "Non se pode reservar nin aparece no buscador. As reservas pasadas consérvanse."
     },
     "subspaces": "Espazos reservables",
-    "subspacesHelp": "Cada espazo resérvase por separado: as pistas dun pavillón, as rúas da piscina ou as prazas dun ximnasio.",
+    "subspacesHelp": "Cada espazo resérvase por separado: as pistas dun pavillón, as rúas da piscina ou as prazas dun ximnasio. Un mesmo espazo físico pode servir para varios deportes.",
     "space": "Espazo {{n}}",
     "spaceName": "Nome do espazo {{n}} en {{language}}",
     "spaceNameShort": "Nome en {{language}}",
     "spaceCapacity": "Reservas simultáneas do espazo {{n}}",
     "spaceCapacityShort": "Reservas simultáneas",
     "spaceCapacityHelp": "1 se o uso é exclusivo; máis para prazas compartidas.",
+    "spaceSports": "Deportes",
+    "spaceSportsHelp": "Se marcas máis dun, quen reserve escolle cal vai practicar. Déixao baleiro nunha sala ou nun ximnasio.",
+    "spaceContains": "Espazos que ocupa tamén o espazo {{n}}",
+    "spaceContainsShort": "Ao reservalo, ocupa tamén",
+    "spaceContainsHelp": "Por exemplo, a pista completa ocupa a pista 1 e a pista 2: reservada enteira, as dúas quedan ocupadas; e as dúas pódense reservar á vez para deportes distintos.",
     "addSpace": "Engadir un espazo",
     "removeSpace": "Quitar o espazo {{n}}",
     "accessibility": "Accesibilidade física",
@@ -442,8 +451,11 @@
       "entity": "Escolle a entidade.",
       "start": "Escolle a hora de inicio.",
       "from": "Escolle o primeiro día.",
-      "to": "O último día ten que ser posterior ao primeiro e non pode ter pasado."
-    }
+      "to": "O último día ten que ser posterior ao primeiro e non pode ter pasado.",
+      "sport": "Escolle o deporte que vai practicar o club."
+    },
+    "sport": "Deporte",
+    "sportPlaceholder": "Escolle un deporte"
   },
   "indicators": {
     "title": "Indicadores",

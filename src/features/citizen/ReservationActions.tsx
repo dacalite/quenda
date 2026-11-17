@@ -38,6 +38,7 @@ export function ReservationActions({
         href={paths.availability(reservation.facilityId, {
           date: reservation.date,
           subspaceId: reservation.subspaceId,
+          sport: reservation.sport,
           replaces: reservation.id,
         })}
       >

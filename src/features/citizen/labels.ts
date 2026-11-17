@@ -4,7 +4,7 @@ import { toIcs, type CalendarEvent } from '../../domain/ics';
 import type { AvailabilitySlot } from '../../domain/rules/availability';
 import type { Facility, Reservation, Tenant } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
-import { useSubspaceName } from '../../i18n/labels';
+import { useSpaceLabel, useSubspaceName } from '../../i18n/labels';
 
 /** Badge tone for each reservation status. */
 export const RESERVATION_TONE = {
@@ -39,10 +39,10 @@ export function useSlotDescription(facility: Facility) {
 /** A reservation as a calendar event: the same text for the .ics file and the Google and Outlook links. */
 export function useCalendarEvent() {
   const { t } = useTranslation('citizen');
-  const subspaceName = useSubspaceName();
+  const spaceLabel = useSpaceLabel();
   return (reservation: Reservation, facility: Facility): CalendarEvent => ({
     uid: `${reservation.id}@quenda`,
-    summary: `${facility.name}, ${subspaceName(facility, reservation.subspaceId)}`,
+    summary: `${facility.name}, ${spaceLabel(facility, reservation)}`,
     location: facility.address,
     description: `${t('reservation.code')}: ${reservation.code}`,
     date: reservation.date,

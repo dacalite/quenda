@@ -9,7 +9,8 @@ import { adminPaths } from '../../app/routes/paths';
 import { ConflictError, RuleViolationError } from '../../data/ports/errors';
 import type { ReservationInput } from '../../data/ports/repositories';
 import { zonedNow } from '../../domain/time';
-import type { Channel, Facility, IsoDate, User } from '../../domain/types';
+import { needsSport } from '../../domain/sports';
+import type { Channel, Facility, IsoDate, Sport, User } from '../../domain/types';
 import { useFormat } from '../../i18n/format';
 import { useLocalized, useViolationText } from '../../i18n/labels';
 import { Button } from '../../ui/Button';
@@ -25,6 +26,7 @@ import { useStaff, useStaffMutation, useStaffQuery } from './queries';
 
 const SLOT_FIELD_ID = 'booking-slot';
 const CONFIRM_FIELD_ID = 'booking-confirm';
+const SPORT_FIELD_ID = 'booking-sport';
 type Confirmation = 'none' | 'sms' | 'email';
 
 export function NewBooking() {
@@ -63,6 +65,7 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
       '',
   );
   const requestedDate = params.get('data');
+  const [sport, setSport] = useState<Sport | null>(null);
   const [date, setDate] = useState<IsoDate>(
     requestedDate && requestedDate >= today ? requestedDate : today,
   );
@@ -77,6 +80,8 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
     (s) => s.subspaceId === subspaceId && s.status === 'free',
   );
   const slot = free.find((s) => s.start === start);
+  const space = facility?.subspaces.find((s) => s.id === subspaceId);
+  const choosesSport = space ? needsSport(space) : false;
 
   const input: ReservationInput | null =
     person && slot
@@ -86,6 +91,7 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
           date,
           start: slot.start,
           end: slot.end,
+          ...(choosesSport && sport ? { sport } : {}),
           holder: { kind: 'user', userId: person.id },
           channel,
           notes,
@@ -100,11 +106,16 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
     r.reservations.create(id, booking),
   );
 
+  // A missing sport is asked for in the form, not reported as a broken rule.
+  const violations = (quote.data?.violations ?? []).filter((v) => v.code !== 'sportRequired');
   const errorOf = (fieldId: string) => errors.find((e) => e.fieldId === fieldId)?.message;
 
   const submit = () => {
     const found: FormError[] = [
       ...(person ? [] : [{ fieldId: PERSON_FIELD_ID, message: t('newBooking.errors.person') }]),
+      ...(choosesSport && !sport
+        ? [{ fieldId: SPORT_FIELD_ID, message: t('newBooking.errors.sport') }]
+        : []),
       ...(slot ? [] : [{ fieldId: SLOT_FIELD_ID, message: t('newBooking.errors.slot') }]),
       ...(confirmation === 'email' && person && !person.email
         ? [{ fieldId: CONFIRM_FIELD_ID, message: t('newBooking.errors.noEmail') }]
@@ -166,6 +177,7 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
               onChange={(value) => {
                 setFacilityId(value);
                 setSubspaceId(facilities.find((f) => f.id === value)?.subspaces[0]?.id ?? '');
+                setSport(null);
                 setStart(null);
               }}
               options={facilities.map((f) => ({ id: f.id, label: f.name }))}
@@ -176,9 +188,29 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
                 value={subspaceId}
                 onChange={(value) => {
                   setSubspaceId(value);
+                  if (
+                    sport &&
+                    !facility.subspaces.find((s) => s.id === value)?.sports.includes(sport)
+                  ) {
+                    setSport(null);
+                  }
                   setStart(null);
                 }}
                 options={facility.subspaces.map((s) => ({ id: s.id, label: localized(s.name) }))}
+              />
+            )}
+            {choosesSport && space && (
+              <Select
+                id={SPORT_FIELD_ID}
+                label={t('newBooking.sport')}
+                placeholder={t('newBooking.sportPlaceholder')}
+                value={sport}
+                isRequired
+                errorMessage={errorOf(SPORT_FIELD_ID)}
+                onChange={(value) => {
+                  setSport(space.sports.find((s) => s === value) ?? null);
+                }}
+                options={space.sports.map((s) => ({ id: s, label: t(`domain:sport.${s}`) }))}
               />
             )}
             <DatePicker
@@ -259,11 +291,11 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
                 tariff: t(`domain:tariff.${quote.data.price.tariff}`),
               })}
             </p>
-            {quote.data.violations.length > 0 && (
+            {violations.length > 0 && (
               <div className={layout.notice} data-tone="danger">
                 <p>{t('newBooking.blocked')}</p>
                 <ul>
-                  {quote.data.violations.map((v) => (
+                  {violations.map((v) => (
                     <li key={v.code}>{violationText(v)}</li>
                   ))}
                 </ul>
@@ -273,11 +305,7 @@ function NewBookingForm({ facilities }: { facilities: Facility[] }) {
         )}
 
         <p>
-          <Button
-            type="submit"
-            variant="primary"
-            isDisabled={Boolean(quote.data && quote.data.violations.length > 0)}
-          >
+          <Button type="submit" variant="primary" isDisabled={violations.length > 0}>
             {t('newBooking.submit')}
           </Button>
         </p>
